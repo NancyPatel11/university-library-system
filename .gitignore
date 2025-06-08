@@ -1,0 +1,10 @@
+# Node.js
+frontend/node_modules
+frontend/dist
+
+# Java (Maven/Gradle)
+backend/target
+backend/build
+
+# Environment files
+**/.env*
