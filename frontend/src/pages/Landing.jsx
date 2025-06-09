@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom';
 import bg from "../assets/images/bg.png";
 import bookicon from "../assets/icons/logo.svg";
 import { sampleBooks } from '../assets/index.js';
@@ -12,6 +13,7 @@ export const Landing = () => {
             style={{
                 backgroundImage: `url(${bg})`,
                 backgroundSize: 'cover',
+                backgroundPosition: 'top',
             }}
         >
             <div className="flex gap-10 h-full items-center">
@@ -29,13 +31,17 @@ export const Landing = () => {
                         </div>
 
                         <div className='flex gap-4'>
-                            <Button className='bg-yellow text-black ibm-plex-sans-700 text-xl p-6 border-2 border-yellow hover:bg-transparent hover:text-white hover:cursor-pointer transition-all duration-300'>
-                                Login
-                            </Button>
+                            <Link to="/login">
+                                <Button className="bg-yellow text-black ibm-plex-sans-700 text-xl p-6 border-2 border-yellow hover:bg-transparent hover:text-white hover:cursor-pointer transition-all duration-300">
+                                    Login
+                                </Button>
+                            </Link>
 
-                            <Button className='text-white bg-transparent ibm-plex-sans-700 text-xl border-2 border-yellow p-6 hover:bg-yellow hover:text-black hover:cursor-pointer transition-colors duration-300' variant='outline'>
-                                Register
-                            </Button>
+                            <Link to="/register">
+                                <Button className="text-white bg-transparent ibm-plex-sans-700 text-xl border-2 border-yellow p-6 hover:bg-yellow hover:text-black hover:cursor-pointer transition-colors duration-300" variant="outline">
+                                    Register
+                                </Button>
+                            </Link>
                         </div>
                     </div>
                 </div>

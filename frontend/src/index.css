@@ -4,9 +4,12 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-    --color-yellow: #E7C9A5; 
-    --color-light-blue: #D6E0FF
-  }
+    --color-yellow: #E7C9A5;
+    --color-light-blue: #D6E0FF;
+    --color-dark-start: #12141D;
+    --color-dark-end: #12151F;
+    --color-form-field: #232839;
+}
 
 .ibm-plex-sans-100 {
     font-family: "IBM Plex Sans", sans-serif;
@@ -147,7 +150,8 @@
     --color-sidebar-accent: var(--sidebar-accent);
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
     --color-sidebar-border: var(--sidebar-border);
-    --color-sidebar-ring: var(--sidebar-ring);}
+    --color-sidebar-ring: var(--sidebar-ring);
+}
 
 :root {
     --radius: 0.625rem;
@@ -181,7 +185,8 @@
     --sidebar-accent: oklch(0.968 0.007 247.896);
     --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
     --sidebar-border: oklch(0.929 0.013 255.508);
-    --sidebar-ring: oklch(0.704 0.04 256.788);}
+    --sidebar-ring: oklch(0.704 0.04 256.788);
+}
 
 .dark {
     --background: oklch(0.129 0.042 264.695);
@@ -214,10 +219,15 @@
     --sidebar-accent: oklch(0.279 0.041 260.031);
     --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
     --sidebar-border: oklch(1 0 0 / 10%);
-    --sidebar-ring: oklch(0.551 0.027 264.364);}
+    --sidebar-ring: oklch(0.551 0.027 264.364);
+}
 
 @layer base {
-  * {
-    @apply border-border outline-ring/50;}
-  body {
-    @apply bg-background text-foreground;}}
+    * {
+        @apply border-border outline-ring/50;
+    }
+
+    body {
+        @apply bg-background text-foreground;
+    }
+}
