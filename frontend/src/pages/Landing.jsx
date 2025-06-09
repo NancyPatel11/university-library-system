@@ -3,6 +3,7 @@ import bg from "../assets/images/bg.png";
 import bookicon from "../assets/icons/logo.svg";
 import { sampleBooks } from '../assets/index.js';
 import BookCoverSvg from '../components/BookCoverSvg.jsx';
+import { Button } from '@/components/ui/button';
 
 export const Landing = () => {
     return (
@@ -21,9 +22,21 @@ export const Landing = () => {
                         <br /> System
                     </h1>
 
-                    <div className="flex items-center gap-3">
-                        <img src={bookicon} alt="book icon" className="h-14" />
-                        <h3 className=" text-white ibm-plex-sans-500 text-5xl">Bookademia</h3>
+                    <div className="flex items-start gap-10 flex-col">
+                        <div className='flex items-center gap-3'>
+                            <img src={bookicon} alt="book icon" className="h-14" />
+                            <h3 className=" text-white ibm-plex-sans-500 text-5xl">Bookademia</h3>
+                        </div>
+
+                        <div className='flex gap-4'>
+                            <Button className='bg-yellow text-black ibm-plex-sans-700 text-xl p-6 border-2 border-yellow hover:bg-transparent hover:text-white hover:cursor-pointer transition-all duration-300'>
+                                Login
+                            </Button>
+
+                            <Button className='text-white bg-transparent ibm-plex-sans-700 text-xl border-2 border-yellow p-6 hover:bg-yellow hover:text-black hover:cursor-pointer transition-colors duration-300' variant='outline'>
+                                Register
+                            </Button>
+                        </div>
                     </div>
                 </div>
 
