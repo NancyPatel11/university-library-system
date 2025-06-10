@@ -72,6 +72,7 @@ export const Register = () => {
                 method: "POST",
                 // IMPORTANT: Do NOT set Content-Type header when sending FormData
                 body: formData,
+                credentials: "include"
             });
 
             const result = await response.json(); 
@@ -80,8 +81,7 @@ export const Register = () => {
                 toast.error(result.message || "Registration failed. Please try again.");
                 return;
             }
-
-            localStorage.setItem("token", result.token);
+            
             toast.success("Registration successful!");
 
             setTimeout(() => {

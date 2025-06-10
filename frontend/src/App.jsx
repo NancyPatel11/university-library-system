@@ -1,4 +1,5 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import {ProtectedRoute} from './auth/ProtectedRoute';
 import { Toaster } from 'sonner';
 import { Landing } from "./pages/Landing"
 import { Login } from "./pages/Login";
@@ -13,7 +14,14 @@ function App() {
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/home" element={<Home />} />
+        <Route
+          path="/home"
+          element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </BrowserRouter>
   )

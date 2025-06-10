@@ -48,6 +48,7 @@ export const Login = () => {
                     email: values.email,
                     password: values.password,
                 }),
+                credentials: "include",
             });
 
             const result = await response.json(); 
@@ -57,7 +58,6 @@ export const Login = () => {
                 return;
             }
 
-            localStorage.setItem("token", result.token);
             toast.success("Login successful!");
 
             setTimeout(() => {
