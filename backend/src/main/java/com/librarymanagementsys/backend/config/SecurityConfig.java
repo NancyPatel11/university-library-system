@@ -30,16 +30,15 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, CorsConfigurationSource corsConfigurationSource) throws Exception {
         http
-                .cors()  // <--- enable Spring Security CORS support
-                .and()
-                .csrf().disable()
-                .authorizeHttpRequests()
-                .requestMatchers("/api/user/register", "/api/user/login").permitAll()
-                .anyRequest().authenticated()
-                .and()
-                .formLogin().disable();
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/user/login", "/api/user/register", "/api/auth/check-token").permitAll()
+                        .anyRequest().authenticated()
+                )
+                .cors(cors -> cors.configurationSource(corsConfigurationSource)) // <- Modern usage
+                .formLogin(form -> form.disable());
 
         return http.build();
     }
