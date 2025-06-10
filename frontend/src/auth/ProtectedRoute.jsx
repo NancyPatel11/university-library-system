@@ -1,6 +1,7 @@
 // src/components/ProtectedRoute.jsx
 import React, { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
+import { toast } from "sonner";
 
 export const ProtectedRoute = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(null); // null = loading
@@ -13,10 +14,14 @@ export const ProtectedRoute = ({ children }) => {
                     credentials: "include",
                 });
 
+                const data = await response.json(); 
+
                 if (response.ok) {
                     setIsAuthenticated(true);
+                    
                 } else {
                     setIsAuthenticated(false);
+                    toast.error(data.message || "Authentication failed. Please log in again.");
                 }
             } catch (error) {
                 console.error("Auth check failed", error);

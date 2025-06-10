@@ -1,12 +1,11 @@
 package com.librarymanagementsys.backend.controller;
 
+import com.librarymanagementsys.backend.security.JwtUtil;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -14,19 +13,38 @@ import java.util.Map;
 @RequestMapping("/api/auth")
 public class AuthController {
 
+    @Autowired
+    private JwtUtil jwtUtil;
+
     @GetMapping("/check-token")
     public ResponseEntity<?> checkAuth(HttpSession session) {
         String jwt = (String) session.getAttribute("jwt");
-        String email = (String) session.getAttribute("email");
+        String sessionEmail = (String) session.getAttribute("email");
+        System.out.println("Checking authentication for session with email: " + sessionEmail);
 
-        if (jwt == null || email == null) {
+        if (jwt == null || sessionEmail == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("message", "User not authenticated"));
         }
 
+        // Validate token and extract email
+        if (!jwtUtil.validateToken(jwt)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "Invalid or expired token"));
+        }
+
+        String tokenEmail = jwtUtil.extractEmail(jwt);
+
+        if (!tokenEmail.equals(sessionEmail)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "Token email mismatch"));
+        }
+
+        System.out.println("User authenticated with email: " + tokenEmail);
         return ResponseEntity.ok(Map.of(
-                "message", "Authenticated",
-                "email", email
+                "message", "User is authenticated",
+                "email", tokenEmail,
+                "token", jwt
         ));
     }
 }
