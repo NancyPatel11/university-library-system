@@ -2,12 +2,12 @@
 
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
+import {toast} from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import {
     Form,
     FormControl,
-    FormDescription,
     FormField,
     FormItem,
     FormLabel,
@@ -23,22 +23,76 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash, faFileUpload } from '@fortawesome/free-solid-svg-icons';
 
 const formSchema = z.object({
-    email: z.string().email(),
-    password: z.string().min(6),
-})
+    fullName: z.string().min(1, "Full Name is required"),
+    email: z.string().email("Invalid email address"),
+    universityId: z
+        .string()
+        .min(1, "University ID is required")
+        .refine((val) => !/\s/.test(val), {
+            message: "University ID cannot contain spaces",
+        }),
+    password: z
+        .string()
+        .min(8, "Password must be at least 8 characters")
+        .regex(/[A-Z]/, "Must contain at least one uppercase letter")
+        .regex(/[!@#$%^&*(),.?":{}|<>]/, "Must contain at least one special character"),
+    // idCard: z
+    //     .any()
+    //     .refine(
+    //         (file) => file instanceof File && ['image/jpeg', 'image/png', 'image/jpg'].includes(file.type),
+    //         { message: "ID Card must be a JPG, JPEG, or PNG image" }
+    //     ),
+});
 
 export const Register = () => {
     const form = useForm({
         resolver: zodResolver(formSchema),
         defaultValues: {
+            fullName: "",
             email: "",
+            universityId: "",
             password: "",
+            // idCard: null,
         },
-    })
+    });
 
-    const onSubmit = (values) => {
-        console.log(values)
-    }
+    const onSubmit = async (values) => {
+        const formData = new FormData();
+        formData.append("fullName", values.fullName);
+        formData.append("email", values.email);
+        formData.append("universityId", values.universityId);
+        formData.append("password", values.password);
+
+        // Example if you have a file input like <input type="file" id="fileInput" />
+        // and you get the file from values.idCard or however you handle files:
+        // formData.append("idCard", values.idCard);
+
+        try {
+            const response = await fetch("http://localhost:8080/api/user/register", {
+                method: "POST",
+                // IMPORTANT: Do NOT set Content-Type header when sending FormData
+                body: formData,
+            });
+
+            const result = await response.json(); 
+            
+            if (!response.ok) {
+                toast.error(result.message || "Registration failed. Please try again.");
+                return;
+            }
+
+            localStorage.setItem("token", result.token);
+            toast.success("Registration successful!");
+
+            setTimeout(() => {
+                window.location.href = "http://localhost:5173/home";
+            }, 1500);
+
+        } catch (error) {
+            console.error("Error:", error);
+            toast.error("Something went wrong. Please try again.");
+        }
+    };
 
     const [showPassword, setShowPassword] = useState(false);
 
@@ -126,7 +180,7 @@ export const Register = () => {
                                                 <FormLabel className='text-light-blue ibm-plex-sans-400'>Password</FormLabel>
                                                 <FormControl>
                                                     <div className="relative">
-                                                        <Input type="password" placeholder="Enter your password" {...field} className='rounded-xs text-light-blue bg-form-field border-form-field p-5' />
+                                                        <Input type={showPassword ? "text" : "password"} placeholder="Enter your password" {...field} className='rounded-xs text-light-blue bg-form-field border-form-field p-5' />
                                                         <button
                                                             type="button"
                                                             onClick={() => setShowPassword(!showPassword)}
@@ -140,7 +194,7 @@ export const Register = () => {
                                             </FormItem>
                                         )}
                                     />
-                                    <FormField
+                                    {/* <FormField
                                         control={form.control}
                                         name="idCard"
                                         render={({ field }) => (
@@ -156,7 +210,7 @@ export const Register = () => {
                                                         <input
                                                             id="idCardUpload"
                                                             type="file"
-                                                            accept=".jpg,.jpeg,.png,.pdf"
+                                                            accept=".jpg,.jpeg,.png"
                                                             onChange={(e) => field.onChange(e.target.files ? e.target.files[0] : null)}
                                                             className="hidden"
                                                         />
@@ -167,7 +221,7 @@ export const Register = () => {
                                                 <FormMessage />
                                             </FormItem>
                                         )}
-                                    />
+                                    /> */}
                                     <Button type="submit" className="w-full text-black border-1 bg-yellow p-5 rounded-xs border-yellow hover:bg-transparent hover:cursor-pointer hover:text-white mt-5 ibm-plex-sans-600 ">Register</Button>
                                 </form>
                             </Form>

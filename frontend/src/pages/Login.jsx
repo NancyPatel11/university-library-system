@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import {
@@ -23,9 +24,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 
 const formSchema = z.object({
-    email: z.string().email(),
-    password: z.string().min(6),
-})
+    email: z.string().email().nonempty(),
+    password: z.string().min(8).nonempty(),
+});
 
 export const Login = () => {
     const form = useForm({
@@ -36,9 +37,38 @@ export const Login = () => {
         },
     })
 
-    const onSubmit = (values) => {
-        console.log(values)
-    }
+    const onSubmit = async (values) => {
+        try {
+            const response = await fetch("http://localhost:8080/api/user/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    email: values.email,
+                    password: values.password,
+                }),
+            });
+
+            const result = await response.json(); 
+            
+            if (!response.ok) {
+                toast.error(result.message || "Login failed. Please try again.");
+                return;
+            }
+
+            localStorage.setItem("token", result.token);
+            toast.success("Login successful!");
+
+            setTimeout(() => {
+                window.location.href = "http://localhost:5173/home";
+            }, 1500);
+
+        } catch (error) {
+            console.error("Login error:", error);
+            toast.error("Something went wrong. Please try again.");
+        }
+    };
 
     const [showPassword, setShowPassword] = useState(false);
 
@@ -89,7 +119,7 @@ export const Login = () => {
                                                 <FormLabel className='text-light-blue ibm-plex-sans-400'>Password</FormLabel>
                                                 <FormControl>
                                                     <div className="relative">
-                                                        <Input type="password" placeholder="Enter your password" {...field} className='rounded-xs text-light-blue bg-form-field border-form-field p-5 ibm-plex-sans-400 ' />
+                                                        <Input type={showPassword ? "text" : "password"} placeholder="Enter your password" {...field} className='rounded-xs text-light-blue bg-form-field border-form-field p-5 ibm-plex-sans-400 ' />
                                                         <button
                                                             type="button"
                                                             onClick={() => setShowPassword(!showPassword)}
