@@ -22,6 +22,7 @@ import loginImg from "../assets/images/auth.jpg";
 import bookicon from "../assets/icons/logo.svg";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import { Loader } from '@/components/Loader';
 
 const formSchema = z.object({
     email: z.string().email().nonempty(),
@@ -29,6 +30,8 @@ const formSchema = z.object({
 });
 
 export const Login = () => {
+    const [loading, setLoading] = useState(false);
+
     const form = useForm({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -38,6 +41,7 @@ export const Login = () => {
     })
 
     const onSubmit = async (values) => {
+        setLoading(true);
         try {
             const response = await fetch("http://localhost:8080/api/user/login", {
                 method: "POST",
@@ -51,8 +55,8 @@ export const Login = () => {
                 credentials: "include",
             });
 
-            const result = await response.json(); 
-            
+            const result = await response.json();
+
             if (!response.ok) {
                 toast.error(result.message || "Login failed. Please try again.");
                 return;
@@ -73,7 +77,7 @@ export const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
 
 
-    return (
+    return loading ? <Loader /> :
         <div
             className="h-screen bg-center bg-no-repeat"
             style={{
@@ -153,5 +157,4 @@ export const Login = () => {
                 </div>
             </div>
         </div>
-    )
 }

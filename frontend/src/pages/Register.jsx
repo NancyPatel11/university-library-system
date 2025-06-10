@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import {toast} from "sonner";
+import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import {
@@ -21,6 +21,7 @@ import registerImg from "../assets/images/auth.jpg";
 import bookicon from "../assets/icons/logo.svg";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash, faFileUpload } from '@fortawesome/free-solid-svg-icons';
+import { Loader } from '@/components/Loader';
 
 const formSchema = z.object({
     fullName: z.string().min(1, "Full Name is required"),
@@ -45,6 +46,8 @@ const formSchema = z.object({
 });
 
 export const Register = () => {
+    const [loading, setLoading] = useState(false);
+
     const form = useForm({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -57,6 +60,8 @@ export const Register = () => {
     });
 
     const onSubmit = async (values) => {
+        setLoading(true);
+
         const formData = new FormData();
         formData.append("fullName", values.fullName);
         formData.append("email", values.email);
@@ -75,13 +80,13 @@ export const Register = () => {
                 credentials: "include"
             });
 
-            const result = await response.json(); 
-            
+            const result = await response.json();
+
             if (!response.ok) {
                 toast.error(result.message || "Registration failed. Please try again.");
                 return;
             }
-            
+
             toast.success("Registration successful!");
 
             setTimeout(() => {
@@ -97,7 +102,7 @@ export const Register = () => {
     const [showPassword, setShowPassword] = useState(false);
 
 
-    return (
+    return loading ? <Loader /> :
         <div
             className="h-screen bg-center bg-no-repeat"
             style={{
@@ -242,5 +247,4 @@ export const Register = () => {
                 </div>
             </div>
         </div>
-    )
 }
