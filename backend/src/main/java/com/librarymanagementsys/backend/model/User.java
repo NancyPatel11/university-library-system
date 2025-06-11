@@ -18,12 +18,18 @@ public class User {
     private String email;
     private String universityId;
     private String password;
+    private String idCardName;
+    private String idCardType;
+    private byte[] idCard;
 
-    public User(String fullName, String email, String universityId, String password) {
+    public User(String fullName, String email, String universityId, String password, String idCardName, String idCardType, byte[] idCard) {
         this.fullName = fullName;
         this.email = email;
         this.universityId = universityId;
         this.password = password;
+        this.idCardName = idCardName;
+        this.idCardType = idCardType;
+        this.idCard = idCard;
     }
 
 }

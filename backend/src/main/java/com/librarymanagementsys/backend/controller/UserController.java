@@ -2,13 +2,19 @@ package com.librarymanagementsys.backend.controller;
 
 import com.librarymanagementsys.backend.dto.LoginRequest;
 import com.librarymanagementsys.backend.dto.RegisterRequest;
+import com.librarymanagementsys.backend.exception.UserNotFoundException;
 import com.librarymanagementsys.backend.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.net.URLConnection;
 import java.time.LocalDateTime;
 import java.util.Map;
 
@@ -20,11 +26,13 @@ public class UserController {
     private UserService userService;
 
     @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Map<String, Object>> registerUser(@ModelAttribute RegisterRequest request, HttpSession session) {
-        String generatedJwtToken = userService.registerUser(request);
+    public ResponseEntity<Map<String, Object>> registerUser(
+            @RequestPart("request") RegisterRequest request,
+            @RequestPart("idCardImage") MultipartFile idCardImage,
+            HttpSession session) {
 
-        // Store in session
-        session.setAttribute("jwt", generatedJwtToken);
+        String jwt = userService.registerUser(request, idCardImage);
+        session.setAttribute("jwt", jwt);
         session.setAttribute("email", request.getEmail());
 
         return ResponseEntity.ok(Map.of(
@@ -47,5 +55,12 @@ public class UserController {
                 "status", 200,
                 "message", "Login successful"
         ));
+    }
+
+    @GetMapping("/idcard")
+    public ResponseEntity<byte[]> getIdCard(HttpSession session) {
+        String email = (String) session.getAttribute("email");
+
+        return userService.getUserIdCardResponse(email); // fully delegated
     }
 }
