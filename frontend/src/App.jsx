@@ -6,6 +6,7 @@ import { Login } from "./pages/Login";
 import { Register } from './pages/Register';
 import { Home } from './pages/Home';
 import { Profile } from './pages/Profile';
+import { BookDetails } from './pages/BookDetails';
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/bookdetails" element={<BookDetails />} />
       </Routes>
     </BrowserRouter>
   )
