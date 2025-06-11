@@ -25,6 +25,14 @@ function App() {
           }
         />
         <Route
+          path="/bookdetails"
+          element={
+            <ProtectedRoute>
+              <BookDetails />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/profile"
           element={
             <ProtectedRoute>
@@ -32,7 +40,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route path="/bookdetails" element={<BookDetails />} />
       </Routes>
     </BrowserRouter>
   )
