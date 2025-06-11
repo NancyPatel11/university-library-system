@@ -37,12 +37,12 @@ const formSchema = z.object({
         .min(8, "Password must be at least 8 characters")
         .regex(/[A-Z]/, "Must contain at least one uppercase letter")
         .regex(/[!@#$%^&*(),.?":{}|<>]/, "Must contain at least one special character"),
-    // idCard: z
-    //     .any()
-    //     .refine(
-    //         (file) => file instanceof File && ['image/jpeg', 'image/png', 'image/jpg'].includes(file.type),
-    //         { message: "ID Card must be a JPG, JPEG, or PNG image" }
-    //     ),
+    idCard: z
+        .any()
+        .refine(
+            (file) => file instanceof File && ['image/jpeg', 'image/png', 'image/jpg'].includes(file.type),
+            { message: "ID Card must be a JPG, JPEG, or PNG image" }
+        ),
 });
 
 export const Register = () => {
@@ -55,7 +55,7 @@ export const Register = () => {
             email: "",
             universityId: "",
             password: "",
-            // idCard: null,
+            idCard: null,
         },
     });
 
@@ -63,19 +63,24 @@ export const Register = () => {
         setLoading(true);
 
         const formData = new FormData();
-        formData.append("fullName", values.fullName);
-        formData.append("email", values.email);
-        formData.append("universityId", values.universityId);
-        formData.append("password", values.password);
 
-        // Example if you have a file input like <input type="file" id="fileInput" />
-        // and you get the file from values.idCard or however you handle files:
-        // formData.append("idCard", values.idCard);
+        // Add JSON as a Blob
+        const requestPayload = {
+            fullName: values.fullName,
+            email: values.email,
+            universityId: values.universityId,
+            password: values.password
+        };
+        formData.append("request", new Blob([JSON.stringify(requestPayload)], {
+            type: "application/json"
+        }));
+
+        // Add the image
+        formData.append("idCardImage", values.idCard); // assuming values.idCard is File
 
         try {
             const response = await fetch("http://localhost:8080/api/user/register", {
                 method: "POST",
-                // IMPORTANT: Do NOT set Content-Type header when sending FormData
                 body: formData,
                 credentials: "include"
             });
@@ -83,20 +88,20 @@ export const Register = () => {
             const result = await response.json();
 
             if (!response.ok) {
-                toast.error(result.message || "Registration failed. Please try again.");
+                toast.error(result.message || "Registration failed");
+                setLoading(false);
                 return;
             }
 
-            toast.success("Registration successful!");
-
+            toast.success("Registered successfully!");
             setTimeout(() => {
                 window.location.href = "http://localhost:5173/home";
             }, 1500);
 
         } catch (error) {
             console.error("Error:", error);
-            toast.error("Something went wrong. Please try again.");
-        }
+            toast.error("Something went wrong.");
+        } 
     };
 
     const [showPassword, setShowPassword] = useState(false);
@@ -199,34 +204,36 @@ export const Register = () => {
                                             </FormItem>
                                         )}
                                     />
-                                    {/* <FormField
+                                    <FormField
                                         control={form.control}
                                         name="idCard"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-light-blue ibm-plex-sans-400">Upload University ID Card (file upload)</FormLabel>
+                                                <FormLabel className="text-light-blue ibm-plex-sans-400">
+                                                    Upload University ID Card (file upload)
+                                                </FormLabel>
                                                 <FormControl>
                                                     <label
                                                         htmlFor="idCardUpload"
                                                         className="flex items-center justify-center gap-3 cursor-pointer rounded-xs bg-form-field border-form-field p-5 text-light-blue hover:bg-gray-700 transition-colors"
                                                     >
                                                         <FontAwesomeIcon icon={faFileUpload} className="text-xl" />
-                                                        <span className="ibm-plex-sans-400 text-light-blue">Upload ID card</span>
+                                                        <span className="ibm-plex-sans-400 text-light-blue">
+                                                            {field.value ? field.value.name : "Upload ID card"}
+                                                        </span>
                                                         <input
                                                             id="idCardUpload"
                                                             type="file"
                                                             accept=".jpg,.jpeg,.png"
-                                                            onChange={(e) => field.onChange(e.target.files ? e.target.files[0] : null)}
+                                                            onChange={(e) => field.onChange(e.target.files?.[0] || null)}
                                                             className="hidden"
                                                         />
                                                     </label>
-
-
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
                                         )}
-                                    /> */}
+                                    />
                                     <Button type="submit" className="w-full text-black border-1 bg-yellow p-5 rounded-xs border-yellow hover:bg-transparent hover:cursor-pointer hover:text-white mt-5 ibm-plex-sans-600 ">Register</Button>
                                 </form>
                             </Form>

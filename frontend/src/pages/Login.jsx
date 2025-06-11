@@ -59,6 +59,7 @@ export const Login = () => {
 
             if (!response.ok) {
                 toast.error(result.message || "Login failed. Please try again.");
+                setLoading(false);
                 return;
             }
 
