@@ -33,7 +33,7 @@ export const Home = () => {
               <p className='text-xl'>Total Books:  <span className='text-yellow ibm-plex-sans-600'>{book1.total_copies}</span></p>
               <p className='text-xl'>Available Books:  <span className='text-yellow ibm-plex-sans-600'>{book1.available_copies}</span></p>
             </div>
-            <p className='text-xl text-light-blue mt-10'>{book1.summary}</p>
+            <p className='text-xl text-light-blue mt-10'>{book1.description}</p>
             <Button className='text-2xl bebas-neue-400 bg-yellow text-dark-end mt-10 rounded-xs border-2 border-yellow hover:bg-yellow-dark hover:border-yellow-dark hover:cursor-pointer'>
               <FontAwesomeIcon icon={faBookOpen} /> BORROW BOOK REQUEST
             </Button>
