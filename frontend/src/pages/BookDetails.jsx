@@ -1,6 +1,6 @@
 import React from 'react'
 import { NavBar } from '@/components/NavBar';
-import { sampleBooks } from '../assets/index.js';
+import sampleBooks from '../assets/sampleBooks.json';
 import BookCoverSvg from '../components/BookCoverSvg.jsx';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar } from '@fortawesome/free-regular-svg-icons';
@@ -67,12 +67,23 @@ export const BookDetails = () => {
           <div className='w-3/5'>
             <h1 className='text-2xl text-light-blue mb-10'>Video</h1>
             {/* Add video player */}
-            <p className='text-xl text-light-blue mt-10 ibm-plex-sans-400'>{book1.summary}</p>
+            <iframe
+              width="900" height="575"
+              src={`${book1.video}`}
+              frameborder="0" allowfullscreen>
+            </iframe>
+            <p className='text-xl text-light-blue mt-10 ibm-plex-sans-400 w-10/11'>
+              {book1.summary.split("\n\n").map((para, i) => (
+                <span key={i}>
+                  {para}
+                  <br /><br />
+                </span>
+              ))}</p>
           </div>
           <div className='w-2/5'>
             <h1 className='text-2xl text-light-blue mb-10'>Popular Books</h1>
 
-            <div className='flex flex-wrap gap-6 justify-start mt-5'>
+            <div className='flex flex-wrap gap-6 justify-start'>
               {sampleBooks.slice(1, 7).map((book, index) => (
                 <div key={index} className="relative">
                   <BookCoverSvg coverColor={book.color} width={160} height={220} />
