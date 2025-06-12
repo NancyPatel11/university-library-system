@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { NavBar } from '@/components/NavBar';
 import BookCoverSvg from '../components/BookCoverSvg.jsx';
@@ -6,19 +6,19 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar } from '@fortawesome/free-regular-svg-icons';
 import { faBookOpen } from '@fortawesome/free-solid-svg-icons';
 import bg from "../assets/images/bg.png";
+import noBooksFoundImg from "../assets/images/no-books.png";
 import { Button } from '@/components/ui/button.jsx';
 import { Loader } from '@/components/Loader.jsx';
 import { toast } from 'sonner';
 
 export const Home = () => {
-
-  const [allBooks, setAllBooks] = useState(null);
-  const [book1, setBook1] = useState(null);
+  const [allBooks, setAllBooks] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchBooks = async () => {
       try {
-        const response = await fetch("http://localhost:8080/api/books/allBooks",{
+        const response = await fetch("http://localhost:8080/api/books/allBooks", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -31,24 +31,48 @@ export const Home = () => {
         }
 
         const data = await response.json();
-
-        if(data.length === 0) {
+        setAllBooks(data);
+        if (data.length === 0) {
           toast.error("No books available at the moment. Please check back later.");
         }
-
-        setBook1(data[0]);
-        setAllBooks(data);
       } catch (error) {
         console.error("Error fetching books:", error);
+      } finally {
+        setLoading(false); // loader stops here
       }
     };
 
     fetchBooks();
   }, []);
 
-  if(!allBooks || !book1) {
+  if (loading) {
     return <Loader message={"Loading books... 📚"} />;
   }
+
+  if (allBooks.length === 0) {
+    return (
+      <div
+        className="h-full bg-center bg-no-repeat"
+        style={{
+          backgroundImage: `url(${bg})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'top',
+        }}
+      >
+        <div className='px-20 py-12'>
+          <NavBar />
+          <div className='flex flex-col items-center justify-center h-screen ibm-plex-sans-600'>
+            <img src={noBooksFoundImg} alt="No Books Found" className="max-w-md" />
+            <h1 className='text-white text-4xl mt-10'>No Books in the Library Currently</h1>
+            <p className='text-light-blue text-2xl mt-5'>Please check back later</p>
+          </div>
+
+        </div>
+      </div>
+    );
+  }
+
+  const book1 = allBooks[0];
 
   return (
     <div
