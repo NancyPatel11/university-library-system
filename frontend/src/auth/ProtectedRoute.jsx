@@ -1,6 +1,7 @@
 // src/components/ProtectedRoute.jsx
 import React, { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
+import { Loader } from "@/components/Loader";
 import { toast } from "sonner";
 
 export const ProtectedRoute = ({ children }) => {
@@ -14,11 +15,11 @@ export const ProtectedRoute = ({ children }) => {
                     credentials: "include",
                 });
 
-                const data = await response.json(); 
+                const data = await response.json();
 
                 if (response.ok) {
                     setIsAuthenticated(true);
-                    
+
                 } else {
                     setIsAuthenticated(false);
                     toast.error(data.message || "Authentication failed. Please log in again.");
@@ -33,7 +34,7 @@ export const ProtectedRoute = ({ children }) => {
     }, []);
 
     if (isAuthenticated === null) {
-        return <div>Loading...</div>; // or a loader component
+        return <Loader message={"Authenticating... 🔒"} />; 
     }
 
     if (!isAuthenticated) {

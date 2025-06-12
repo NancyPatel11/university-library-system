@@ -7,6 +7,7 @@ import { faStar } from '@fortawesome/free-regular-svg-icons';
 import { faBookOpen } from '@fortawesome/free-solid-svg-icons';
 import bg from "../assets/images/bg.png";
 import { Button } from '@/components/ui/button.jsx';
+import { Loader } from '@/components/Loader.jsx';
 import { toast } from 'sonner';
 
 export const Home = () => {
@@ -45,8 +46,8 @@ export const Home = () => {
     fetchBooks();
   }, []);
 
-  if(!allBooks) {
-    return <div className="text-white text-2xl px-20 py-12">Loading books...</div>;
+  if(!allBooks || !book1) {
+    return <Loader message={"Loading books... 📚"} />;
   }
 
   return (

@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import bg from "../assets/images/bg.png";
 
-export const Loader = () => {
+export const Loader = ({message}) => {
     useEffect(() => {
         // Inject keyframes only once
         const style = document.createElement('style');
@@ -30,11 +30,6 @@ export const Loader = () => {
         animationTimingFunction: 'ease-in-out',
         animationIterationCount: 'infinite',
     };
-
-    const centerElement = {
-        margin: "auto",
-        width: "50%"
-    }
 
     return (
         <div
@@ -79,7 +74,7 @@ export const Loader = () => {
                         </div>
                     </div>
                 </div>
-                <p className="text-lg text-light-blue mt-4">Logging you into <strong>Bookademia</strong> 📚</p>
+                <p className="text-lg text-light-blue mt-4">{message}</p>
 
 
 
