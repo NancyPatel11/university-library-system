@@ -60,7 +60,7 @@ export const Home = () => {
         }}
       >
         <div className='px-20 py-12'>
-          <NavBar />
+          <NavBar homeColor={'yellow'} />
           <div className='flex flex-col items-center justify-center h-screen ibm-plex-sans-600'>
             <img src={noBooksFoundImg} alt="No Books Found" className="max-w-md" />
             <h1 className='text-white text-4xl mt-10'>No Books in the Library Currently</h1>
@@ -84,7 +84,7 @@ export const Home = () => {
       }}
     >
       <div className='px-20 py-12'>
-        <NavBar />
+        <NavBar homeColor={'yellow'} />
 
         <div className="flex mt-14 ibm-plex-sans-400 text-white justify-between items-center gap-100">
           <div className='w-1/2'>

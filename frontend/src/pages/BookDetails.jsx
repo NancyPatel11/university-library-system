@@ -87,7 +87,7 @@ export const BookDetails = () => {
       }}
     >
       <div className='px-20 py-12'>
-        <NavBar />
+        <NavBar homeColor={'yellow'} />
 
         <div className="flex mt-14 ibm-plex-sans-400 text-white justify-between items-center gap-100">
           <div className='w-1/2'>
