@@ -13,7 +13,7 @@ export const Home = () => {
 
   return (
     <div
-      className="h-full bg-center bg-no-repeat"
+      className="h-screen bg-center bg-no-repeat"
       style={{
         backgroundImage: `url(${bg})`,
         backgroundSize: 'cover',
