@@ -30,4 +30,16 @@ public class BookService {
             throw new RuntimeException("Error retrieving book: " + e.getMessage());
         }
     }
+
+    public List<Book> searchBooks(String keyword) {
+        try {
+            List<Book> books = bookRepository.findByTitleContainingIgnoreCaseOrAuthorContainingIgnoreCaseOrGenreContainingIgnoreCase(keyword, keyword, keyword);
+            if (books.isEmpty()) {
+                return List.of(); // Return an empty list if no books found
+            }
+            return books;
+        } catch (Exception e) {
+            throw new RuntimeException("Error searching books: " + e.getMessage());
+        }
+    }
 }

@@ -20,4 +20,9 @@ public class BookController {
     public ResponseEntity<?> getBookById(@PathVariable String bookId) {
         return ResponseEntity.ok(bookService.getBookById(bookId));
     }
+
+    @GetMapping("/search/{keyword}")
+    public ResponseEntity<?> searchBooks(@PathVariable String keyword) {
+        return ResponseEntity.ok(bookService.searchBooks(keyword));
+    }
 }

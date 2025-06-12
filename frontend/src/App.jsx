@@ -7,6 +7,7 @@ import { Register } from './pages/Register';
 import { Home } from './pages/Home';
 import { Profile } from './pages/Profile';
 import { BookDetails } from './pages/BookDetails';
+import { Search } from './pages/Search';
 
 function App() {
   return (
@@ -29,6 +30,14 @@ function App() {
           element={
             <ProtectedRoute>
               <BookDetails />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/search"
+          element={
+            <ProtectedRoute>
+              <Search />
             </ProtectedRoute>
           }
         />
