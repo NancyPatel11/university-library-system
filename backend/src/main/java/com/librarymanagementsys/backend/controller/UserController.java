@@ -63,4 +63,19 @@ public class UserController {
 
         return userService.getUserIdCardResponse(email); // fully delegated
     }
+
+    @GetMapping("/profile")
+    public ResponseEntity<?> getUserByEmail(HttpSession session) {
+        String email = (String) session.getAttribute("email");
+        try {
+            return ResponseEntity.ok(userService.getUserByEmail(email));
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
+                    "timestamp", LocalDateTime.now(),
+                    "status", 404,
+                    "message", e.getMessage()
+            ));
+        }
+    }
+    
 }

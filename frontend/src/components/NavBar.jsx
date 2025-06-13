@@ -1,9 +1,9 @@
 import React from 'react'
 import bookicon from "../assets/icons/logo.svg";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowRightFromBracket } from '@fortawesome/free-solid-svg-icons';
+import logoutSvg from "../assets/icons/logout.svg";
 
-export const NavBar = ({homeColor, searchColor}) => {
+export const NavBar = ({ homeColor, searchColor, userColor }) => {
+
     return (
         <div className='flex ibm-plex-sans-400 text-white items-center justify-between'>
             <div className='flex items-center gap-3'>
@@ -14,8 +14,8 @@ export const NavBar = ({homeColor, searchColor}) => {
                 <ul className='flex gap-8 text-xl'>
                     <li className={`text-${homeColor}`}><a href="/home">Home</a></li>
                     <li className={`text-${searchColor}`}><a href="/search">Search</a></li>
-                    <li className='text-light-blue font-bold'><a href="/profile">User</a></li>
-                    <li><a href=""><FontAwesomeIcon icon={faArrowRightFromBracket} className='text-red-500'/></a></li>
+                    <li className={`text-${userColor}`}><a href="/profile">Profile</a></li>
+                    <li><a href=""><img src={logoutSvg} alt="" className='h-7' /></a></li>
                 </ul>
             </div>
         </div>
