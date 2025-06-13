@@ -4,6 +4,23 @@ import logoutSvg from "../assets/icons/logout.svg";
 
 export const NavBar = ({ homeColor, searchColor, userColor }) => {
 
+    const handleLogout = async () => {
+        try {
+            const response = await fetch("http://localhost:8080/api/user/logout", {
+                method: "GET",
+                credentials: "include",
+            });
+
+            if (response.ok) {
+                window.location.href = "/login"; // Redirect to login page after logout
+            } else {
+                console.error("Logout failed");
+            }
+        } catch (error) {
+            console.error("Error during logout:", error);
+        }
+    }
+
     return (
         <div className='flex ibm-plex-sans-400 text-white items-center justify-between'>
             <div className='flex items-center gap-3'>
@@ -15,7 +32,7 @@ export const NavBar = ({ homeColor, searchColor, userColor }) => {
                     <li className={`text-${homeColor}`}><a href="/home">Home</a></li>
                     <li className={`text-${searchColor}`}><a href="/search">Search</a></li>
                     <li className={`text-${userColor}`}><a href="/profile">Profile</a></li>
-                    <li><a href=""><img src={logoutSvg} alt="" className='h-7' /></a></li>
+                    <li onClick={handleLogout}><a href=""><img src={logoutSvg} alt="" className='h-7' /></a></li>
                 </ul>
             </div>
         </div>

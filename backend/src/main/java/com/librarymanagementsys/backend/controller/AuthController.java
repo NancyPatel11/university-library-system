@@ -18,9 +18,15 @@ public class AuthController {
 
     @GetMapping("/check-token")
     public ResponseEntity<?> checkAuth(HttpSession session) {
+        Boolean wasLoggedOut = (Boolean) session.getAttribute("loggedOut");
+
+        if (Boolean.TRUE.equals(wasLoggedOut)) {
+            session.invalidate(); // invalidate session after the frontend sees 204
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build(); // 204 = logout
+        }
+
         String jwt = (String) session.getAttribute("jwt");
         String sessionEmail = (String) session.getAttribute("email");
-        System.out.println("Checking authentication for session with email: " + sessionEmail);
 
         if (jwt == null || sessionEmail == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -40,7 +46,6 @@ public class AuthController {
                     .body(Map.of("message", "Token email mismatch"));
         }
 
-        System.out.println("User authenticated with email: " + tokenEmail);
         return ResponseEntity.ok(Map.of(
                 "message", "User is authenticated",
                 "email", tokenEmail,

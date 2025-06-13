@@ -12,9 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.net.URLConnection;
 import java.time.LocalDateTime;
 import java.util.Map;
 
@@ -77,5 +74,14 @@ public class UserController {
             ));
         }
     }
-    
+
+    @GetMapping("/logout")
+    public ResponseEntity<?> logoutUser(HttpSession session) {
+        session.setAttribute("loggedOut", true);
+        return ResponseEntity.ok(Map.of(
+                "timestamp", LocalDateTime.now(),
+                "status", 200,
+                "message", "User logged out successfully"
+        ));
+    }
 }

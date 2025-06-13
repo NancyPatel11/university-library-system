@@ -15,11 +15,17 @@ export const ProtectedRoute = ({ children }) => {
                     credentials: "include",
                 });
 
+                // ✅ 204 No Content = logged out, do NOT show error toast
+                if (response.status === 204) {
+                    setIsAuthenticated(false);
+                    toast.success("Logged out successfully! 👋");
+                    return;
+                }
+
                 const data = await response.json();
 
                 if (response.ok) {
                     setIsAuthenticated(true);
-
                 } else {
                     setIsAuthenticated(false);
                     toast.error(data.message || "Authentication failed. Please log in again.");
@@ -34,7 +40,7 @@ export const ProtectedRoute = ({ children }) => {
     }, []);
 
     if (isAuthenticated === null) {
-        return <Loader message={"Authenticating... 🔒"} />; 
+        return <Loader message={"Authenticating... 🔒"} />;
     }
 
     if (!isAuthenticated) {
