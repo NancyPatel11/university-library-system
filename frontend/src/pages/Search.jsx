@@ -3,6 +3,15 @@ import { Link } from 'react-router-dom';
 import { Loader } from '@/components/Loader';
 import { NavBar } from '@/components/NavBar';
 import { Button } from '@/components/ui/button.jsx';
+import {
+    Pagination,
+    PaginationContent,
+    PaginationEllipsis,
+    PaginationItem,
+    PaginationLink,
+    PaginationNext,
+    PaginationPrevious,
+} from "@/components/ui/pagination"
 import { toast } from 'sonner';
 import BookCoverSvg from '../components/BookCoverSvg.jsx';
 import bg from "../assets/images/bg.png";
@@ -13,7 +22,9 @@ export const Search = () => {
     const [loading, setLoading] = useState(true);
     const [searchValue, setSearchValue] = useState("");
     const [flag, setFlag] = useState(false);
-
+    const [currentPage, setCurrentPage] = useState(1);
+    const booksPerPage = 7;
+    const totalPages = Math.ceil(allBooks.length / booksPerPage);
 
     const fetchBooks = async () => {
         setFlag(false); // Reset flag before fetching books
@@ -46,6 +57,10 @@ export const Search = () => {
     useEffect(() => {
         fetchBooks();
     }, []);
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [currentPage]);
 
     const handleSearch = async (e) => {
         e.preventDefault(); // Prevent page reload on submit
@@ -162,6 +177,7 @@ export const Search = () => {
                        hover:bg-yellow-dark hover:cursor-pointer" onClick={() => {
                                 setSearchValue("");     // clear search bar
                                 fetchBooks();           // fetch all books again
+                                setCurrentPage(1); // reset to first page
                                 toast.success("Search cleared, showing all books.");
                             }}>
                             Clear Search
@@ -172,34 +188,144 @@ export const Search = () => {
                     <div className='text-white ibm-plex-sans-500 mt-18'>
                         <h1 className='text-3xl text-light-blue mb-10'>Search Results</h1>
                         <div className='flex flex-wrap gap-10 justify-start mt-5'>
-                            {allBooks.slice(0, 12).map((book, index) => (
-                                <div key={index} className="relative">
-                                    <Link to={`/bookdetails/${book.id}`}>
-                                        <BookCoverSvg coverColor={book.color} width={200} height={280} />
-                                        <img
-                                            src={book.cover}
-                                            alt={book.title}
-                                            className="absolute top-0 left-4 w-[183px] h-[245px] object-fit rounded-lg"
-                                        />
-                                        <div className="mt-3 w-[183px]">
-                                            <h2 className="text-lg w-[183px]">{book.title} - By {book.author}</h2>
-                                            <p className="text-sm text-light-blue italic truncate">{book.genre}</p>
-                                        </div>
-                                    </Link>
-                                </div>
-                            ))}
+                            {allBooks
+                                .slice((currentPage - 1) * booksPerPage, currentPage * booksPerPage)
+                                .map((book, index) => (
+                                    <div key={index} className="relative h-[400px]">
+                                        <Link to={`/bookdetails/${book.id}`}>
+                                            <BookCoverSvg coverColor={book.color} width={200} height={280} />
+                                            <img
+                                                src={book.cover}
+                                                alt={book.title}
+                                                className="absolute top-0 left-4 w-[183px] h-[245px] object-fit rounded-lg"
+                                            />
+                                            <div className="mt-3 w-[183px]">
+                                                <h2 className="text-lg w-[183px]">{book.title} - By {book.author}</h2>
+                                                <p className="text-sm text-light-blue italic truncate">{book.genre}</p>
+                                            </div>
+                                        </Link>
+                                    </div>
+                                ))}
                         </div>
-                        <Button
-                            className="text-md mt-10 px-13 ibm-plex-sans-600 bg-yellow text-dark-end rounded-xs 
+                        <div className='flex flex-wrap gap-3 items-baseline justify-between mt-14'>
+                            <Button
+                                className="text-md px-13 ibm-plex-sans-600 bg-yellow text-dark-end rounded-xs 
         hover:bg-yellow-dark hover:cursor-pointer"
-                            onClick={() => {
-                                setSearchValue("");
-                                fetchBooks();
-                                toast.success("Search cleared, showing all books.");
-                            }}
-                        >
-                            Clear Search
-                        </Button>
+                                onClick={() => {
+                                    setSearchValue("");
+                                    fetchBooks();
+                                    setCurrentPage(1); // Reset to first page
+                                    toast.success("Search cleared, showing all books.");
+                                }}
+                            >
+                                Clear Search
+                            </Button>
+                            <Pagination className="text-light-blue">
+                                <PaginationContent>
+                                    {/* Previous */}
+                                    <PaginationItem className="bg-search-bar rounded-sm">
+                                        <PaginationPrevious
+                                            href="#"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                if (currentPage > 1) setCurrentPage(currentPage - 1);
+                                            }}
+                                        />
+                                    </PaginationItem>
+
+                                    {/* Pages logic */}
+                                    {totalPages <= 5 ? (
+                                        // Case: Show all pages when totalPages is 5 or fewer
+                                        [...Array(totalPages)].map((_, index) => (
+                                            <PaginationItem key={index} className="bg-search-bar rounded-sm">
+                                                <PaginationLink
+                                                    href="#"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        setCurrentPage(index + 1);
+                                                    }}
+                                                    className={currentPage === index + 1 ? "bg-yellow border-yellow text-black" : ""}
+                                                >
+                                                    {index + 1}
+                                                </PaginationLink>
+                                            </PaginationItem>
+                                        ))
+                                    ) : (
+                                        // Case: totalPages > 5
+                                        <>
+                                            {/* First page always */}
+                                            <PaginationItem className="bg-search-bar rounded-sm">
+                                                <PaginationLink
+                                                    href="#"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        setCurrentPage(1);
+                                                    }}
+                                                    className={currentPage === 1 ? "bg-yellow border-yellow text-black" : ""}
+                                                >
+                                                    1
+                                                </PaginationLink>
+                                            </PaginationItem>
+
+                                            {/* Ellipsis after 1 if currentPage > 2 */}
+                                            {currentPage > 2 && (
+                                                <PaginationItem>
+                                                    <PaginationEllipsis />
+                                                </PaginationItem>
+                                            )}
+
+                                            {/* Show current page if not 1 or totalPages */}
+                                            {currentPage !== 1 && currentPage !== totalPages && (
+                                                <PaginationItem className="bg-search-bar rounded-sm">
+                                                    <PaginationLink
+                                                        href="#"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            setCurrentPage(currentPage);
+                                                        }}
+                                                        className="bg-yellow border-yellow text-black"
+                                                    >
+                                                        {currentPage}
+                                                    </PaginationLink>
+                                                </PaginationItem>
+                                            )}
+
+                                            {/* Ellipsis before last page if currentPage < totalPages - 1 */}
+                                            {currentPage < totalPages - 1 && (
+                                                <PaginationItem>
+                                                    <PaginationEllipsis />
+                                                </PaginationItem>
+                                            )}
+
+                                            {/* Last page always */}
+                                            <PaginationItem className="bg-search-bar rounded-sm">
+                                                <PaginationLink
+                                                    href="#"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        setCurrentPage(totalPages);
+                                                    }}
+                                                    className={currentPage === totalPages ? "bg-yellow border-yellow text-black" : ""}
+                                                >
+                                                    {totalPages}
+                                                </PaginationLink>
+                                            </PaginationItem>
+                                        </>
+                                    )}
+
+                                    {/* Next */}
+                                    <PaginationItem className="bg-search-bar rounded-sm">
+                                        <PaginationNext
+                                            href="#"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+                                            }}
+                                        />
+                                    </PaginationItem>
+                                </PaginationContent>
+                            </Pagination>
+                        </div>
                     </div>
                 }
             </div>
