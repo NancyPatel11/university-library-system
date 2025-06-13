@@ -72,6 +72,29 @@ export const BookDetails = () => {
     fetchBooks();
   }, []);
 
+  const handleBorrowRequest = async () => {
+    try {
+      const response = await fetch(`http://localhost:8080/api/user/borrowbook/${book.id}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to send borrow request");
+      }
+
+      const result = await response.json();
+      toast.success(result.message || "Borrow request sent successfully!");
+    }
+    catch (error) {
+      console.error("Error sending borrow request:", error);
+      toast.error(error.message || "Something went wrong while sending the borrow request.");
+    }
+  }
+
   if (!allBooks || !book) {
     return <Loader message={"Loading book details... 📘"} />;
   }
@@ -100,7 +123,7 @@ export const BookDetails = () => {
               <p className='text-xl'>Available Books:  <span className='text-yellow ibm-plex-sans-600'>{book.available_copies}</span></p>
             </div>
             <p className='text-xl text-light-blue mt-10'>{book.description}</p>
-            <Button className='text-2xl bebas-neue-400 bg-yellow text-dark-end mt-10 rounded-xs border-2 border-yellow hover:bg-yellow-dark hover:border-yellow-dark hover:cursor-pointer'>
+            <Button onClick={handleBorrowRequest} className='text-2xl bebas-neue-400 bg-yellow text-dark-end mt-10 rounded-xs border-2 border-yellow hover:bg-yellow-dark hover:border-yellow-dark hover:cursor-pointer'>
               <FontAwesomeIcon icon={faBookOpen} /> BORROW BOOK REQUEST
             </Button>
           </div>

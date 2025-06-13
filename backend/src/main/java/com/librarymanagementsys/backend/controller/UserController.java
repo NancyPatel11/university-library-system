@@ -84,4 +84,10 @@ public class UserController {
                 "message", "User logged out successfully"
         ));
     }
+
+    @GetMapping("/borrowbook/{bookId}")
+    public ResponseEntity<?> borrowBook(@PathVariable String bookId, HttpSession session) {
+        String email = (String) session.getAttribute("email");
+        return ResponseEntity.ok(userService.borrowBook(bookId, email));
+    }
 }

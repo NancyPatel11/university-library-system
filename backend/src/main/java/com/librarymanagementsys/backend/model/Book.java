@@ -21,8 +21,8 @@ public class Book {
     private String cover;
     private String color;
     private String description;
-    private String total_copies;
-    private String available_copies;
+    private int total_copies;
+    private int available_copies;
     private String video;
     private String summary;
 }
