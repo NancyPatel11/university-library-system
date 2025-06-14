@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
@@ -31,6 +31,8 @@ const formSchema = z.object({
 
 export const Login = () => {
     const [loading, setLoading] = useState(false);
+    const [role, setRole] = useState("student");
+    const navigate = useNavigate();
 
     const form = useForm({
         resolver: zodResolver(formSchema),
@@ -43,7 +45,10 @@ export const Login = () => {
     const onSubmit = async (values) => {
         setLoading(true);
         try {
-            const response = await fetch("http://localhost:8080/api/user/login", {
+            const endpoint = role === "admin"
+                ? "http://localhost:8080/api/admin/login"
+                : "http://localhost:8080/api/user/login";
+            const response = await fetch(endpoint, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -66,7 +71,7 @@ export const Login = () => {
             toast.success("Login successful!");
 
             setTimeout(() => {
-                window.location.href = "http://localhost:5173/home";
+                navigate(role === "student" ? "/home" : "/admin-dashboard");
             }, 1500);
 
         } catch (error) {
@@ -102,6 +107,28 @@ export const Login = () => {
                         <p className='text-light-blue ibm-plex-sans-400 mt-4'>Access the vast collection of resources, and stay updated</p>
 
                         <div className='mt-16'>
+                            <div className="flex gap-3 mb-6">
+                                <Button
+                                    type="button"
+                                    onClick={() => setRole("student")}
+                                    className={`hover:cursor-pointer hover:bg-yellow-dark hover:text-black ${role === "student"
+                                        ? "bg-yellow text-black"
+                                        : "bg-form-field text-light-blue"
+                                        }`}
+                                >
+                                    Student
+                                </Button>
+                                <Button
+                                    type="button"
+                                    onClick={() => setRole("admin")}
+                                    className={`hover:cursor-pointer hover:bg-yellow-dark hover:text-black ${role === "admin"
+                                        ? "bg-yellow text-black"
+                                        : "bg-form-field text-light-blue"
+                                        }`}
+                                >
+                                    Admin
+                                </Button>
+                            </div>
                             <Form {...form} >
                                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                                     <FormField

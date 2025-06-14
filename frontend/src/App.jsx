@@ -8,6 +8,7 @@ import { Home } from './pages/Home';
 import { Profile } from './pages/Profile';
 import { BookDetails } from './pages/BookDetails';
 import { Search } from './pages/Search';
+import { AdminDashboard } from './pages/admin/AdminDashboard';
 
 function App() {
   return (
@@ -46,6 +47,15 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={["student", "admin"]}>
               <Profile />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin-dashboard"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AdminDashboard />
             </ProtectedRoute>
           }
         />
