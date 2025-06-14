@@ -79,12 +79,8 @@ public class UserController {
 
     @GetMapping("/logout")
     public ResponseEntity<?> logoutUser(HttpSession session) {
-        session.setAttribute("loggedOut", true);
-        return ResponseEntity.ok(Map.of(
-                "timestamp", LocalDateTime.now(),
-                "status", 200,
-                "message", "User logged out successfully"
-        ));
+        session.invalidate();
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/borrowbook/{bookId}")

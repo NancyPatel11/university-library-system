@@ -53,4 +53,10 @@ public class AdminController {
         ));
     }
 
+    @GetMapping("/logout")
+    public ResponseEntity<?> logoutAdmin(HttpSession session) {
+        session.invalidate();
+        return ResponseEntity.noContent().build();
+    }
+
 }

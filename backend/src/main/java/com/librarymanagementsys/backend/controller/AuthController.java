@@ -18,12 +18,6 @@ public class AuthController {
 
     @GetMapping("/check-token")
     public ResponseEntity<?> checkAuth(HttpSession session) {
-        Boolean wasLoggedOut = (Boolean) session.getAttribute("loggedOut");
-
-        if (Boolean.TRUE.equals(wasLoggedOut)) {
-            session.invalidate(); // invalidate session after the frontend sees 204
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build(); // 204 = logout
-        }
 
         String jwt = (String) session.getAttribute("jwt");
         String sessionEmail = (String) session.getAttribute("email");
