@@ -1,5 +1,5 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import {ProtectedRoute} from './auth/ProtectedRoute';
+import { ProtectedRoute } from './auth/ProtectedRoute';
 import { Toaster } from 'sonner';
 import { Landing } from "./pages/Landing"
 import { Login } from "./pages/Login";
@@ -20,7 +20,7 @@ function App() {
         <Route
           path="/home"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={["student"]}>
               <Home />
             </ProtectedRoute>
           }
@@ -28,7 +28,7 @@ function App() {
         <Route
           path="/bookdetails/:bookId"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={["student"]}>
               <BookDetails />
             </ProtectedRoute>
           }
@@ -36,7 +36,7 @@ function App() {
         <Route
           path="/search"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={["student"]}>
               <Search />
             </ProtectedRoute>
           }
@@ -44,7 +44,7 @@ function App() {
         <Route
           path="/profile"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={["student", "admin"]}>
               <Profile />
             </ProtectedRoute>
           }

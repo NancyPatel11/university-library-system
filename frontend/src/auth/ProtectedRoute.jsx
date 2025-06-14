@@ -1,11 +1,12 @@
 // src/components/ProtectedRoute.jsx
 import React, { useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { Loader } from "@/components/Loader";
 import { toast } from "sonner";
 
-export const ProtectedRoute = ({ children }) => {
-    const [isAuthenticated, setIsAuthenticated] = useState(null); // null = loading
+export const ProtectedRoute = ({ children, allowedRoles }) => {
+    const [authState, setAuthState] = useState({ loading: true, authorized: false });
+    const location = useLocation();
 
     useEffect(() => {
         const checkAuth = async () => {
@@ -15,36 +16,44 @@ export const ProtectedRoute = ({ children }) => {
                     credentials: "include",
                 });
 
-                // ✅ 204 No Content = logged out, do NOT show error toast
                 if (response.status === 204) {
-                    setIsAuthenticated(false);
-                    toast.success("Logged out successfully! 👋");
+                    // Session exists but user is logged out
+                    setAuthState({ loading: false, authorized: false });
+                    toast.success("Logged out successfully 👋");
                     return;
                 }
 
                 const data = await response.json();
 
-                if (response.ok) {
-                    setIsAuthenticated(true);
-                } else {
-                    setIsAuthenticated(false);
+                if (!response.ok) {
                     toast.error(data.message || "Authentication failed. Please log in again.");
+                    setAuthState({ loading: false, authorized: false });
+                    return;
                 }
+
+                const userRole = data.role;
+                if (allowedRoles && !allowedRoles.includes(userRole)) {
+                    toast.error("Unauthorized: Access denied");
+                    setAuthState({ loading: false, authorized: false });
+                    return;
+                }
+
+                // All good
+                setAuthState({ loading: false, authorized: true });
             } catch (error) {
-                console.error("Auth check failed", error);
-                setIsAuthenticated(false);
+                console.error("Error during auth check:", error);
+                toast.error("Could not verify authentication.");
+                setAuthState({ loading: false, authorized: false });
             }
         };
 
         checkAuth();
-    }, []);
+    }, [allowedRoles]);
 
-    if (isAuthenticated === null) {
-        return <Loader message={"Authenticating... 🔒"} />;
-    }
+    if (authState.loading) return <Loader message={"Authenticating... 🔒"} />;
 
-    if (!isAuthenticated) {
-        return <Navigate to="/login" replace />;
+    if (!authState.authorized) {
+        return <Navigate to="/login" replace state={{ from: location }} />;
     }
 
     return children;

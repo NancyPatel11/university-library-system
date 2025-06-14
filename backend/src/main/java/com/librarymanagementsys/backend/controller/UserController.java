@@ -31,6 +31,7 @@ public class UserController {
         String jwt = userService.registerUser(request, idCardImage);
         session.setAttribute("jwt", jwt);
         session.setAttribute("email", request.getEmail());
+        session.setAttribute("role", "student");
 
         return ResponseEntity.ok(Map.of(
                 "timestamp", LocalDateTime.now(),
@@ -46,6 +47,7 @@ public class UserController {
         // Store in session
         session.setAttribute("jwt", token);
         session.setAttribute("email", request.getEmail());
+        session.setAttribute("role", "student");
 
         return ResponseEntity.ok(Map.of(
                 "timestamp", LocalDateTime.now(),
