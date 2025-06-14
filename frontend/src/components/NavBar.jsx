@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/context/authContext';
 import { toast } from 'sonner';
 import bookicon from "../assets/icons/logo.svg";
@@ -11,7 +11,7 @@ import bookSvg from "../assets/icons/admin/book.svg";
 import bookMarkSvg from "../assets/icons/admin/bookmark.svg";
 import userFallBackImg from "../assets/icons/user.svg";
 
-export const NavBar = () => {
+export const NavBar = ({ homeColor, searchColor, userColor }) => {
     const { auth, setAuth } = useAuth();
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState("Home"); // default active
@@ -46,9 +46,9 @@ export const NavBar = () => {
                     </h3>
                 </div>
                 <ul className='flex gap-8 text-xl'>
-                    <li className='text-admin-primary-blue'><a href="/home">Home</a></li>
-                    <li><a href="/search">Search</a></li>
-                    <li><a href="/profile">Profile</a></li>
+                    <li className={`text-${homeColor}`}><Link to="/home">Home</Link></li>
+                    <li className={`text-${searchColor}`}><Link to="/search">Search</Link></li>
+                    <li><Link to="/profile"><img src={userFallBackImg} alt="" className={`p-1 rounded-full h-7 ${userColor ? `bg-${userColor}` : 'bg-gray-100'}`} /></Link></li>
                     <li onClick={handleLogout}><img src={logoutSvg} alt="logout" className='h-7 cursor-pointer' /></li>
                 </ul>
             </div>
@@ -56,7 +56,7 @@ export const NavBar = () => {
     }
 
     return (
-        <div className="h-screen w-64 bg-white text-admin-primary-black flex flex-col">
+        <div className="h-full min-h-screen min-w-85 bg-white text-admin-primary-black flex flex-col">
             <div className="flex items-center gap-3 p-6 border-b">
                 <div className="h-10 w-10 rounded-full bg-admin-primary-blue flex items-center justify-center">
                     <img src={bookicon} alt="book icon" className="h-6 w-6 object-contain" />
@@ -70,10 +70,17 @@ export const NavBar = () => {
                 <AdminNavItem icon={bookMarkSvg} to="/borrow-requests" label="Borrow Requests" active={activeTab === "Borrow Requests"} onClick={() => setActiveTab("Borrow Requests")} />
                 <AdminNavItem icon={userSvg} to="/account-requests" label="Account Requests" active={activeTab === "Account Requests"} onClick={() => setActiveTab("Account Requests")} />
             </nav>
-            <div className="p-4 m-5 border border-gray-200 rounded-full ibm-plex-sans-400">
+            <div className="p-4 m-12 border border-gray-200 rounded-full ibm-plex-sans-400">
                 <button onClick={handleLogout} className="flex items-center gap-2 text-admin-primary-blue">
-                    <img src={userFallBackImg} alt="" className='bg-gray-200 p-1 rounded-full' />
-                    <div className='truncate'>{auth.email}</div>
+                    <img src={userFallBackImg} alt="" className='bg-gray-200 p-1 rounded-full h-10' />
+                    <div className='flex flex-col items-start'>
+                        <div className='text-admin-primary-black'>
+                            {auth.name}
+                        </div>
+                        <div className='text-admin-secondary-black'>
+                            {auth.email}
+                        </div>
+                    </div>
                     <img src={logoutSvg} alt="logout" className='h-7 cursor-pointer' />
                 </button>
             </div>

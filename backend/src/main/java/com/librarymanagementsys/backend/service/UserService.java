@@ -10,6 +10,7 @@ import com.librarymanagementsys.backend.model.BorrowedBook;
 import com.librarymanagementsys.backend.model.User;
 import com.librarymanagementsys.backend.repository.UserRepository;
 import com.librarymanagementsys.backend.security.JwtUtil;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -64,11 +65,13 @@ public class UserService {
         return jwtUtil.generateToken(user.getEmail());
     }
 
-    public String loginUser(LoginRequest request) {
+    public String loginUser(LoginRequest request, HttpSession session) {
         User user = userRepository.findByEmail(request.getEmail());
         if (user == null) {
             throw new UserNotFoundException("User not found with email: " + request.getEmail());
         }
+
+        session.setAttribute("fullName", user.getFullName());
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new InvalidCredentialsException("Incorrect password");

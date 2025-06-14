@@ -1,5 +1,6 @@
 package com.librarymanagementsys.backend.service;
 
+import com.librarymanagementsys.backend.dto.LoginAdminRequest;
 import com.librarymanagementsys.backend.dto.RegisterAdminRequest;
 import com.librarymanagementsys.backend.exception.EmailAlreadyExistsException;
 import com.librarymanagementsys.backend.exception.InvalidCredentialsException;
@@ -7,6 +8,7 @@ import com.librarymanagementsys.backend.exception.UserNotFoundException;
 import com.librarymanagementsys.backend.model.Admin;
 import com.librarymanagementsys.backend.repository.AdminRepository;
 import com.librarymanagementsys.backend.security.JwtUtil;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -41,11 +43,13 @@ public class AdminService {
         return jwtUtil.generateToken(admin.getEmail());
     }
 
-    public String loginAdmin(RegisterAdminRequest request) {
+    public String loginAdmin(LoginAdminRequest request, HttpSession session) {
         Admin admin = adminRepository.findByEmail(request.getEmail());
         if (admin == null) {
             throw new UserNotFoundException("Admin user not found with email: " + request.getEmail());
         }
+
+        session.setAttribute("fullName", admin.getFullName());
 
         if (!passwordEncoder.matches(request.getPassword(), admin.getPassword())) {
             throw new InvalidCredentialsException("Incorrect password");

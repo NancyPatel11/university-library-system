@@ -32,6 +32,7 @@ public class UserController {
         session.setAttribute("jwt", jwt);
         session.setAttribute("email", request.getEmail());
         session.setAttribute("role", "student");
+        session.setAttribute("fullName", request.getFullName());
 
         return ResponseEntity.ok(Map.of(
                 "timestamp", LocalDateTime.now(),
@@ -42,12 +43,13 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody LoginRequest request, HttpSession session) {
-        String token = userService.loginUser(request);
+        String token = userService.loginUser(request,session);
 
         // Store in session
         session.setAttribute("jwt", token);
         session.setAttribute("email", request.getEmail());
         session.setAttribute("role", "student");
+
 
         return ResponseEntity.ok(Map.of(
                 "timestamp", LocalDateTime.now(),

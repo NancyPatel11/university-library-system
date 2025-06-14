@@ -1,5 +1,6 @@
 package com.librarymanagementsys.backend.controller;
 
+import com.librarymanagementsys.backend.dto.LoginAdminRequest;
 import com.librarymanagementsys.backend.dto.RegisterAdminRequest;
 import com.librarymanagementsys.backend.service.AdminService;
 import jakarta.servlet.http.HttpSession;
@@ -28,6 +29,7 @@ public class AdminController {
         session.setAttribute("jwt", jwt);
         session.setAttribute("email", request.getEmail());
         session.setAttribute("role", "admin");
+        session.setAttribute("fullName", request.getFullName());
 
         return ResponseEntity.ok(Map.of(
                 "timestamp", LocalDateTime.now(),
@@ -37,9 +39,9 @@ public class AdminController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, Object>> loginUser(@RequestBody RegisterAdminRequest request,
+    public ResponseEntity<Map<String, Object>> loginUser(@RequestBody LoginAdminRequest request,
                                                          HttpSession session) {
-        String jwt = adminService.loginAdmin(request);
+        String jwt = adminService.loginAdmin(request, session);
 
         // Store in session
         session.setAttribute("jwt", jwt);
