@@ -12,9 +12,11 @@
     --color-form-field: #232839;
     --color-search-bar: #232839;
     --color-admin-primary-blue: #25388C;
+    --color-admin-secondary-blue: #3B4BBE;
     --color-admin-primary-black: #1E293B;
     --color-admin-secondary-black: #64748B;
-    --color-admin-border: #EDF1F1;
+    --color-admin-light-border: #EDF1F1;
+    --color-admin-dark-border: #CBD5E1;
     --color-admin-bg: #F8F8FF;
 }
 
