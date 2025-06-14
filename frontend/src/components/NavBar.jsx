@@ -56,7 +56,7 @@ export const NavBar = () => {
     }
 
     return (
-        <div className="h-screen w-64 bg-white text-black flex flex-col fixed left-0 top-0">
+        <div className="h-screen w-64 bg-white text-admin-primary-black flex flex-col">
             <div className="flex items-center gap-3 p-6 border-b">
                 <div className="h-10 w-10 rounded-full bg-admin-primary-blue flex items-center justify-center">
                     <img src={bookicon} alt="book icon" className="h-6 w-6 object-contain" />

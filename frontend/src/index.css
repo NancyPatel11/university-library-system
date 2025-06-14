@@ -12,6 +12,10 @@
     --color-form-field: #232839;
     --color-search-bar: #232839;
     --color-admin-primary-blue: #25388C;
+    --color-admin-primary-black: #1E293B;
+    --color-admin-secondary-black: #64748B;
+    --color-admin-background: #EDF1F1;
+    --color-admin-button-bg: #F8F8FF;
 }
 
 .ibm-plex-sans-100 {
