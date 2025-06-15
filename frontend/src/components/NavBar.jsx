@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { NavLink, useNavigate, Link } from 'react-router-dom';
+import React from 'react';
+import { NavLink, useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/authContext';
 import { toast } from 'sonner';
 import bookicon from "../assets/icons/logo.svg";
@@ -14,7 +14,8 @@ import userFallBackImg from "../assets/icons/user.svg";
 export const NavBar = ({ homeColor, searchColor, userColor }) => {
     const { auth, setAuth } = useAuth();
     const navigate = useNavigate();
-    const [activeTab, setActiveTab] = useState("Home"); // default active
+
+    const location = useLocation();
 
     const handleLogout = async () => {
         try {
@@ -64,11 +65,11 @@ export const NavBar = ({ homeColor, searchColor, userColor }) => {
                 <h3 className="text-2xl font-semibold text-admin-primary-blue">Bookademia</h3>
             </div>
             <nav className="flex-1 px-4 py-6 space-y-3 text-lg ibm-plex-sans-500">
-                <AdminNavItem icon={homeSvg} to="/admin-dashboard" label="Home" active={activeTab === "Home"} onClick={() => setActiveTab("Home")} />
-                <AdminNavItem icon={allUsersSvg} to="/all-users" label="All Users" active={activeTab === "All Users"} onClick={() => setActiveTab("All Users")} />
-                <AdminNavItem icon={bookSvg} to="/all-books" label="All Books" active={activeTab === "All Books"} onClick={() => setActiveTab("All Books")} />
-                <AdminNavItem icon={bookMarkSvg} to="/borrow-requests" label="Borrow Requests" active={activeTab === "Borrow Requests"} onClick={() => setActiveTab("Borrow Requests")} />
-                <AdminNavItem icon={userSvg} to="/account-requests" label="Account Requests" active={activeTab === "Account Requests"} onClick={() => setActiveTab("Account Requests")} />
+                <AdminNavItem icon={homeSvg} to="/admin-dashboard" label="Home" active={location.pathname === "/admin-dashboard"} />
+                <AdminNavItem icon={allUsersSvg} to="/all-users" label="All Users" active={location.pathname === "/all-users"} />
+                <AdminNavItem icon={bookSvg} to="/all-books" label="All Books" active={location.pathname === "/all-books"} />
+                <AdminNavItem icon={bookMarkSvg} to="/borrow-requests" label="Borrow Requests" active={location.pathname === "/borrow-requests"} />
+                <AdminNavItem icon={userSvg} to="/account-requests" label="Account Requests" active={location.pathname === "/account-requests"} />
             </nav>
             <div className="p-4 m-12 border border-gray-200 rounded-full ibm-plex-sans-400">
                 <button onClick={handleLogout} className="flex items-center gap-2 text-admin-primary-blue">
