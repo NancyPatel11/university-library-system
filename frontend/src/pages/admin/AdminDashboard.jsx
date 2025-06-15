@@ -76,7 +76,7 @@ export const AdminDashboard = () => {
   return (
     <div className="flex">
       <NavBar />
-      <div className="bg-admin-bg border-1 border-admin-border w-full ibm-plex-sans-600 px-5 rounded-xl pt-5">
+      <div className="h-full min-h-screen bg-admin-bg border-1 border-admin-border w-full ibm-plex-sans-600 px-5 rounded-xl pt-5">
         <div className="flex flex-wrap gap-4 justify-between items-center">
           <div>
             <h1 className='text-admin-primary-black text-2xl'>Welcome, {auth.name}</h1>
@@ -145,7 +145,7 @@ export const AdminDashboard = () => {
                 </Button>
               </div>
               {pendingUsers.length > 0 ?
-                <div className="flex flex-wrap justify-between mt-5">
+                <div className="flex flex-wrap justify-between mt-5 gap-3">
                   {pendingUsers.map((user, index) => (
                     <div
                       key={index}
