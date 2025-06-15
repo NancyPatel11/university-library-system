@@ -138,4 +138,12 @@ public class UserService {
                 "bookId", bookId
         ));
     }
+
+    public List<User> getAllUsers() {
+        try{
+            return userRepository.findAll();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to fetch users: " + e.getMessage());
+        }
+    }
 }
