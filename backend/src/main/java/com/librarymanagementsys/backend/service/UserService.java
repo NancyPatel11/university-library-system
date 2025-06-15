@@ -21,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -60,6 +61,7 @@ public class UserService {
         user.setIdCard(idCardBytes); // ✅ Save the image
         user.setAccountStatus("Verification Pending"); // Initial status
         user.setBorrowedBooks(List.of()); // Initialize with an empty list
+        user.setRegistrationDate(new Date());
 
         userRepository.save(user);
         return jwtUtil.generateToken(user.getEmail());

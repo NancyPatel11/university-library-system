@@ -61,4 +61,9 @@ public class AdminController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/allAdmins")
+    public ResponseEntity<?> getAllAdmins() {
+        return ResponseEntity.ok(adminService.getAllAdmins());
+    }
+
 }

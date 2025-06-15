@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Date;
+
 @Document(collection = "Admins")
 @Data
 @AllArgsConstructor
@@ -18,4 +20,5 @@ public class Admin {
     private String email;
     private String password;
     private String mobileNumber;
+    private Date registrationDate;
 }

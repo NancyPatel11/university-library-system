@@ -13,6 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+import java.util.List;
+
 @Service
 public class AdminService {
 
@@ -37,6 +40,7 @@ public class AdminService {
         admin.setEmail(request.getEmail());
         admin.setPassword(passwordEncoder.encode(request.getPassword()));
         admin.setMobileNumber(request.getMobileNumber());
+        admin.setRegistrationDate(new Date());
 
         adminRepository.save(admin);
 
@@ -56,6 +60,14 @@ public class AdminService {
         }
 
         return jwtUtil.generateToken(admin.getEmail());
+    }
+
+    public List<Admin> getAllAdmins(){
+        try{
+            return adminRepository.findAll();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to fetch users: " + e.getMessage());
+        }
     }
 
 

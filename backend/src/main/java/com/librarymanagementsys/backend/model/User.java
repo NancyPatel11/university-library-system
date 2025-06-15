@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Date;
 import java.util.List;
 
 @Document(collection = "Users")
@@ -23,6 +24,8 @@ public class User {
     private String idCardName;
     private String idCardType;
     private byte[] idCard;
+    private int noBooksBorrowed = 0; // Default 0
+    private Date registrationDate;
     private String accountStatus = "Verification Pending"; // Default status when a user is registered
     private List<BorrowedBook> borrowedBooks;
 }
