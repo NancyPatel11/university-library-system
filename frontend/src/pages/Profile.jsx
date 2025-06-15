@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useAuth } from '@/context/authContext';
 import { NavBar } from '@/components/NavBar';
 import { Loader } from '@/components/Loader';
 import BookCoverSvg from '@/components/BookCoverSvg';
@@ -11,6 +12,7 @@ import CalendarImg from "../assets/icons/calendar.svg";
 import userFallbackImg from "../assets/icons/user-fill.svg";
 
 export const Profile = () => {
+  const { auth } = useAuth();
   const [idCardUrl, setIdCardUrl] = useState(null);
   const [user, setUser] = useState(null);
   const [borrowedBooks, setBorrowedBooks] = useState([]);
@@ -100,7 +102,7 @@ export const Profile = () => {
   }, [user]);
 
   if (!user || !idCardUrl) {
-    return <Loader message={"Navigating to your profile 👤"} />
+    return <Loader message={"Navigating to your profile 👤"} role={auth.userRole} />
   }
   return (
     <div

@@ -84,7 +84,7 @@ export const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
 
 
-    return loading ? <Loader message={"Logging you into Bookademia 📚"} /> :
+    return loading ? <Loader message={role === "student" ? "Logging you into Bookademia 📚" : "Loading Admin Dashboard 🖥️"} role={role} /> :
         <div
             className="h-screen bg-center bg-no-repeat"
             style={{

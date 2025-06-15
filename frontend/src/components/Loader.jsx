@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react'
 import bg from "../assets/images/bg.png";
 
-export const Loader = ({message}) => {
+export const Loader = ({ role, message }) => {
+
     useEffect(() => {
         // Inject keyframes only once
         const style = document.createElement('style');
@@ -31,58 +32,70 @@ export const Loader = ({message}) => {
         animationIterationCount: 'infinite',
     };
 
-    return (
-        <div
-            className="h-screen bg-center bg-no-repeat"
-            style={{
-                backgroundImage: `url(${bg})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'top',
-            }}
-        >
-            <div className="flex flex-col items-center justify-center h-screen ibm-plex-sans-500">
+    if (role === "student") {
+        return (
+            <div
+                className="h-screen bg-center bg-no-repeat"
+                style={{
+                    backgroundImage: `url(${bg})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'top',
+                }}
+            >
+                <div className="flex flex-col items-center justify-center h-screen ibm-plex-sans-500">
 
-                <div className="flex items-end justify-center mt-4 gap-15 text-white">
-                    <h2 className="text-5xl font-semibold my-4 text-white inline">Flipping pages</h2>
-                    <div className=" w-14 h-18 content-end inline" style={{ perspective: '600px' }}>
+                    <div className="flex items-end justify-center mt-4 gap-15 text-white">
+                        <h2 className="text-5xl font-semibold my-4 text-white inline">Flipping pages</h2>
+                        <div className=" w-14 h-18 content-end inline" style={{ perspective: '600px' }}>
 
-                        <div
-                            className="relative w-full h-full"
-                            style={{ transform: 'rotateX(10deg)', position: 'relative' }}
-                        >
                             <div
-                                style={{
-                                    ...pageBaseStyle,
-                                    zIndex: 3,
-                                    animationDelay: '0s',
-                                }}
-                            ></div>
-                            <div
-                                style={{
-                                    ...pageBaseStyle,
-                                    zIndex: 2,
-                                    animationDelay: '0.2s',
-                                }}
-                            ></div>
-                            <div
-                                style={{
-                                    ...pageBaseStyle,
-                                    zIndex: 1,
-                                    animationDelay: '0.4s',
-                                }}
-                            ></div>
+                                className="relative w-full h-full"
+                                style={{ transform: 'rotateX(10deg)', position: 'relative' }}
+                            >
+                                <div
+                                    style={{
+                                        ...pageBaseStyle,
+                                        zIndex: 3,
+                                        animationDelay: '0s',
+                                    }}
+                                ></div>
+                                <div
+                                    style={{
+                                        ...pageBaseStyle,
+                                        zIndex: 2,
+                                        animationDelay: '0.2s',
+                                    }}
+                                ></div>
+                                <div
+                                    style={{
+                                        ...pageBaseStyle,
+                                        zIndex: 1,
+                                        animationDelay: '0.4s',
+                                    }}
+                                ></div>
+                            </div>
                         </div>
                     </div>
+                    <p className="text-lg text-light-blue mt-4">{message}</p>
+
+
+
+                    <p className="text-sm italic text-light-blue">
+                        Organizing your bookshelf...
+                    </p>
+
                 </div>
-                <p className="text-lg text-light-blue mt-4">{message}</p>
-
-
-
-                <p className="text-sm italic text-light-blue">
-                    Organizing your bookshelf... 
-                </p>
-
             </div>
+        )
+    }
+
+    return (
+        <div className="flex flex-col justify-center items-center h-screen bg-admin-bg text-admin-primary-blue ibm-plex-sans-600">
+            <div className="relative flex justify-center items-center mb-4">
+                <div className="w-16 h-16 border-4 border-admin-primary-blue border-t-transparent rounded-full animate-spin"></div>
+            </div>
+            <h2 className="text-2xl">{message}</h2>
+            <p className="text-admin-secondary-black text-sm mt-1 italic">Preparing your data...</p>
         </div>
-    )
+    );
 }

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { useAuth } from '@/context/AuthContext.jsx';
 import { Link, useParams } from 'react-router-dom';
 import { NavBar } from '@/components/NavBar';
 import BookCoverSvg from '../components/BookCoverSvg.jsx';
@@ -11,6 +12,7 @@ import { Loader } from '@/components/Loader.jsx';
 import { toast } from 'sonner';
 
 export const BookDetails = () => {
+  const { auth } = useAuth();
   const { bookId } = useParams();
   const [book, setBook] = useState(null);
 
@@ -96,7 +98,7 @@ export const BookDetails = () => {
   }
 
   if (!allBooks || !book) {
-    return <Loader message={"Loading book details... 📘"} />;
+    return <Loader message={"Loading book details... 📘"} role={auth.userRole} />;
   }
 
 

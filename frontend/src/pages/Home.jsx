@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useAuth } from '@/context/authContext.jsx';
 import { Link } from 'react-router-dom';
 import { NavBar } from '@/components/NavBar';
 import BookCoverSvg from '../components/BookCoverSvg.jsx';
@@ -12,6 +13,7 @@ import { Loader } from '@/components/Loader.jsx';
 import { toast } from 'sonner';
 
 export const Home = () => {
+  const { auth } = useAuth();
   const [allBooks, setAllBooks] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -69,7 +71,7 @@ export const Home = () => {
   }
 
   if (loading) {
-    return <Loader message={"Loading books... 📚"} />;
+    return <Loader message={"Loading books... 📚"} role={auth.userRole} />;
   }
 
   if (allBooks.length === 0) {

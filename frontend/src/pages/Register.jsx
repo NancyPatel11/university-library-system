@@ -135,7 +135,7 @@ export const Register = () => {
     const [showPassword, setShowPassword] = useState(false);
 
 
-    return loading ? <Loader message={"Registering user and logging you into Bookademia 📚"} /> :
+    return loading ? <Loader message={role ? "Registering user and logging you into Bookademia 📚" : "Loading Admin Dashboard 🖥️"} role={role} /> :
         <div
             className="h-screen bg-center bg-no-repeat"
             style={{

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useAuth } from '@/context/AuthContext.jsx';
 import { Link } from 'react-router-dom';
 import { Loader } from '@/components/Loader';
 import { NavBar } from '@/components/NavBar';
@@ -18,6 +19,7 @@ import bg from "../assets/images/bg.png";
 import noBooksFoundImg from "../assets/images/no-books.png";
 
 export const Search = () => {
+    const { auth } = useAuth();
     const [allBooks, setAllBooks] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchValue, setSearchValue] = useState("");
@@ -94,7 +96,7 @@ export const Search = () => {
 
 
     if (loading) {
-        return <Loader message={"Navigating you to search... 🔎"} />;
+        return <Loader message={"Navigating you to search... 🔎"} role={auth.userRole} />;
     }
 
     if (allBooks.length === 0) {

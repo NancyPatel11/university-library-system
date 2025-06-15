@@ -6,7 +6,7 @@ import { toast } from "sonner";
 
 export const ProtectedRoute = ({ children, allowedRoles }) => {
     const [authState, setAuthState] = useState({ loading: true, authorized: false });
-    const { setAuth } = useAuth();
+    const { auth, setAuth } = useAuth();
     const location = useLocation();
 
     useEffect(() => {
@@ -48,7 +48,7 @@ export const ProtectedRoute = ({ children, allowedRoles }) => {
         checkAuth();
     }, [allowedRoles, setAuth]);
 
-    if (authState.loading) return <Loader message={"Authenticating... 🔒"} />;
+    if (authState.loading) return <Loader role={auth.userRole} message={"Authenticating... 🔒"} />;
 
     if (!authState.authorized) {
         return <Navigate to="/login" replace state={{ from: location }} />;
