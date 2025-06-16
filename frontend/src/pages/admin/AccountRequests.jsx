@@ -7,6 +7,7 @@ import denyIcon from '../../assets/icons/admin/deny.png'
 import approveIcon from '../../assets/icons/admin/approve.png'
 import closeIcon from '../../assets/icons/admin/close.svg'
 import closeCircleIcon from '../../assets/icons/admin/close-circle.svg'
+import eyeIcon from '../../assets/icons/admin/eye.png'
 import { toast } from 'sonner'
 
 const getInitials = (name) => {
@@ -36,6 +37,8 @@ export const AccountRequests = () => {
     const [showApprove, setShowApprove] = useState(false);
     const [showReject, setShowReject] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
+    const [idCardUrl, setIdCardUrl] = useState(null);
+    const [showIdCard, setShowIdCard] = useState(false);
     const [loading, setLoading] = useState(true);
 
     const fetchStudents = async () => {
@@ -109,6 +112,27 @@ export const AccountRequests = () => {
         }
     };
 
+
+    const fetchIdCard = async (email) => {
+        try {
+            const requestUrl = `http://localhost:8080/api/user/idcard/${email}`;
+            const response = await fetch(requestUrl, {
+                method: "GET",
+                credentials: "include"
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to fetch ID card");
+            }
+
+            const blob = await response.blob();
+            const idUrl = URL.createObjectURL(blob);
+            setIdCardUrl(idUrl);
+        } catch (error) {
+            console.error("Error fetching ID card:", error);
+        }
+    };
+
     if (loading) {
         return <Loader message={"Loading Account Requests Dashboard 🧾"} role={auth.userRole} />;
     }
@@ -146,7 +170,7 @@ export const AccountRequests = () => {
                 </div>
 
                 <div className='bg-white mt-10 rounded-lg py-8 px-5 ibm-plex-sans-500'>
-                    <h1 className='text-admin-primary-black text-2xl mb-6'>All Users</h1>
+                    <h1 className='text-admin-primary-black text-2xl mb-6'>Account Registration Requests</h1>
 
                     <div className="overflow-x-auto rounded-lg">
                         <table className="min-w-full text-md text-left border-collapse">
@@ -189,7 +213,19 @@ export const AccountRequests = () => {
                                                 : "—"}
                                         </td>
                                         <td>{student.universityId}</td>
-                                        <td>ID Card</td>
+                                        <td>
+                                            <Button
+                                                className="flex items-center flex-wrap text-admin-primary-blue bg-transparent hover:bg-transparent hover:cursor-pointer shadow-none border-none"
+                                                onClick={() => {
+                                                    setSelectedUser(student.email);
+                                                    fetchIdCard(student.email);
+                                                    setShowIdCard(true);
+                                                }}
+                                            >
+                                                <img src={eyeIcon} alt="eye" />
+                                                View Id Card
+                                            </Button>
+                                        </td>
                                         <td>
                                             {student.accountStatus != "Verified" && student.accountStatus != "Denied" ?
                                                 <div className='flex items-start gap-2'>
@@ -288,6 +324,32 @@ export const AccountRequests = () => {
                                     >
                                         Deny & Notify Student
                                     </Button>
+                                </div>
+                            </div>
+                        )}
+                        {showIdCard && (
+                            <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
+                                <div className="relative bg-white p-6 rounded-lg shadow-lg text-center w-[600px]">
+                                    <Button
+                                        onClick={() => {
+                                            setIdCardUrl(null);
+                                            setShowIdCard(false)
+                                        }
+                                        }
+                                        className="absolute top-2 right-4 p-0 m-0 bg-transparent hover:bg-transparent shadow-none border-none hover:shadow-none focus:outline-none hover:cursor-pointer"
+                                    >
+                                        <img src={closeIcon} alt="close" className="h-4 w-4" />
+                                    </Button>
+                                    <h1 className='text-xl mb-4 text-admin-primary-black'>ID Card</h1>
+                                    {idCardUrl ? (
+                                        <img src={idCardUrl} alt="ID Card" className='w-full h-auto rounded-md' />
+                                    ) : (
+                                        <div className='flex items-center gap-4 justify-center'>
+                                            <div className="w-10 h-10 border-4 border-admin-primary-blue border-t-transparent rounded-full animate-spin" />
+                                            <p className="text-sm text-admin-secondary-black mt-2">Loading ID Card...</p>
+                                        </div>
+
+                                    )}
                                 </div>
                             </div>
                         )}

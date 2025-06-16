@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import trashIcon from '../../assets/icons/admin/trash.svg'
 import denyIcon from '../../assets/icons/admin/deny.png'
 import closeIcon from '../../assets/icons/admin/close.svg'
+import eyeIcon from '../../assets/icons/admin/eye.png'
 
 const getInitials = (name) => {
     if (!name) return "";
@@ -34,6 +35,8 @@ export const AllUsers = () => {
     const [allStudents, setAllStudents] = useState([]);
     const [showConfirm, setShowConfirm] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
+    const [idCardUrl, setIdCardUrl] = useState(null);
+    const [showIdCard, setShowIdCard] = useState(false);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -96,6 +99,26 @@ export const AllUsers = () => {
             }
         } catch (error) {
             console.error("Error deleting user:", error);
+        }
+    };
+
+    const fetchIdCard = async (email) => {
+        try {
+            const requestUrl = `http://localhost:8080/api/user/idcard/${email}`;
+            const response = await fetch(requestUrl, {
+                method: "GET",
+                credentials: "include"
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to fetch ID card");
+            }
+
+            const blob = await response.blob();
+            const idUrl = URL.createObjectURL(blob);
+            setIdCardUrl(idUrl);
+        } catch (error) {
+            console.error("Error fetching ID card:", error);
         }
     };
 
@@ -231,7 +254,19 @@ export const AllUsers = () => {
                                         <td><span className='bg-admin-red-bg text-red-600 px-3 py-1 rounded-2xl'>Student</span></td>
                                         <td>{student.noBooksBorrowed}</td>
                                         <td>{student.universityId}</td>
-                                        <td>ID Card</td>
+                                        <td>
+                                            <Button
+                                                className="flex items-center flex-wrap text-admin-primary-blue bg-transparent hover:bg-transparent hover:cursor-pointer shadow-none border-none"
+                                                onClick={() => {
+                                                    setSelectedUser(student.email);
+                                                    fetchIdCard(student.email);
+                                                    setShowIdCard(true);
+                                                }}
+                                            >
+                                                <img src={eyeIcon} alt="eye" />
+                                                View Id Card
+                                            </Button>
+                                        </td>
                                         <td>
                                             <Button
                                                 className="bg-transparent hover:bg-transparent hover:cursor-pointer shadow-none border-none"
@@ -276,6 +311,32 @@ export const AllUsers = () => {
                                     >
                                         Delete User
                                     </Button>
+                                </div>
+                            </div>
+                        )}
+                        {showIdCard && (
+                            <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
+                                <div className="relative bg-white p-6 rounded-lg shadow-lg text-center w-[600px]">
+                                    <Button
+                                        onClick={() => {
+                                            setIdCardUrl(null);
+                                            setShowIdCard(false)
+                                        }
+                                        }
+                                        className="absolute top-2 right-4 p-0 m-0 bg-transparent hover:bg-transparent shadow-none border-none hover:shadow-none focus:outline-none hover:cursor-pointer"
+                                    >
+                                        <img src={closeIcon} alt="close" className="h-4 w-4" />
+                                    </Button>
+                                    <h1 className='text-xl mb-4 text-admin-primary-black'>ID Card</h1>
+                                    {idCardUrl ? (
+                                        <img src={idCardUrl} alt="ID Card" className='w-full h-auto rounded-md' />
+                                    ) : (
+                                        <div className='flex items-center gap-4 justify-center'>
+                                            <div className="w-10 h-10 border-4 border-admin-primary-blue border-t-transparent rounded-full animate-spin" />
+                                            <p className="text-sm text-admin-secondary-black mt-2">Loading ID Card...</p>
+                                        </div>
+
+                                    )}
                                 </div>
                             </div>
                         )}
