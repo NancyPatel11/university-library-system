@@ -95,4 +95,15 @@ public class UserController {
     public ResponseEntity<?> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
     }
+
+    @DeleteMapping("/delete/{email}")
+    public ResponseEntity<?> deleteUser(@PathVariable String email) {
+        userService.deleteUser(email);
+        return ResponseEntity.ok(Map.of(
+                "timestamp", LocalDateTime.now(),
+                "status", 200,
+                "message", "User deleted successfully"
+        ));
+    }
+
 }

@@ -4,6 +4,8 @@ import { NavBar } from '@/components/NavBar'
 import { Loader } from '@/components/Loader'
 import { Button } from '@/components/ui/button'
 import trashIcon from '../../assets/icons/admin/trash.svg'
+import denyIcon from '../../assets/icons/admin/deny.png'
+import closeIcon from '../../assets/icons/admin/close.svg'
 
 const getInitials = (name) => {
     if (!name) return "";
@@ -30,6 +32,8 @@ export const AllUsers = () => {
     const [searchValue, setSearchValue] = useState("");
     const [allAdmins, setAllAdmins] = useState([]);
     const [allStudents, setAllStudents] = useState([]);
+    const [showConfirm, setShowConfirm] = useState(false);
+    const [selectedUser, setSelectedUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -69,6 +73,31 @@ export const AllUsers = () => {
 
         fetchUsers();
     }, []);
+
+    const handleDeleteUser = async (user) => {
+        if (!user) return;
+
+        const url = user.role === "admin"
+            ? `http://localhost:8080/api/admin/delete/${user.email}`
+            : `http://localhost:8080/api/user/delete/${user.email}`;
+
+        try {
+            const res = await fetch(url, {
+                method: "DELETE",
+                credentials: "include",
+            });
+
+            if (!res.ok) throw new Error("Failed to delete user");
+
+            if (user.role === "admin") {
+                setAllAdmins(prev => prev.filter(a => a.email !== user.email));
+            } else {
+                setAllStudents(prev => prev.filter(s => s.email !== user.email));
+            }
+        } catch (error) {
+            console.error("Error deleting user:", error);
+        }
+    };
 
     if (loading) {
         return <Loader message={"Loading User Stats 📊"} role={auth.userRole} />;
@@ -154,9 +183,17 @@ export const AllUsers = () => {
                                         <td className="px-4 py-2">—</td>
                                         <td className="px-4 py-2">—</td>
                                         <td className="px-4 py-2">
-                                            <Button className={`bg-transparent hover:bg-transparent hover:cursor-pointer`}>
-                                                <img src={trashIcon} alt="trash" />
-                                            </Button>
+                                            {auth.email !== admin.email && (
+                                                <Button
+                                                    className="bg-transparent hover:bg-transparent hover:cursor-pointer shadow-none border-none"
+                                                    onClick={() => {
+                                                        setSelectedUser({ email: admin.email, role: "admin" });
+                                                        setShowConfirm(true);
+                                                    }}
+                                                >
+                                                    <img src={trashIcon} alt="trash" />
+                                                </Button>
+                                            )}
                                         </td>
                                     </tr>
                                 ))}
@@ -193,7 +230,13 @@ export const AllUsers = () => {
                                         <td className="px-4 py-2">{student.noBooksBorrowed}</td>
                                         <td className="px-4 py-2">{student.universityId}</td>
                                         <td className="px-4 py-2">
-                                            <Button className={`bg-transparent hover:bg-transparent hover:cursor-pointer`}>
+                                            <Button
+                                                className="bg-transparent hover:bg-transparent hover:cursor-pointer shadow-none border-none"
+                                                onClick={() => {
+                                                    setSelectedUser({ email: student.email, role: "student" });
+                                                    setShowConfirm(true);
+                                                }}
+                                            >
                                                 <img src={trashIcon} alt="trash" />
                                             </Button>
                                         </td>
@@ -201,6 +244,38 @@ export const AllUsers = () => {
                                 ))}
                             </tbody>
                         </table>
+                        {showConfirm && (
+                            <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
+                                <div className="relative bg-white p-6 rounded-lg shadow-lg text-center w-[450px] flex flex-col items-center">
+
+                                    <Button
+                                        onClick={() => setShowConfirm(false)}
+                                        className="absolute top-2 right-4 p-0 m-0 bg-transparent hover:bg-transparent shadow-none border-none hover:shadow-none focus:outline-none hover:cursor-pointer"
+                                    >
+                                        <img src={closeIcon} alt="close" className="h-4 w-4" />
+                                    </Button>
+
+                                    <div className='p-4 bg-admin-red-bg rounded-full'>
+                                        <img src={denyIcon} alt="" className='h-15 w-15' />
+                                    </div>
+
+                                    <h1 className='mt-5'>Confirm Delete</h1>
+                                    <p className='text-sm ibm-plex-sans-300 text-admin-secondary-black'>
+                                        Confirming will lead to permanent deletion of the selected user account.
+                                    </p>
+
+                                    <Button
+                                        onClick={() => {
+                                            handleDeleteUser(selectedUser);
+                                            setShowConfirm(false);
+                                        }}
+                                        className="bg-admin-red mt-5 w-full p-5 hover:cursor-pointer hover:bg-admin-dark-red"
+                                    >
+                                        Delete User
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

@@ -70,5 +70,19 @@ public class AdminService {
         }
     }
 
+    public void deleteAdmin(String email) {
+        Admin admin = adminRepository.findByEmail(email);
+        if (admin == null) {
+            throw new UserNotFoundException("Admin user not found with email: " + email);
+        }
+
+        try {
+            adminRepository.delete(admin);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to delete admin: " + e.getMessage());
+        }
+    }
+
+
 
 }

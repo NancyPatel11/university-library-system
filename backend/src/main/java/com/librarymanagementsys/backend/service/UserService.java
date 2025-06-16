@@ -148,4 +148,16 @@ public class UserService {
             throw new RuntimeException("Failed to fetch users: " + e.getMessage());
         }
     }
+
+    public void deleteUser(String email) {
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new UserNotFoundException("User not found with email: " + email);
+        }
+        try{
+            userRepository.delete(user);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to delete user: " + e.getMessage());
+        }
+    }
 }

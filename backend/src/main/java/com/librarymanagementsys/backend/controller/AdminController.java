@@ -66,4 +66,14 @@ public class AdminController {
         return ResponseEntity.ok(adminService.getAllAdmins());
     }
 
+    @DeleteMapping("/delete/{email}")
+    public ResponseEntity<?> deleteAdmin(@PathVariable String email) {
+        adminService.deleteAdmin(email);
+        return ResponseEntity.ok(Map.of(
+                "timestamp", LocalDateTime.now(),
+                "status", 200,
+                "message", "Admin deleted successfully"
+        ));
+    }
+
 }
