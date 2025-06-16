@@ -71,19 +71,28 @@ export const NavBar = ({ homeColor, searchColor, userColor }) => {
                 <AdminNavItem icon={bookMarkSvg} to="/borrow-requests" label="Borrow Requests" active={location.pathname === "/borrow-requests"} />
                 <AdminNavItem icon={userSvg} to="/account-requests" label="Account Requests" active={location.pathname === "/account-requests"} />
             </nav>
-            <div className="p-4 m-12 border border-gray-200 rounded-full ibm-plex-sans-400">
-                <button onClick={handleLogout} className="flex items-center gap-2 text-admin-primary-blue">
-                    <img src={userFallBackImg} alt="" className='bg-gray-200 p-1 rounded-full h-10' />
-                    <div className='flex flex-col items-start'>
-                        <div className='text-admin-primary-black'>
+            <div className="p-2 m-12 border border-gray-200 rounded-full ibm-plex-sans-400">
+                <div className='flex items-center gap-2 text-admin-primary-blue justify-between'>
+                    <div className="relative">
+                        <img
+                            src={userFallBackImg}
+                            alt="profile pic"
+                            className="bg-gray-200 p-1 rounded-full h-13 w-13"
+                        />
+                        <span className="absolute bottom-0 right-0 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></span>
+                    </div>
+                    <div className='flex flex-col items-start overflow-hidden w-[120px]'>
+                        <div className='text-admin-primary-black truncate'>
                             {auth.name}
                         </div>
-                        <div className='text-admin-secondary-black'>
+                        <div className='text-admin-secondary-black truncate'>
                             {auth.email}
                         </div>
                     </div>
-                    <img src={logoutSvg} alt="logout" className='h-7 cursor-pointer' />
-                </button>
+                    <button onClick={handleLogout}>
+                        <img src={logoutSvg} alt="logout" className='h-7 cursor-pointer' />
+                    </button>
+                </div>
             </div>
         </div>
     );
