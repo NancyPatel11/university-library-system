@@ -160,4 +160,36 @@ public class UserService {
             throw new RuntimeException("Failed to delete user: " + e.getMessage());
         }
     }
+
+    public void approveUser(String email) {
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new UserNotFoundException("User not found with email: " + email);
+        }
+
+        user.setAccountStatus("Verified");
+        user.setRegistrationDate(new Date()); // Update registration date to date of approval
+
+        try {
+            userRepository.save(user);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to approve user: " + e.getMessage());
+        }
+    }
+
+    public void denyUser(String email) {
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new UserNotFoundException("User not found with email: " + email);
+        }
+
+        user.setAccountStatus("Denied");
+        user.setRegistrationDate(new Date()); // Update registration date to date of denial
+
+        try {
+            userRepository.save(user);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to deny user: " + e.getMessage());
+        }
+    }
 }

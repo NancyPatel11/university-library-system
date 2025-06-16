@@ -10,6 +10,7 @@ import { BookDetails } from './pages/BookDetails';
 import { Search } from './pages/Search';
 import { AdminDashboard } from './pages/admin/AdminDashboard';
 import { AllUsers } from './pages/admin/AllUsers';
+import { AccountRequests } from './pages/admin/AccountRequests';
 
 function App() {
   return (
@@ -66,6 +67,15 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
               <AllUsers />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/account-requests"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AccountRequests />
             </ProtectedRoute>
           }
         />

@@ -106,4 +106,24 @@ public class UserController {
         ));
     }
 
+    @PutMapping("/approve/{email}")
+    public ResponseEntity<?> approveUser(@PathVariable String email) {
+        userService.approveUser(email);
+        return ResponseEntity.ok(Map.of(
+                "timestamp", LocalDateTime.now(),
+                "status", 200,
+                "message", "User approved successfully"
+        ));
+    }
+
+    @PutMapping("/deny/{email}")
+    public ResponseEntity<?> denyUser(@PathVariable String email) {
+        userService.denyUser(email);
+        return ResponseEntity.ok(Map.of(
+                "timestamp", LocalDateTime.now(),
+                "status", 200,
+                "message", "User denied successfully"
+        ));
+    }
+
 }
