@@ -70,7 +70,7 @@ export const AdminDashboard = () => {
   }, [])
 
   if (loading) {
-    return <Loader message={"Loading admin dashboard 🖥️"} role={auth.userRole} />;
+    return <Loader message={"Loading Admin Dashboard 🖥️"} role={auth.userRole} />;
   }
 
   return (
