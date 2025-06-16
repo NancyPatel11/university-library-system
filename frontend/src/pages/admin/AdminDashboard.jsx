@@ -186,7 +186,7 @@ export const AdminDashboard = () => {
               Add New Book
             </Button>
             {allBooks.length > 0 ?
-              <div className='flex flex-col mt-5'>
+              <div className='flex flex-col mt-8 gap-2'>
                 {allBooks.slice(0, 6).map((book, index) => (
                   <div key={index} className="p-2 rounded-lg flex items-center gap-4">
                     <div className="relative">
