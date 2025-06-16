@@ -168,7 +168,6 @@ public class UserService {
         }
 
         user.setAccountStatus("Verified");
-        user.setRegistrationDate(new Date()); // Update registration date to date of approval
 
         try {
             userRepository.save(user);
@@ -184,7 +183,6 @@ public class UserService {
         }
 
         user.setAccountStatus("Denied");
-        user.setRegistrationDate(new Date()); // Update registration date to date of denial
 
         try {
             userRepository.save(user);
