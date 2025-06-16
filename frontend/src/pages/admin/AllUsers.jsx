@@ -7,6 +7,7 @@ import trashIcon from '../../assets/icons/admin/trash.svg'
 import denyIcon from '../../assets/icons/admin/deny.png'
 import closeIcon from '../../assets/icons/admin/close.svg'
 import eyeIcon from '../../assets/icons/admin/eye.png'
+import swapIcon from '../../assets/icons/admin/arrow-swap.png'
 
 const getInitials = (name) => {
     if (!name) return "";
@@ -31,12 +32,12 @@ const AvatarFallback = ({ name }) => {
 export const AllUsers = () => {
     const { auth } = useAuth();
     const [searchValue, setSearchValue] = useState("");
-    const [allAdmins, setAllAdmins] = useState([]);
-    const [allStudents, setAllStudents] = useState([]);
+    const [combinedUsers, setCombinedUsers] = useState([]);
     const [showConfirm, setShowConfirm] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
     const [idCardUrl, setIdCardUrl] = useState(null);
     const [showIdCard, setShowIdCard] = useState(false);
+    const [sortAZ, setSortAZ] = useState(true);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -65,8 +66,11 @@ export const AllUsers = () => {
                     adminsRes.json(),
                 ]);
 
-                setAllAdmins(admins);
-                setAllStudents(students);
+                const taggedAdmins = admins.map(admin => ({ ...admin, role: "admin" }));
+                const taggedStudents = students.map(student => ({ ...student, role: "student" }));
+
+                const combined = [...taggedAdmins, ...taggedStudents];
+                setCombinedUsers(combined);
                 setLoading(false);
 
             } catch (error) {
@@ -92,11 +96,7 @@ export const AllUsers = () => {
 
             if (!res.ok) throw new Error("Failed to delete user");
 
-            if (user.role === "admin") {
-                setAllAdmins(prev => prev.filter(a => a.email !== user.email));
-            } else {
-                setAllStudents(prev => prev.filter(s => s.email !== user.email));
-            }
+            setCombinedUsers(prev => prev.filter(u => u.email !== user.email));
         } catch (error) {
             console.error("Error deleting user:", error);
         }
@@ -126,7 +126,17 @@ export const AllUsers = () => {
         return <Loader message={"Loading User Stats 📊"} role={auth.userRole} />;
     }
 
-    console.log(allStudents)
+
+    const sortUsersAlphabetically = () => {
+        const sorted = [...combinedUsers].sort((a, b) => {
+            return sortAZ
+                ? a.fullName.localeCompare(b.fullName)
+                : b.fullName.localeCompare(a.fullName);
+        });
+        setCombinedUsers(sorted);
+        setSortAZ(!sortAZ);
+    };
+
     return (
         <div className="flex">
             <NavBar />
@@ -159,7 +169,16 @@ export const AllUsers = () => {
                 </div>
 
                 <div className='bg-white mt-10 rounded-lg py-8 px-5 ibm-plex-sans-500'>
-                    <h1 className='text-admin-primary-black text-2xl mb-6'>All Users</h1>
+                    <div className='flex justify-between items-center mb-6'>
+                        <h1 className='text-admin-primary-black text-2xl'>All Users</h1>
+                        <Button
+                            onClick={sortUsersAlphabetically}
+                            className="bg-transparent text-admin-primary-black shadow-none border-1 border-admin-dark-border hover:cursor-pointer hover:bg-admin-dark-border flex items-center gap-2"
+                        >
+                            {sortAZ ? "Sort A-Z" : "Sort Z-A"}
+                            <img src={swapIcon} alt="sort" />
+                        </Button>
+                    </div>
 
                     <div className="overflow-x-auto rounded-lg">
                         <table className="min-w-full text-md text-left border-collapse">
@@ -175,108 +194,66 @@ export const AllUsers = () => {
                                 </tr>
                             </thead>
                             <tbody className=''>
-                                {allAdmins.map((admin, index) => (
+                                {combinedUsers.map((user, index) => (
                                     <tr key={index} className="border-b border-admin-bg">
                                         <td className="px-4 py-4">
                                             <div className="flex gap-2 items-center">
-                                                <td>
-                                                    <div className="flex items-center gap-2">
-                                                        <AvatarFallback name={admin.fullName} />
-                                                    </div>
-                                                </td>
+                                                <AvatarFallback name={user.fullName} />
                                                 <div className='flex flex-col items-start'>
-                                                    <div className=''>
-                                                        {admin.fullName}
-                                                    </div>
-                                                    <div className='text-admin-secondary-black ibm-plex-sans-300'>
-                                                        {admin.email}
-                                                    </div>
+                                                    <div>{user.fullName}</div>
+                                                    <div className='text-admin-secondary-black ibm-plex-sans-300'>{user.email}</div>
                                                 </div>
                                             </div>
                                         </td>
+
                                         <td>
-                                            {admin.registrationDate
-                                                ? new Date(admin.registrationDate).toLocaleDateString("en-US", {
+                                            {user.registrationDate
+                                                ? new Date(user.registrationDate).toLocaleDateString("en-US", {
                                                     month: "short",
                                                     day: "2-digit",
                                                     year: "numeric",
                                                 })
                                                 : "—"}
                                         </td>
-                                        <td><span className='bg-admin-green-bg text-green-600 px-3 py-1 rounded-2xl'>Admin</span></td>
-                                        <td>—</td>
-                                        <td>—</td>
-                                        <td>—</td>
+
                                         <td>
-                                            {auth.email !== admin.email && (
+                                            <span className={`${user.role === "admin"
+                                                ? "bg-admin-green-bg text-green-600"
+                                                : "bg-admin-red-bg text-red-600"
+                                                } px-3 py-1 rounded-2xl`}>
+                                                {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                                            </span>
+                                        </td>
+
+                                        <td>{user.role === "student" ? user.noBooksBorrowed : "—"}</td>
+                                        <td>{user.role === "student" ? user.universityId : "—"}</td>
+                                        <td>
+                                            {user.role === "student" ? (
+                                                <Button
+                                                    className="flex items-center flex-wrap text-admin-primary-blue bg-transparent hover:bg-transparent hover:cursor-pointer shadow-none border-none"
+                                                    onClick={() => {
+                                                        setSelectedUser(user.email);
+                                                        fetchIdCard(user.email);
+                                                        setShowIdCard(true);
+                                                    }}
+                                                >
+                                                    <img src={eyeIcon} alt="eye" />
+                                                    View Id Card
+                                                </Button>
+                                            ) : "—"}
+                                        </td>
+                                        <td>
+                                            {auth.email !== user.email && (
                                                 <Button
                                                     className="bg-transparent hover:bg-transparent hover:cursor-pointer shadow-none border-none"
                                                     onClick={() => {
-                                                        setSelectedUser({ email: admin.email, role: "admin" });
+                                                        setSelectedUser({ email: user.email, role: user.role });
                                                         setShowConfirm(true);
                                                     }}
                                                 >
                                                     <img src={trashIcon} alt="trash" />
                                                 </Button>
                                             )}
-                                        </td>
-                                    </tr>
-                                ))}
-
-                                {allStudents.map((student, index) => (
-                                    <tr key={index} className="border-b border-admin-bg">
-                                        <td className="px-4 py-4">
-                                            <div className="flex gap-2 items-center">
-                                                <td>
-                                                    <div className="flex items-center gap-2">
-                                                        <AvatarFallback name={student.fullName} />
-                                                    </div>
-                                                </td>
-                                                <div className='flex flex-col items-start'>
-                                                    <div className=''>
-                                                        {student.fullName}
-                                                    </div>
-                                                    <div className='text-admin-secondary-black ibm-plex-sans-300'>
-                                                        {student.email}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            {student.registrationDate
-                                                ? new Date(student.registrationDate).toLocaleDateString("en-US", {
-                                                    month: "short",
-                                                    day: "2-digit",
-                                                    year: "numeric",
-                                                })
-                                                : "—"}
-                                        </td>
-                                        <td><span className='bg-admin-red-bg text-red-600 px-3 py-1 rounded-2xl'>Student</span></td>
-                                        <td>{student.noBooksBorrowed}</td>
-                                        <td>{student.universityId}</td>
-                                        <td>
-                                            <Button
-                                                className="flex items-center flex-wrap text-admin-primary-blue bg-transparent hover:bg-transparent hover:cursor-pointer shadow-none border-none"
-                                                onClick={() => {
-                                                    setSelectedUser(student.email);
-                                                    fetchIdCard(student.email);
-                                                    setShowIdCard(true);
-                                                }}
-                                            >
-                                                <img src={eyeIcon} alt="eye" />
-                                                View Id Card
-                                            </Button>
-                                        </td>
-                                        <td>
-                                            <Button
-                                                className="bg-transparent hover:bg-transparent hover:cursor-pointer shadow-none border-none"
-                                                onClick={() => {
-                                                    setSelectedUser({ email: student.email, role: "student" });
-                                                    setShowConfirm(true);
-                                                }}
-                                            >
-                                                <img src={trashIcon} alt="trash" />
-                                            </Button>
                                         </td>
                                     </tr>
                                 ))}
