@@ -11,6 +11,26 @@ import bookSvg from "../assets/icons/admin/book.svg";
 import bookMarkSvg from "../assets/icons/admin/bookmark.svg";
 import userFallBackImg from "../assets/icons/user.svg";
 
+const getInitials = (name) => {
+    if (!name) return "";
+    const parts = name.trim().split(" ");
+    const initials = parts[0][0] + (parts[1]?.[0] || "");
+    return initials.toUpperCase();
+};
+
+const AvatarFallback = ({ name }) => {
+    const initials = getInitials(name);
+    const { bg, text, border } = { bg: "bg-blue-200", text: "text-blue-700", border: "border-blue-700" }
+
+    return (
+        <div
+            className={`h-13 w-13 rounded-full flex items-center justify-center font-semibold text-lg ${bg} ${text} ${border} border`}
+        >
+            {initials}
+        </div>
+    );
+};
+
 export const NavBar = ({ homeColor, searchColor, userColor }) => {
     const { auth, setAuth } = useAuth();
     const navigate = useNavigate();
@@ -74,11 +94,7 @@ export const NavBar = ({ homeColor, searchColor, userColor }) => {
             <div className="p-2 m-12 border border-gray-200 rounded-full ibm-plex-sans-400">
                 <div className='flex items-center gap-2 text-admin-primary-blue justify-between'>
                     <div className="relative">
-                        <img
-                            src={userFallBackImg}
-                            alt="profile pic"
-                            className="bg-gray-200 p-1 rounded-full h-13 w-13"
-                        />
+                        <AvatarFallback name={auth.name} />
                         <span className="absolute bottom-0 right-0 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></span>
                     </div>
                     <div className='flex flex-col items-start overflow-hidden w-[120px]'>
