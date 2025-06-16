@@ -143,11 +143,12 @@ export const AllUsers = () => {
                             <thead className="text-md text-admin-primary-blue uppercase bg-admin-bg border-admin-bg">
                                 <tr>
                                     <th scope="col" className="p-4">Name</th>
-                                    <th scope="col" className="p-4">Date Joined</th>
-                                    <th scope="col" className="p-4">Role</th>
-                                    <th scope="col" className="p-4">Books Borrowed</th>
-                                    <th scope="col" className="p-4">University ID</th>
-                                    <th scope="col" className="p-4">Action</th>
+                                    <th scope="col">Date Joined</th>
+                                    <th scope="col">Role</th>
+                                    <th scope="col">Books Borrowed</th>
+                                    <th scope="col">University ID</th>
+                                    <th scope="col">University ID Card</th>
+                                    <th scope="col">Action</th>
                                 </tr>
                             </thead>
                             <tbody className=''>
@@ -155,7 +156,7 @@ export const AllUsers = () => {
                                     <tr key={index} className="border-b border-admin-bg">
                                         <td className="px-4 py-4">
                                             <div className="flex gap-2 items-center">
-                                                <td className="px-4 py-2">
+                                                <td>
                                                     <div className="flex items-center gap-2">
                                                         <AvatarFallback name={admin.fullName} />
                                                     </div>
@@ -170,7 +171,7 @@ export const AllUsers = () => {
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-4 py-2">
+                                        <td>
                                             {admin.registrationDate
                                                 ? new Date(admin.registrationDate).toLocaleDateString("en-US", {
                                                     month: "short",
@@ -179,10 +180,11 @@ export const AllUsers = () => {
                                                 })
                                                 : "—"}
                                         </td>
-                                        <td className="px-4 py-2"><span className='bg-admin-green-bg text-green-600 px-3 py-1 rounded-2xl'>Admin</span></td>
-                                        <td className="px-4 py-2">—</td>
-                                        <td className="px-4 py-2">—</td>
-                                        <td className="px-4 py-2">
+                                        <td><span className='bg-admin-green-bg text-green-600 px-3 py-1 rounded-2xl'>Admin</span></td>
+                                        <td>—</td>
+                                        <td>—</td>
+                                        <td>—</td>
+                                        <td>
                                             {auth.email !== admin.email && (
                                                 <Button
                                                     className="bg-transparent hover:bg-transparent hover:cursor-pointer shadow-none border-none"
@@ -202,7 +204,7 @@ export const AllUsers = () => {
                                     <tr key={index} className="border-b border-admin-bg">
                                         <td className="px-4 py-4">
                                             <div className="flex gap-2 items-center">
-                                                <td className="px-4 py-2">
+                                                <td>
                                                     <div className="flex items-center gap-2">
                                                         <AvatarFallback name={student.fullName} />
                                                     </div>
@@ -217,7 +219,7 @@ export const AllUsers = () => {
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-4 py-2">
+                                        <td>
                                             {student.registrationDate
                                                 ? new Date(student.registrationDate).toLocaleDateString("en-US", {
                                                     month: "short",
@@ -226,10 +228,11 @@ export const AllUsers = () => {
                                                 })
                                                 : "—"}
                                         </td>
-                                        <td className="px-4 py-2"><span className='bg-admin-red-bg text-red-600 px-3 py-1 rounded-2xl'>Student</span></td>
-                                        <td className="px-4 py-2">{student.noBooksBorrowed}</td>
-                                        <td className="px-4 py-2">{student.universityId}</td>
-                                        <td className="px-4 py-2">
+                                        <td><span className='bg-admin-red-bg text-red-600 px-3 py-1 rounded-2xl'>Student</span></td>
+                                        <td>{student.noBooksBorrowed}</td>
+                                        <td>{student.universityId}</td>
+                                        <td>ID Card</td>
+                                        <td>
                                             <Button
                                                 className="bg-transparent hover:bg-transparent hover:cursor-pointer shadow-none border-none"
                                                 onClick={() => {
