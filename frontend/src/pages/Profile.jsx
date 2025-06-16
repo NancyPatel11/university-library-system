@@ -20,7 +20,8 @@ export const Profile = () => {
   useEffect(() => {
     const fetchIdCard = async () => {
       try {
-        const response = await fetch("http://localhost:8080/api/user/idcard", {
+        const requestUrl = `http://localhost:8080/api/user/idcard/${auth.email}`;
+        const response = await fetch(requestUrl, {
           method: "GET",
           credentials: "include"
         });
@@ -38,7 +39,7 @@ export const Profile = () => {
     };
 
     fetchIdCard();
-  }, []);
+  }, [auth.email]);
 
   useEffect(() => {
     const fetchUser = async () => {

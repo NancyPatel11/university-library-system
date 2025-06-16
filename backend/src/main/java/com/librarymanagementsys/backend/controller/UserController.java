@@ -58,11 +58,9 @@ public class UserController {
         ));
     }
 
-    @GetMapping("/idcard")
-    public ResponseEntity<byte[]> getIdCard(HttpSession session) {
-        String email = (String) session.getAttribute("email");
-
-        return userService.getUserIdCardResponse(email); // fully delegated
+    @GetMapping("/idcard/{email}")
+    public ResponseEntity<byte[]> getIdCard(@PathVariable String email) {
+        return userService.getUserIdCardResponse(email);
     }
 
     @GetMapping("/profile")
