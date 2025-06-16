@@ -8,6 +8,7 @@ import approveIcon from '../../assets/icons/admin/approve.png'
 import closeIcon from '../../assets/icons/admin/close.svg'
 import closeCircleIcon from '../../assets/icons/admin/close-circle.svg'
 import eyeIcon from '../../assets/icons/admin/eye.png'
+import swapIcon from '../../assets/icons/admin/arrow-swap.png'
 import { toast } from 'sonner'
 
 const getInitials = (name) => {
@@ -39,6 +40,7 @@ export const AccountRequests = () => {
     const [selectedUser, setSelectedUser] = useState(null);
     const [idCardUrl, setIdCardUrl] = useState(null);
     const [showIdCard, setShowIdCard] = useState(false);
+    const [sortOldestFirst, setSortOldestFirst] = useState(true);
     const [loading, setLoading] = useState(true);
 
     const fetchStudents = async () => {
@@ -170,7 +172,24 @@ export const AccountRequests = () => {
                 </div>
 
                 <div className='bg-white mt-10 rounded-lg py-8 px-5 ibm-plex-sans-500'>
-                    <h1 className='text-admin-primary-black text-2xl mb-6'>Account Registration Requests</h1>
+                    <div className='flex justify-between items-center mb-6'>
+                        <h1 className='text-admin-primary-black text-2xl'>Account Registration Requests</h1>
+                        <Button
+                            className="bg-transparent text-admin-primary-black shadow-none border-1 border-admin-dark-border hover:cursor-pointer hover:bg-admin-dark-border flex items-center gap-2"
+                            onClick={() => {
+                                const sortedStudents = [...allStudents].sort((a, b) => {
+                                    return sortOldestFirst
+                                        ? new Date(a.registrationDate) - new Date(b.registrationDate) // Oldest to Recent
+                                        : new Date(b.registrationDate) - new Date(a.registrationDate); // Recent to Oldest
+                                });
+                                setAllStudents(sortedStudents);
+                                setSortOldestFirst(!sortOldestFirst);
+                            }}
+                        >
+                            {sortOldestFirst ? "Oldest to Recent" : "Recent to Oldest"}
+                            <img src={swapIcon} alt="sort" />
+                        </Button>
+                    </div>
 
                     <div className="overflow-x-auto rounded-lg">
                         <table className="min-w-full text-md text-left border-collapse">
