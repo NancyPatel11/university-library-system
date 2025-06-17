@@ -4,6 +4,7 @@ import com.librarymanagementsys.backend.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/books")
@@ -24,5 +25,11 @@ public class BookController {
     @GetMapping("/search/{keyword}")
     public ResponseEntity<?> searchBooks(@PathVariable String keyword) {
         return ResponseEntity.ok(bookService.searchBooks(keyword));
+    }
+
+    @DeleteMapping("/{bookId}")
+    public ResponseEntity<?> deleteBook(@PathVariable String bookId) {
+        bookService.deleteBook(bookId);
+        return ResponseEntity.ok(Map.of("message", "Book deleted successfully"));
     }
 }

@@ -42,4 +42,15 @@ public class BookService {
             throw new RuntimeException("Error searching books: " + e.getMessage());
         }
     }
+
+    public void deleteBook(String bookId) {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new BookNotFoundException("Book not found with id: " + bookId));
+
+        try {
+            bookRepository.delete(book);
+        } catch (Exception e) {
+            throw new RuntimeException("Error deleting book: " + e.getMessage());
+        }
+    }
 }
