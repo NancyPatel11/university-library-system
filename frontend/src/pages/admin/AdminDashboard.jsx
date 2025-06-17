@@ -6,15 +6,34 @@ import { Button } from '@/components/ui/button';
 import illustration1 from '../../assets/icons/admin/illustration1.png';
 import illustration2 from '../../assets/icons/admin/illustration2.png';
 import plusButton from '../../assets/icons/admin/plusButton.png';
-import userFilledImg from '../../assets/icons/user-fill.svg';
 import BookCoverSvg from '@/components/BookCoverSvg';
 import calendarImg from '../../assets/icons/admin/calendar.svg';
+
+const getInitials = (name) => {
+  if (!name) return "";
+  const parts = name.trim().split(" ");
+  const initials = parts[0][0] + (parts[1]?.[0] || "");
+  return initials.toUpperCase();
+};
+
+const AvatarFallback = ({ name }) => {
+  const initials = getInitials(name);
+  const { bg, text, border } = { bg: "bg-blue-200", text: "text-blue-700", border: "border-blue-700" }
+
+  return (
+    <div
+      className={`h-14 w-14 rounded-full flex items-center justify-center font-semibold text-sm ${bg} ${text} ${border} border`}
+    >
+      {initials}
+    </div>
+  );
+};
 
 export const AdminDashboard = () => {
   const { auth } = useAuth();
   const [searchValue, setSearchValue] = useState("");
-  const [allUsers, setAllUsers] = useState([]);
-  const [pendingUsers, setPendingUsers] = useState([]);
+  const [allStudents, setAllStudents] = useState([]);
+  const [pendingStudents, setPendingStudents] = useState([]);
   const [allBooks, setAllBooks] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -52,16 +71,16 @@ export const AdminDashboard = () => {
         });
 
         if (!response.ok) {
-          throw new Error("Failed to fetch users");
+          throw new Error("Failed to fetch students");
         }
 
         const data = await response.json();
-        setAllUsers(data);
-        const pending = data.filter(user => user.accountStatus === "Verification Pending");
-        setPendingUsers(pending);
+        setAllStudents(data);
+        const pending = data.filter(student => student.accountStatus === "Verification Pending");
+        setPendingStudents(pending);
         setLoading(false);
       } catch (error) {
-        console.error("Error fetching users:", error);
+        console.error("Error fetching students:", error);
       }
     };
 
@@ -110,8 +129,8 @@ export const AdminDashboard = () => {
             <h1 className='text-3xl'>145</h1>
           </div>
           <div className='bg-white rounded-2xl w-1/3 p-5'>
-            <p className='ibm-plex-sans-400 text-admin-secondary-black mb-7'>Total Users</p>
-            <h1 className='text-3xl'>{allUsers.length}</h1>
+            <p className='ibm-plex-sans-400 text-admin-secondary-black mb-7'>Total Students</p>
+            <h1 className='text-3xl'>{allStudents.length}</h1>
           </div>
           <div className='bg-white rounded-2xl w-1/3 p-5'>
             <p className='ibm-plex-sans-400 text-admin-secondary-black mb-7'>Total Books</p>
@@ -144,20 +163,18 @@ export const AdminDashboard = () => {
                   View All
                 </Button>
               </div>
-              {pendingUsers.length > 0 ?
+              {pendingStudents.length > 0 ?
                 <div className="flex flex-wrap justify-between mt-5 gap-3">
-                  {pendingUsers.map((user, index) => (
+                  {pendingStudents.map((student, index) => (
                     <div
                       key={index}
                       className="basis-[32%] flex-none bg-admin-bg rounded-lg p-5 flex flex-col items-center text-center ibm-plex-sans-500 text-admin-primary-black"
                     >
-                      <img
-                        src={user.profilePicture || userFilledImg}
-                        alt="User"
-                        className="h-14 w-14 rounded-full mb-3"
-                      />
-                      <h2 className="text-lg">{user.fullName}</h2>
-                      <p className="text-sm text-admin-secondary-black ibm-plex-sans-300">{user.email}</p>
+                      <div className="mb-3">
+                        <AvatarFallback name={student.fullName} />
+                      </div>
+                      <h2 className="text-lg">{student.fullName}</h2>
+                      <p className="text-sm text-admin-secondary-black ibm-plex-sans-300">{student.email}</p>
                     </div>
                   ))}
                 </div>
