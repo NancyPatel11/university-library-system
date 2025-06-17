@@ -1,20 +1,25 @@
 import React, { useEffect, useState } from 'react'
 import { useAuth } from '@/context/AuthContext.jsx';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import { NavBar } from '@/components/NavBar';
 import BookCoverSvg from '../components/BookCoverSvg.jsx';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar } from '@fortawesome/free-regular-svg-icons';
-import { faBookOpen } from '@fortawesome/free-solid-svg-icons';
+import { faBookOpen, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import bg from "../assets/images/bg.png";
 import { Button } from '@/components/ui/button.jsx';
 import { Loader } from '@/components/Loader.jsx';
 import { toast } from 'sonner';
+import calendarIcon from "../assets/icons/admin/calendar.svg";
+import editIcon from "../assets/icons/admin/edit.svg";
 
 export const BookDetails = () => {
   const { auth } = useAuth();
   const { bookId } = useParams();
   const [book, setBook] = useState(null);
+  const [searchValue, setSearchValue] = useState("");
+
+  const navigate = useNavigate();
 
   // Find the book based on the bookId from search params
   useEffect(() => {
@@ -102,7 +107,7 @@ export const BookDetails = () => {
   }
 
 
-  return (
+  return auth.userRole === "student" ?
     <div
       className="h-full bg-center bg-no-repeat"
       style={{
@@ -169,7 +174,8 @@ export const BookDetails = () => {
                   {para}
                   <br /><br />
                 </span>
-              ))}</p>
+              ))}
+            </p>
           </div>
           <div className='w-2/5'>
             <h1 className='text-2xl text-light-blue mb-10'>Popular Books</h1>
@@ -192,5 +198,104 @@ export const BookDetails = () => {
         </div>
       </div>
     </div>
-  )
+    :
+    <div className="flex">
+      <NavBar />
+      <div className="h-full min-h-screen bg-admin-bg border-1 border-admin-border w-full ibm-plex-sans-600 px-5 rounded-xl pt-5">
+        <div className="flex flex-wrap gap-4 justify-between items-center">
+          <div>
+            <h1 className='text-admin-primary-black text-2xl'>Welcome, {auth.name}</h1>
+            <p className='text-admin-secondary-black ibm-plex-sans-300 mt-2'>Monitor all of your projects and tasks here</p>
+          </div>
+          <div>
+            <form className="ibm-plex-sans-300 w-[350px]">
+              <div className="relative">
+                <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                  <svg className="w-4 h-4 text-admin-primary-blue" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                    <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                      d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                  </svg>
+                </div>
+                <input
+                  type="search"
+                  value={searchValue}
+                  onChange={(e) => setSearchValue(e.target.value)}
+                  className="block w-full p-3 ps-10 text-sm border border-admin-dark-border rounded-sm bg-white 
+                       text-admin-secondary-black focus:outline-none caret-admin-primary-blue"
+                  placeholder="Search users, books by title, author, genre."
+                />
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <Button
+          onClick={() => navigate(-1)}
+          className={`mt-10 bg-white text-admin-primary-black shadow-none hover:bg-admin-primary-blue hover:text-white hover:cursor-pointer `}
+        >
+          <FontAwesomeIcon icon={faArrowLeft} />
+          Go Back
+        </Button>
+
+        <div className='flex mt-10 ibm-plex-sans-600 gap-7'>
+          <div className="relative px-25 py-8 rounded-lg overflow-hidden">
+            <div
+              className="absolute inset-0 z-0"
+              style={{
+                backgroundColor: book.color,
+                opacity: 0.5,
+              }}
+            />
+            <div className="relative z-10">
+              <BookCoverSvg coverColor={book.color} width={150} height={200} />
+              <img
+                src={book.cover}
+                alt={book.title}
+                className="absolute top-0 left-4 w-[133px] h-[175px] object-fit rounded-lg"
+              />
+            </div>
+          </div>
+          <div className='w-1/3 flex flex-col gap-3 justify-between'>
+            <div className='flex gap-2'>
+              <p className='text-admin-secondary-black ibm-plex-sans-300'>Created at:  </p>
+              <img src={calendarIcon} alt="" />
+              <p className='text-admin-secondary-black ibm-plex-sans-300'>{book.createdAt}</p>
+            </div>
+            <h1 className='text-4xl'>{book.title}</h1>
+            <h1 className='text-2xl'>{book.author}</h1>
+            <p className='text-lg text-admin-secondary-black ibm-plex-sans-300'>{book.genre}</p>
+            <Button className="py-6 text-lg w-full border-admin-dark-border border-1 text-admin-bg bg-admin-primary-blue hover:bg-admin-tertiary-blue hover:cursor-pointer">
+              <img
+                src={editIcon}
+                alt="plus"
+              />
+              Edit Book
+            </Button>
+          </div>
+        </div>
+        <div className='flex gap-5 mt-10'>
+          <div>
+            <h1 className='text-lg'>Summary</h1>
+            <p className='mt-5 text-lg text-admin-secondary-black ibm-plex-sans-300'>
+              {book.summary.split("\n\n").map((para, i) => (
+                <span key={i}>
+                  {para}
+                  <br /><br />
+                </span>
+              ))}
+            </p>
+          </div>
+          <div>
+            <h1 className="text-lg">Video</h1>
+            {/* Add video player */}
+            <iframe
+              width="600" height="350"
+              src={`${book.video}`}
+            >
+            </iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+
 }

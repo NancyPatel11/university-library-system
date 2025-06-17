@@ -32,7 +32,7 @@ function App() {
         <Route
           path="/bookdetails/:bookId"
           element={
-            <ProtectedRoute allowedRoles={["student"]}>
+            <ProtectedRoute allowedRoles={["student", "admin"]}>
               <BookDetails />
             </ProtectedRoute>
           }

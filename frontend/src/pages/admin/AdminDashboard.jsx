@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext'
 import { Loader } from '@/components/Loader';
 import { NavBar } from '@/components/NavBar'
@@ -36,6 +37,8 @@ export const AdminDashboard = () => {
   const [pendingStudents, setPendingStudents] = useState([]);
   const [allBooks, setAllBooks] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     setLoading(true);
@@ -205,7 +208,16 @@ export const AdminDashboard = () => {
             {allBooks.length > 0 ?
               <div className='flex flex-col mt-8 gap-2'>
                 {allBooks.slice(0, 6).map((book, index) => (
-                  <div key={index} className="p-2 rounded-lg flex items-center gap-4">
+                  <div
+                    key={index}
+                    className="p-2 rounded-lg flex items-center gap-4 hover:cursor-pointer"
+                    onClick={
+                      () => {
+                        // Navigate to book details page
+                        navigate(`/bookdetails/${book.id}`)
+                      }
+                    }
+                  >
                     <div className="relative">
                       <BookCoverSvg coverColor={book.color} width={50} height={70} />
                       <img

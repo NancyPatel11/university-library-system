@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext.jsx'
 import { NavBar } from '@/components/NavBar'
 import { Loader } from '@/components/Loader'
@@ -20,6 +21,8 @@ export const AllBooks = () => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [sortAZ, setSortAZ] = useState(true);
     const [loading, setLoading] = useState(true);
+
+    const navigate = useNavigate();
 
     const sortBooksAlphabetically = () => {
         const sorted = [...allBooks].sort((a, b) => {
@@ -156,7 +159,15 @@ export const AllBooks = () => {
                                 {allBooks.map((book, index) => (
                                     <tr key={index} className="border-b border-admin-bg">
                                         <td className="p-4 font-medium text-admin-primary-black">
-                                            <div className='flex items-center gap-2'>
+                                            <div
+                                                className='flex items-center gap-2 hover:cursor-pointer'
+                                                onClick={
+                                                    () => {
+                                                        // Navigate to book details page
+                                                        navigate(`/bookdetails/${book.id}`)
+                                                    }
+                                                }
+                                            >
                                                 <div className="relative">
                                                     <BookCoverSvg coverColor={book.color} width={45} height={60} />
                                                     <img
