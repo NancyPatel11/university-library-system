@@ -83,12 +83,6 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/borrowbook/{bookId}")
-    public ResponseEntity<?> borrowBook(@PathVariable String bookId, HttpSession session) {
-        String email = (String) session.getAttribute("email");
-        return ResponseEntity.ok(userService.borrowBook(bookId, email));
-    }
-
     @GetMapping("/allUsers")
     public ResponseEntity<?> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());

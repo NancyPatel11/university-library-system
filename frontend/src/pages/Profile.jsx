@@ -10,6 +10,7 @@ import verificationPendingImg from "../assets/icons/warning.svg";
 import borrowedBookImg from "../assets/icons/book-2.svg";
 import CalendarImg from "../assets/icons/calendar.svg";
 import userFallbackImg from "../assets/icons/user-fill.svg";
+import tickIcon from "../assets/icons/tick.svg";
 
 export const Profile = () => {
   const { auth } = useAuth();
@@ -54,7 +55,6 @@ export const Profile = () => {
         }
 
         const data = await response.json();
-        console.log("User data:", data);
         setUser(data);
       } catch (error) {
         console.error("Error fetching user profile:", error);
@@ -65,42 +65,62 @@ export const Profile = () => {
   }, []);
 
   useEffect(() => {
-    const fetchAllBorrowedBooks = async () => {
-      if (!user?.borrowedBooks?.length) return;
+    const fetchAllBorrowedBooksIDs = async () => {
+      if (auth.userRole !== 'student') return;
 
       try {
-        const booksWithMeta = await Promise.all(
-          user.borrowedBooks.map(async (borrowed) => {
-            const res = await fetch(`http://localhost:8080/api/books/${borrowed.bookId}`, {
+        const response = await fetch("http://localhost:8080/api/borrow-requests/my-borrowed-books", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch borrowed books");
+        }
+
+        const data = await response.json();
+
+        const bookDetails = await Promise.all(
+          data.map(async (borrowRequest) => {
+            const bookId = borrowRequest.bookId;
+
+            const res = await fetch(`http://localhost:8080/api/books/${bookId}`, {
               method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+              },
               credentials: "include",
             });
 
             if (!res.ok) {
-              console.error(`Failed to fetch book ${borrowed.bookId}`);
-              return null;
+              throw new Error(`Failed to fetch book with ID ${bookId}`);
             }
 
             const bookData = await res.json();
 
             return {
               ...bookData,
-              issueDate: borrowed.issueDate,
-              returnDate: borrowed.returnDate,
-              status: borrowed.status,
+              studentEmail: borrowRequest.studentEmail,
+              issueDate: borrowRequest.issueDate,
+              dueDate: borrowRequest.dueDate,
+              status: borrowRequest.status,
             };
           })
         );
 
-        // Filter out nulls if any fetch fails
-        setBorrowedBooks(booksWithMeta.filter(Boolean));
+        console.log("Fetched all book details:", bookDetails);
+        setBorrowedBooks(bookDetails);
       } catch (error) {
         console.error("Error fetching borrowed book details:", error);
       }
     };
 
-    fetchAllBorrowedBooks();
-  }, [user]);
+    fetchAllBorrowedBooksIDs();
+  }, [auth.userRole, user?.borrowedBooks]);
+
 
   if (!user || !idCardUrl) {
     return <Loader message={"Navigating to your profile 👤"} role={auth.userRole} />
@@ -212,26 +232,47 @@ export const Profile = () => {
                       </h2>
                       <p className="text-sm text-light-blue italic truncate mt-2 mb-5">{book.genre}</p>
                     </div>
-                    {book.status == "Borrow Request Pending" ?
+                    {book.status == "Pending" ?
                       <div className='flex gap-2 flex-wrap text-light-blue'>
                         <img src={verificationPendingImg} alt="Book Requesnt Pending" />
-                        <p>{book.status}</p>
+                        <p>Book Request Approval Pending</p>
                       </div>
                       :
-                      <div className='flex flex-col gap-2 text-light-blue'>
-                        <div className='flex gap-2 flex-wrap'>
-                          <img src={verifiedImg} alt="Borrowed" />
-                          <p className='text-light-blue'>{book.status}</p>
+                      book.status == "Borrowed" ?
+                        <div className='flex flex-col gap-2 text-light-blue'>
+                          <div className='flex gap-2 flex-wrap'>
+                            <img src={borrowedBookImg} alt="Borrowed" />
+                            <p>Borrowed on {book.issueDate}</p>
+                          </div>
+                          <div className='flex gap-2 flex-wrap'>
+                            <img src={CalendarImg} alt="Borrowed" />
+                            <p>To be returned on {book.dueDate}</p>
+                          </div>
                         </div>
-                        <div className='flex gap-2 flex-wrap'>
-                          <img src={borrowedBookImg} alt="Borrowed" />
-                          <p>Borrowed on {book.issueDate}</p>
-                        </div>
-                        <div className='flex gap-2 flex-wrap'>
-                          <img src={CalendarImg} alt="Borrowed" />
-                          <p>To be returned on {book.returnDate}</p>
-                        </div>
-                      </div>}
+                        :
+                        book.status == "Returned" ?
+                          <div className='flex flex-col gap-2 text-light-blue'>
+                            <div className='flex gap-2 flex-wrap'>
+                              <img src={borrowedBookImg} alt="Borrowed" />
+                              <p>Borrowed on {book.issueDate}</p>
+                            </div>
+                            <div className='flex gap-2 flex-wrap'>
+                              <img src={tickIcon} alt="Borrowed" />
+                              <p>Returned on {book.returnDate}</p>
+                            </div>
+                          </div>
+                          :
+                          <div className='flex flex-col gap-2 text-light-blue'>
+                            <div className='flex gap-2 flex-wrap'>
+                              <img src={borrowedBookImg} alt="Borrowed" />
+                              <p>Borrowed on {book.issueDate}</p>
+                            </div>
+                            <div className='flex gap-2 flex-wrap'>
+                              <img src={verificationPendingImg} alt="Borrowed" />
+                              <p className='text-red-400'>Overdue Return</p>
+                            </div>
+                          </div>
+                    }
                   </div>
                 </div>
               ))}

@@ -50,41 +50,42 @@ export const BookDetails = () => {
     fetchCurrentBook();
   }, [bookId]);
 
+  const checkIfBookBorrowRequested = async () => {
+    try {
+      const payload = {
+        bookId: book.id,
+        studentEmail: auth.email
+      };
+      const response = await fetch(`http://localhost:8080/api/borrow-requests/check-status`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        setShowBorrowButton(true);
+        return;
+      }
+
+      // If the response is ok, parse the JSON
+      const data = await response.json();
+      setBorrowRequest(data);
+      setShowBorrowButton(false);
+    }
+    catch {
+      console.error("Error checking borrow request status");
+      setShowBorrowButton(true);
+    }
+  }
+
   useEffect(() => {
     if (auth.userRole === "admin") return;
-    const checkIfBookBorrowRequested = async () => {
-      try {
-        const payload = {
-          bookId: book.id,
-          studentEmail: auth.email
-        };
-        const response = await fetch(`http://localhost:8080/api/borrow-requests/check-status`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify(payload),
-        });
-
-        if (!response.ok) {
-          setShowBorrowButton(true);
-          return;
-        }
-
-        // If the response is ok, parse the JSON
-        const data = await response.json();
-        setBorrowRequest(data);
-        setShowBorrowButton(false);
-      }
-      catch {
-        console.error("Error checking borrow request status");
-        setShowBorrowButton(true);
-      }
-    }
 
     checkIfBookBorrowRequested();
-  }, [book, auth.email, auth.userRole]);
+  });
 
   const [allBooks, setAllBooks] = useState(null);
 
@@ -124,7 +125,7 @@ export const BookDetails = () => {
         bookId: book.id,
         studentEmail: auth.email,
       };
-      
+
       const response = await fetch(`http://localhost:8080/api/borrow-requests/create`, {
         method: "POST",
         headers: {
@@ -141,6 +142,7 @@ export const BookDetails = () => {
 
       const result = await response.text(); // response is just a string, not JSON
       toast.success(result || "Borrow request sent successfully!");
+      checkIfBookBorrowRequested(); // Refresh borrow request status
     } catch (error) {
       console.error("Error sending borrow request:", error);
       toast.error(error.message || "Something went wrong while sending the borrow request.");

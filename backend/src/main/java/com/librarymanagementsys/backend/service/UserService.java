@@ -6,7 +6,6 @@ import com.librarymanagementsys.backend.exception.EmailAlreadyExistsException;
 import com.librarymanagementsys.backend.exception.ImageNotSaved;
 import com.librarymanagementsys.backend.exception.InvalidCredentialsException;
 import com.librarymanagementsys.backend.exception.UserNotFoundException;
-import com.librarymanagementsys.backend.model.BorrowedBook;
 import com.librarymanagementsys.backend.model.User;
 import com.librarymanagementsys.backend.repository.UserRepository;
 import com.librarymanagementsys.backend.security.JwtUtil;
@@ -20,10 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class UserService {
@@ -60,7 +57,6 @@ public class UserService {
         user.setIdCardType(idCardImage.getContentType());
         user.setIdCard(idCardBytes); // ✅ Save the image
         user.setAccountStatus("Verification Pending"); // Initial status
-        user.setBorrowedBooks(List.of()); // Initialize with an empty list
         user.setRegistrationDate(new Date());
 
         userRepository.save(user);
@@ -114,31 +110,6 @@ public class UserService {
             throw new UserNotFoundException("User not found with email: " + email);
         }
         return user;
-    }
-
-    public ResponseEntity<?> borrowBook(String bookId, String email) {
-        User user = userRepository.findByEmail(email);
-        if (user == null) {
-            throw new UserNotFoundException("User not found with email: " + email);
-        }
-
-        BorrowedBook borrowedBook = new BorrowedBook();
-        borrowedBook.setBookId(bookId);
-        borrowedBook.setStatus("Borrow Request Pending");
-
-        List<BorrowedBook> borrowedBooks = user.getBorrowedBooks();
-        if (borrowedBooks == null) {
-            borrowedBooks = List.of();
-        }
-
-        borrowedBooks.add(borrowedBook);
-
-        user.setBorrowedBooks(borrowedBooks);
-        userRepository.save(user);
-        return ResponseEntity.ok(Map.of(
-                "message", "Book borrowed request created.",
-                "bookId", bookId
-        ));
     }
 
     public List<User> getAllUsers() {

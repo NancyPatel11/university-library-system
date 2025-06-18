@@ -21,5 +21,6 @@ public class BorrowRequest {
     private String status; // "Pending", "Approved", or "Rejected"
     private Date requestDate;  // the date when the request was made by the student
     private Date issueDate;  // the date when the book was issued to the student
-    private Date returnDate; // the date when the book is expected to be returned by the student
+    private Date dueDate; // the date when the book is due to be returned
+    private Date returnDate; // the date when the book was returned by the student
 }

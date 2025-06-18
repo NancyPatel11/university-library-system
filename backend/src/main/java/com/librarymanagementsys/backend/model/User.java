@@ -27,5 +27,4 @@ public class User {
     private int noBooksBorrowed = 0; // Default 0
     private Date registrationDate;
     private String accountStatus = "Verification Pending"; // Default status when a user is registered
-    private List<BorrowedBook> borrowedBooks;
 }

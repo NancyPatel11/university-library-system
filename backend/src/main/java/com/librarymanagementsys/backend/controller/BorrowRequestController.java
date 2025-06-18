@@ -3,6 +3,7 @@ package com.librarymanagementsys.backend.controller;
 import com.librarymanagementsys.backend.dto.BorrowStatusRequest;
 import com.librarymanagementsys.backend.model.BorrowRequest;
 import com.librarymanagementsys.backend.service.BorrowRequestService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,5 +29,14 @@ public class BorrowRequestController {
         );
 
         return ResponseEntity.ok(borrowRequest);
+    }
+
+    @GetMapping("/my-borrowed-books")
+    public ResponseEntity<?> getMyBorrowedBooks(HttpSession session) {
+        String studentEmail = (String) session.getAttribute("email");
+        if (studentEmail == null) {
+            return ResponseEntity.badRequest().body("No student email found in session");
+        }
+        return ResponseEntity.ok(borrowRequestService.getMyBorrowedBooks(studentEmail));
     }
 }

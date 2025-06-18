@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class BorrowRequestService {
@@ -35,5 +36,15 @@ public class BorrowRequestService {
         }
 
         return borrowRequest; // Return the found borrow request
+    }
+
+    public List<BorrowRequest> getMyBorrowedBooks(String studentEmail) {
+        // Fetch all borrow requests for the given student email
+        List<BorrowRequest> borrowedBooks = borrowRequestRepository.findByStudentEmail(studentEmail);
+
+        if (borrowedBooks.isEmpty()) {
+           return List.of(); // Return an empty list if no borrowed books found
+        }
+        return borrowedBooks; // Return the list of borrowed books
     }
 }
