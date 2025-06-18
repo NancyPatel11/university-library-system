@@ -12,12 +12,15 @@ import { Loader } from '@/components/Loader.jsx';
 import { toast } from 'sonner';
 import calendarIcon from "../assets/icons/admin/calendar.svg";
 import editIcon from "../assets/icons/admin/edit.svg";
+import warningIcon from "../assets/icons/warning.svg";
 
 export const BookDetails = () => {
   const { auth } = useAuth();
   const { bookId } = useParams();
   const [book, setBook] = useState(null);
   const [searchValue, setSearchValue] = useState("");
+  const [showBorrowButton, setShowBorrowButton] = useState(true);
+  const [borrowRequest, setBorrowRequest] = useState(null);
 
   const navigate = useNavigate();
 
@@ -46,6 +49,42 @@ export const BookDetails = () => {
 
     fetchCurrentBook();
   }, [bookId]);
+
+  useEffect(() => {
+    if (auth.userRole === "admin") return;
+    const checkIfBookBorrowRequested = async () => {
+      try {
+        const payload = {
+          bookId: book.id,
+          studentEmail: auth.email
+        };
+        const response = await fetch(`http://localhost:8080/api/borrow-requests/check-status`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+          setShowBorrowButton(true);
+          return;
+        }
+
+        // If the response is ok, parse the JSON
+        const data = await response.json();
+        setBorrowRequest(data);
+        setShowBorrowButton(false);
+      }
+      catch {
+        console.error("Error checking borrow request status");
+        setShowBorrowButton(true);
+      }
+    }
+
+    checkIfBookBorrowRequested();
+  }, [book, auth.email, auth.userRole]);
 
   const [allBooks, setAllBooks] = useState(null);
 
@@ -81,26 +120,32 @@ export const BookDetails = () => {
 
   const handleBorrowRequest = async () => {
     try {
-      const response = await fetch(`http://localhost:8080/api/user/borrowbook/${book.id}`, {
-        method: "GET",
+      const payload = {
+        bookId: book.id,
+        studentEmail: auth.email,
+      };
+      
+      const response = await fetch(`http://localhost:8080/api/borrow-requests/create`, {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         credentials: "include",
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to send borrow request");
+        const errorText = await response.text();
+        throw new Error(errorText || "Failed to send borrow request");
       }
 
-      const result = await response.json();
-      toast.success(result.message || "Borrow request sent successfully!");
-    }
-    catch (error) {
+      const result = await response.text(); // response is just a string, not JSON
+      toast.success(result || "Borrow request sent successfully!");
+    } catch (error) {
       console.error("Error sending borrow request:", error);
       toast.error(error.message || "Something went wrong while sending the borrow request.");
     }
-  }
+  };
 
   if (!allBooks || !book) {
     return <Loader message={"Loading book details... 📘"} role={auth.userRole} />;
@@ -130,9 +175,24 @@ export const BookDetails = () => {
               <p className='text-xl'>Available Books:  <span className='text-yellow ibm-plex-sans-600'>{book.available_copies}</span></p>
             </div>
             <p className='text-xl text-light-blue mt-10'>{book.description}</p>
-            <Button onClick={handleBorrowRequest} className='text-2xl bebas-neue-400 bg-yellow text-dark-end mt-10 rounded-xs border-2 border-yellow hover:bg-yellow-dark hover:border-yellow-dark hover:cursor-pointer'>
-              <FontAwesomeIcon icon={faBookOpen} /> BORROW BOOK REQUEST
-            </Button>
+            {(showBorrowButton || borrowRequest.status === "Returned") &&
+              <Button onClick={handleBorrowRequest} className='text-2xl bebas-neue-400 bg-yellow text-dark-end mt-10 rounded-xs border-2 border-yellow hover:bg-yellow-dark hover:border-yellow-dark hover:cursor-pointer'>
+                <FontAwesomeIcon icon={faBookOpen} /> BORROW BOOK REQUEST
+              </Button>
+            }
+            {borrowRequest && borrowRequest?.status === "Pending" && (
+              <div className='flex mt-5 text-lg ibm-plex-sans-300 bg-search-bar p-3 rounded-sm w-[325px] items-center justify-around'>
+                <img src={warningIcon} alt="warning" />
+                Book Request Approval Pending
+              </div>
+            )}
+            {borrowRequest && borrowRequest.status === "Borrowed" && (
+              <div className='flex mt-5 text-lg ibm-plex-sans-300 bg-search-bar p-3 rounded-sm w-[325px] items-center justify-around'>
+                <img src={warningIcon} alt="warning" />
+                Due Date: <span className='text-yellow ibm-plex-sans-600'>{borrowRequest.dueDate}</span>
+              </div>
+            )}
+
           </div>
           <div className='w-1/2'>
             <div className='relative'>
