@@ -49,4 +49,9 @@ public class BorrowRequestController {
     public ResponseEntity<BorrowRequest> approveBorrowRequest(@PathVariable String requestId) {
         return ResponseEntity.ok(borrowRequestService.approveBorrowRequest(requestId));
     }
+
+    @PutMapping("/return-book/{requestId}")
+    public ResponseEntity<String> returnBook(@PathVariable String requestId) {
+        return ResponseEntity.ok(borrowRequestService.returnBook(requestId));
+    }
 }

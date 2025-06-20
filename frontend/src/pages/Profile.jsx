@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/authContext';
 import { NavBar } from '@/components/NavBar';
 import { Loader } from '@/components/Loader';
@@ -17,6 +18,8 @@ export const Profile = () => {
   const [idCardUrl, setIdCardUrl] = useState(null);
   const [user, setUser] = useState(null);
   const [borrowedBooks, setBorrowedBooks] = useState([]);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchIdCard = async () => {
@@ -106,6 +109,7 @@ export const Profile = () => {
               studentEmail: borrowRequest.studentEmail,
               issueDate: borrowRequest.issueDate,
               dueDate: borrowRequest.dueDate,
+              returnDate: borrowRequest.returnDate,
               status: borrowRequest.status,
             };
           })
@@ -125,6 +129,7 @@ export const Profile = () => {
   if (!user || !idCardUrl) {
     return <Loader message={"Navigating to your profile 👤"} role={auth.userRole} />
   }
+
   return (
     <div
       className="min-h-screen h-full bg-center bg-no-repeat"
@@ -201,7 +206,12 @@ export const Profile = () => {
 
             <div className='flex flex-wrap gap-7 mt-5 text-white justify-start'>
               {borrowedBooks.map((book, index) => (
-                <div key={index} className="bg-search-bar p-5 rounded-lg gap-4 items-center">
+                <div
+                  onClick={
+                    () => navigate(`/bookdetails/${book.id}`)
+                  }
+                  key={index}
+                  className="bg-search-bar p-5 rounded-lg gap-4 items-center hover:cursor-pointer">
                   {/* Wrapper with overlay */}
                   <div className="relative px-10 py-5 rounded-lg overflow-hidden">
                     {/* Color overlay with 30% opacity */}
@@ -242,11 +252,21 @@ export const Profile = () => {
                         <div className='flex flex-col gap-2 text-light-blue'>
                           <div className='flex gap-2 flex-wrap'>
                             <img src={borrowedBookImg} alt="Borrowed" />
-                            <p>Borrowed on {book.issueDate}</p>
+                            <p>Borrowed on {
+                              new Date(book.issueDate).toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric'
+                              })
+                            }</p>
                           </div>
                           <div className='flex gap-2 flex-wrap'>
                             <img src={CalendarImg} alt="Borrowed" />
-                            <p>To be returned on {book.dueDate}</p>
+                            <p>To be returned on {new Date(book.dueDate).toLocaleDateString('en-US', {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric'
+                            })}</p>
                           </div>
                         </div>
                         :
@@ -254,18 +274,30 @@ export const Profile = () => {
                           <div className='flex flex-col gap-2 text-light-blue'>
                             <div className='flex gap-2 flex-wrap'>
                               <img src={borrowedBookImg} alt="Borrowed" />
-                              <p>Borrowed on {book.issueDate}</p>
+                              <p>Borrowed on {new Date(book.issueDate).toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric'
+                              })}</p>
                             </div>
                             <div className='flex gap-2 flex-wrap'>
                               <img src={tickIcon} alt="Borrowed" />
-                              <p>Returned on {book.returnDate}</p>
+                              <p>Returned on {new Date(book.returnDate).toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric'
+                              })}</p>
                             </div>
                           </div>
                           :
                           <div className='flex flex-col gap-2 text-light-blue'>
                             <div className='flex gap-2 flex-wrap'>
                               <img src={borrowedBookImg} alt="Borrowed" />
-                              <p>Borrowed on {book.issueDate}</p>
+                              <p>Borrowed on {new Date(book.issueDate).toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric'
+                              })}</p>
                             </div>
                             <div className='flex gap-2 flex-wrap'>
                               <img src={verificationPendingImg} alt="Borrowed" />

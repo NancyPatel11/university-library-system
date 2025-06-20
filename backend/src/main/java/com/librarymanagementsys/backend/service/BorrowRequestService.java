@@ -2,8 +2,10 @@ package com.librarymanagementsys.backend.service;
 
 import com.librarymanagementsys.backend.model.Book;
 import com.librarymanagementsys.backend.model.BorrowRequest;
+import com.librarymanagementsys.backend.model.User;
 import com.librarymanagementsys.backend.repository.BookRepository;
 import com.librarymanagementsys.backend.repository.BorrowRequestRepository;
+import com.librarymanagementsys.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +20,9 @@ public class BorrowRequestService {
 
     @Autowired
     private BookRepository bookRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     public void createBorrowRequest(BorrowRequest borrowRequest) {
         borrowRequest.setStatus("Pending"); // Set default status to "Pending"
@@ -71,17 +76,45 @@ public class BorrowRequestService {
         Book book = bookRepository.findById(borrowRequest.getBookId())
                 .orElseThrow(() -> new RuntimeException("Book not found with ID: " + borrowRequest.getBookId()));
 
+        User user = userRepository.findByEmail(borrowRequest.getStudentEmail());
+
         try {
+            user.setNoBooksBorrowed(user.getNoBooksBorrowed() + 1); // Increment the number of books borrowed by the user
             book.setAvailable_copies(book.getAvailable_copies() - 1); // Decrease the available copies of the book
             borrowRequest.setStatus("Borrowed");
             borrowRequest.setIssueDate(new Date()); // Set the issue date to the current date
             borrowRequest.setDueDate(new Date(System.currentTimeMillis() + 14 * 24 * 60 * 60 * 1000)); // Set due date to 14 days from now
             borrowRequestRepository.save(borrowRequest); // Save the updated borrow request
             bookRepository.save(book); // Save the updated book information
+            userRepository.save(user); // Save the updated user information
             return borrowRequest; // Return the updated borrow request
         }
         catch (Exception e) {
             throw new RuntimeException("Error approving borrow request: " + e.getMessage());
+        }
+    }
+
+    public String returnBook(String requestId) {
+        // Find the borrow request by ID
+        BorrowRequest borrowRequest = borrowRequestRepository.findById(requestId)
+                .orElseThrow(() -> new RuntimeException("Borrow request not found with ID: " + requestId));
+
+        Book book = bookRepository.findById(borrowRequest.getBookId())
+                .orElseThrow(() -> new RuntimeException("Book not found with ID: " + borrowRequest.getBookId()));
+
+        User user = userRepository.findByEmail(borrowRequest.getStudentEmail());
+
+        try {
+            user.setNoBooksBorrowed(user.getNoBooksBorrowed() - 1); // Decrement the number of books borrowed by the user
+            book.setAvailable_copies(book.getAvailable_copies() + 1); // Increase the available copies of the book
+            borrowRequest.setStatus("Returned"); // Update the status to "Returned"
+            borrowRequest.setReturnDate(new Date()); // Set the return date to the current date
+            borrowRequestRepository.save(borrowRequest); // Save the updated borrow request
+            bookRepository.save(book); // Save the updated book information
+            return "Book returned successfully";
+        }
+        catch (Exception e) {
+            throw new RuntimeException("Error returning book: " + e.getMessage());
         }
     }
 }

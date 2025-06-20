@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { useAuth } from '@/context/AuthContext.jsx';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { NavBar } from '@/components/NavBar';
@@ -50,7 +50,15 @@ export const BookDetails = () => {
     fetchCurrentBook();
   }, [bookId]);
 
-  const checkIfBookBorrowRequested = async () => {
+  useEffect(() => {
+    setBook(null);
+    setBorrowRequest(null);
+    setShowBorrowButton(true);
+  }, [bookId]);
+
+  const checkIfBookBorrowRequested = useCallback(async () => {
+    if (!book || auth.userRole === "admin") return;
+
     try {
       const payload = {
         bookId: book.id,
@@ -66,6 +74,7 @@ export const BookDetails = () => {
       });
 
       if (!response.ok) {
+        setBorrowRequest(null);
         setShowBorrowButton(true);
         return;
       }
@@ -74,18 +83,16 @@ export const BookDetails = () => {
       const data = await response.json();
       setBorrowRequest(data);
       setShowBorrowButton(false);
-    }
-    catch {
-      console.error("Error checking borrow request status");
+    } catch (error) {
+      console.error("Error checking borrow request status:", error);
+      setBorrowRequest(null);
       setShowBorrowButton(true);
     }
-  }
+  }, [book, auth.email, auth.userRole]);
 
   useEffect(() => {
-    if (auth.userRole === "admin") return;
-
     checkIfBookBorrowRequested();
-  });
+  }, [book, auth.email, checkIfBookBorrowRequested]);
 
   const [allBooks, setAllBooks] = useState(null);
 
@@ -149,6 +156,33 @@ export const BookDetails = () => {
     }
   };
 
+  const handleReturnBook = async (borrowRequestId) => {
+    try {
+      const response = await fetch(`http://localhost:8080/api/borrow-requests/return-book/${borrowRequestId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || "Failed to return book");
+      }
+
+      const result = await response.text(); // response is just a string, not JSON
+      toast.success(result || "Book returned successfully!");
+      setBorrowRequest(prev => ({
+        ...prev,
+        status: "Returned"
+      })); // Update borrow request status in state
+    } catch (error) {
+      console.error("Error returning book:", error);
+      toast.error(error.message || "Something went wrong while returning the book.");
+    }
+  };
+
   if (!allBooks || !book) {
     return <Loader message={"Loading book details... 📘"} role={auth.userRole} />;
   }
@@ -189,12 +223,43 @@ export const BookDetails = () => {
               </div>
             )}
             {borrowRequest && borrowRequest.status === "Borrowed" && (
-              <div className='flex mt-5 text-lg ibm-plex-sans-300 bg-search-bar p-3 rounded-sm w-[325px] items-center justify-around'>
-                <img src={warningIcon} alt="warning" />
-                Due Date: <span className='text-yellow ibm-plex-sans-600'>{borrowRequest.dueDate}</span>
+              <div className='flex mt-5 text-lg ibm-plex-sans-300 bg-search-bar p-3 rounded-sm items-center justify-between gap-3'>
+                <div className='flex gap-3'>
+                  <img src={warningIcon} alt="warning" />
+
+                  Due Date:
+                  <span className='text-yellow ibm-plex-sans-600'>
+                    {
+                      new Date(borrowRequest.dueDate).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })
+                    }
+                  </span>
+                </div>
+                <Button
+                  onClick={() => {
+                    handleReturnBook(borrowRequest.id);
+                  }}
+                  className={`bg-yellow-dark text-black hover:cursor-pointer hover:bg-yellow ibm-plex-sans-500`}>
+                  Return Book
+                </Button>
               </div>
             )}
-
+            {
+              borrowRequest && borrowRequest.status === "Overdue" && (
+                <div className='flex mt-5 text-lg ibm-plex-sans-300 bg-search-bar p-3 rounded-sm items-center justify-between gap-3'>
+                  <div className='flex gap-3'>
+                    <img src={warningIcon} alt="warning" />
+                    <span className='text-yellow ibm-plex-sans-600'>Your book is overdue!</span>
+                  </div>
+                  <Button className={`bg-yellow-dark text-black hover:cursor-pointer hover:bg-yellow ibm-plex-sans-500`}>
+                    Return Book
+                  </Button>
+                </div>
+              )
+            }
           </div>
           <div className='w-1/2'>
             <div className='relative'>
