@@ -12,6 +12,7 @@ import { AdminDashboard } from './pages/admin/AdminDashboard';
 import { AllUsers } from './pages/admin/AllUsers';
 import { AccountRequests } from './pages/admin/AccountRequests';
 import { AllBooks } from './pages/admin/AllBooks';
+import { BorrowRequests } from './pages/admin/BorrowRequests';
 
 function App() {
   return (
@@ -77,6 +78,15 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
               <AllBooks />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/borrow-requests"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <BorrowRequests />
             </ProtectedRoute>
           }
         />

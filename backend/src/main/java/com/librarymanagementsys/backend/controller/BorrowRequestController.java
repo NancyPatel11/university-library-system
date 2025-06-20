@@ -39,4 +39,14 @@ public class BorrowRequestController {
         }
         return ResponseEntity.ok(borrowRequestService.getMyBorrowedBooks(studentEmail));
     }
+
+    @GetMapping("/all-borrow-requests")
+    public ResponseEntity<?> getAllBorrowRequests(){
+        return ResponseEntity.ok(borrowRequestService.getAllBorrowRequests());
+    }
+
+    @PutMapping("/approve-request/{requestId}")
+    public ResponseEntity<BorrowRequest> approveBorrowRequest(@PathVariable String requestId) {
+        return ResponseEntity.ok(borrowRequestService.approveBorrowRequest(requestId));
+    }
 }

@@ -1,6 +1,8 @@
 package com.librarymanagementsys.backend.service;
 
+import com.librarymanagementsys.backend.model.Book;
 import com.librarymanagementsys.backend.model.BorrowRequest;
+import com.librarymanagementsys.backend.repository.BookRepository;
 import com.librarymanagementsys.backend.repository.BorrowRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,6 +15,9 @@ public class BorrowRequestService {
 
     @Autowired
     private BorrowRequestRepository borrowRequestRepository;
+
+    @Autowired
+    private BookRepository bookRepository;
 
     public void createBorrowRequest(BorrowRequest borrowRequest) {
         borrowRequest.setStatus("Pending"); // Set default status to "Pending"
@@ -46,5 +51,37 @@ public class BorrowRequestService {
            return List.of(); // Return an empty list if no borrowed books found
         }
         return borrowedBooks; // Return the list of borrowed books
+    }
+
+    public List<BorrowRequest> getAllBorrowRequests() {
+        // Fetch all borrow requests from the repository
+        List<BorrowRequest> allBorrowRequests = borrowRequestRepository.findAll();
+
+        if (allBorrowRequests.isEmpty()) {
+            return List.of(); // Return an empty list if no borrow requests found
+        }
+        return allBorrowRequests; // Return the list of all borrow requests
+    }
+
+    public BorrowRequest approveBorrowRequest(String requestId) {
+        // Find the borrow request by ID
+        BorrowRequest borrowRequest = borrowRequestRepository.findById(requestId)
+                .orElseThrow(() -> new RuntimeException("Borrow request not found with ID: " + requestId));
+
+        Book book = bookRepository.findById(borrowRequest.getBookId())
+                .orElseThrow(() -> new RuntimeException("Book not found with ID: " + borrowRequest.getBookId()));
+
+        try {
+            book.setAvailable_copies(book.getAvailable_copies() - 1); // Decrease the available copies of the book
+            borrowRequest.setStatus("Borrowed");
+            borrowRequest.setIssueDate(new Date()); // Set the issue date to the current date
+            borrowRequest.setDueDate(new Date(System.currentTimeMillis() + 14 * 24 * 60 * 60 * 1000)); // Set due date to 14 days from now
+            borrowRequestRepository.save(borrowRequest); // Save the updated borrow request
+            bookRepository.save(book); // Save the updated book information
+            return borrowRequest; // Return the updated borrow request
+        }
+        catch (Exception e) {
+            throw new RuntimeException("Error approving borrow request: " + e.getMessage());
+        }
     }
 }
