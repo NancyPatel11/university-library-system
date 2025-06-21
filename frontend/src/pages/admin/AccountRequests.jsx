@@ -31,6 +31,13 @@ const AvatarFallback = ({ name }) => {
     );
 };
 
+const Spinner = ({ size = "sm" }) => (
+    <div
+        className={`animate-spin rounded-full border-2 border-t-transparent ${size === "sm" ? "h-4 w-4" : "h-6 w-6"
+            } border-admin-primary-blue`}
+    ></div>
+);
+
 export const AccountRequests = () => {
     const { auth } = useAuth();
     const [searchValue, setSearchValue] = useState("");
@@ -41,6 +48,7 @@ export const AccountRequests = () => {
     const [idCardUrl, setIdCardUrl] = useState(null);
     const [showIdCard, setShowIdCard] = useState(false);
     const [sortOldestFirst, setSortOldestFirst] = useState(true);
+    const [actionLoading, setActionLoading] = useState(false);
     const [loading, setLoading] = useState(true);
 
     const fetchStudents = async () => {
@@ -49,27 +57,33 @@ export const AccountRequests = () => {
                 method: "GET",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",
-            })
+            });
 
             if (!studentsRes.ok) {
                 throw new Error("Failed to fetch users");
             }
 
-            const students = await studentsRes.json()
+            const students = await studentsRes.json();
             setAllStudents(students);
-            setLoading(false);
         } catch (error) {
             console.error("Error fetching users:", error);
+            toast.error("Failed to fetch users. Please try again.");
         }
-    }
+    };
 
     useEffect(() => {
-        setLoading(true);
-        fetchStudents();
+        const loadStudents = async () => {
+            setLoading(true);
+            await fetchStudents();
+            setLoading(false);
+        };
+
+        loadStudents();
     }, []);
 
     const handleApproveRequest = async (userEmail) => {
         if (!userEmail) return;
+        setActionLoading(true);
 
         const url = `http://localhost:8080/api/user/approve/${userEmail}`;
 
@@ -85,19 +99,21 @@ export const AccountRequests = () => {
             }
 
             toast.success(`Account for ${userEmail} approved successfully!`);
-            fetchStudents(); // Refresh the list after approval
+            await fetchStudents();
         } catch (error) {
-            console.error("Error deleting user:", error);
+            console.error("Error approving user:", error);
+        } finally {
+            setActionLoading(false);
+            setShowApprove(false);
         }
     };
 
     const handleRejectRequest = async (userEmail) => {
         if (!userEmail) return;
-
-        const url = `http://localhost:8080/api/user/deny/${userEmail}`;
+        setActionLoading(true);
 
         try {
-            const res = await fetch(url, {
+            const res = await fetch(`http://localhost:8080/api/user/deny/${userEmail}`, {
                 method: "PUT",
                 credentials: "include",
             });
@@ -108,9 +124,13 @@ export const AccountRequests = () => {
             }
 
             toast.success(`Account for ${userEmail} denied successfully!`);
-            fetchStudents(); // Refresh the list after denial
+            await fetchStudents();
         } catch (error) {
-            console.error("Error deleting user:", error);
+            console.error("Error denying user:", error);
+            toast.error("Something went wrong.");
+        } finally {
+            setActionLoading(false);
+            setShowReject(false);
         }
     };
 
@@ -139,7 +159,6 @@ export const AccountRequests = () => {
         return <Loader message={"Loading Account Requests Dashboard 🧾"} role={auth.userRole} />;
     }
 
-    console.log(allStudents)
     return (
         <div className="flex">
             <NavBar />
@@ -293,24 +312,30 @@ export const AccountRequests = () => {
                                         <img src={closeIcon} alt="close" className="h-4 w-4" />
                                     </Button>
 
-                                    <div className='p-4 bg-admin-green-bg rounded-full'>
-                                        <img src={approveIcon} alt="" className='h-15 w-15' />
-                                    </div>
+                                    {actionLoading ? (
+                                        <div className="flex flex-col items-center py-10">
+                                            <div className="animate-spin rounded-full h-8 w-8 border-2 border-admin-primary-blue border-t-transparent mb-4" />
+                                            <p className="text-admin-primary-blue font-medium">Approving student...</p>
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <div className='p-4 bg-admin-green-bg rounded-full'>
+                                                <img src={approveIcon} alt="" className='h-15 w-15' />
+                                            </div>
 
-                                    <h1 className='mt-5'>Approve Student Account</h1>
-                                    <p className='text-sm ibm-plex-sans-300 text-admin-secondary-black'>
-                                        Approve the student's account request and grant access. A confirmation email will be sent upon approval.
-                                    </p>
+                                            <h1 className='mt-5'>Approve Student Account</h1>
+                                            <p className='text-sm ibm-plex-sans-300 text-admin-secondary-black'>
+                                                Approve the student's account request and grant access. A confirmation email will be sent upon approval.
+                                            </p>
 
-                                    <Button
-                                        onClick={() => {
-                                            handleApproveRequest(selectedUser);
-                                            setShowApprove(false);
-                                        }}
-                                        className="bg-admin-green mt-5 w-full p-5 hover:cursor-pointer hover:bg-admin-dark-green"
-                                    >
-                                        Approve & Send Confirmation
-                                    </Button>
+                                            <Button
+                                                onClick={() => handleApproveRequest(selectedUser)}
+                                                className="bg-admin-green mt-5 w-full p-5 hover:cursor-pointer hover:bg-admin-dark-green"
+                                            >
+                                                Approve & Send Confirmation
+                                            </Button>
+                                        </>
+                                    )}
                                 </div>
                             </div>
                         )}
@@ -325,24 +350,32 @@ export const AccountRequests = () => {
                                         <img src={closeIcon} alt="close" className="h-4 w-4" />
                                     </Button>
 
-                                    <div className='p-4 bg-admin-red-bg rounded-full'>
-                                        <img src={denyIcon} alt="" className='h-15 w-15' />
-                                    </div>
+                                    {actionLoading ? (
+                                        <div className="flex flex-col items-center py-10">
+                                            <div className="animate-spin rounded-full h-8 w-8 border-2 border-admin-primary-blue border-t-transparent mb-4" />
+                                            <p className="text-admin-primary-blue font-medium">Rejecting student...</p>
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <div className='p-4 bg-admin-red-bg rounded-full'>
+                                                <img src={denyIcon} alt="" className='h-15 w-15' />
+                                            </div>
 
-                                    <h1 className='mt-5'>Deny Account Request</h1>
-                                    <p className='text-sm ibm-plex-sans-300 text-admin-secondary-black'>
-                                        Denying this request will notify the student they’re not eligible due to unsuccessful ID card verification.
-                                    </p>
+                                            <h1 className='mt-5'>Deny Account Request</h1>
+                                            <p className='text-sm ibm-plex-sans-300 text-admin-secondary-black'>
+                                                Denying this request will notify the student they're not eligible due to unsuccessful ID card verification.
+                                            </p>
 
-                                    <Button
-                                        onClick={() => {
-                                            handleRejectRequest(selectedUser);
-                                            setShowReject(false);
-                                        }}
-                                        className="bg-admin-red mt-5 w-full p-5 hover:cursor-pointer hover:bg-admin-dark-red"
-                                    >
-                                        Deny & Notify Student
-                                    </Button>
+                                            <Button
+                                                onClick={() => {
+                                                    handleRejectRequest(selectedUser);
+                                                }}
+                                                className="bg-admin-red mt-5 w-full p-5 hover:cursor-pointer hover:bg-admin-dark-red"
+                                            >
+                                                Deny & Notify Student
+                                            </Button>
+                                        </>
+                                    )}
                                 </div>
                             </div>
                         )}

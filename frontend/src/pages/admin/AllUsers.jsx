@@ -41,8 +41,8 @@ export const AllUsers = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        setLoading(true);
         const fetchUsers = async () => {
+            setLoading(true);
             try {
                 const [studentsRes, adminsRes] = await Promise.all([
                     fetch("http://localhost:8080/api/user/allUsers", {
@@ -71,10 +71,10 @@ export const AllUsers = () => {
 
                 const combined = [...taggedAdmins, ...taggedStudents];
                 setCombinedUsers(combined);
-                setLoading(false);
-
             } catch (error) {
                 console.error("Error fetching users:", error);
+            } finally {
+                setLoading(false);
             }
         }
 

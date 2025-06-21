@@ -34,28 +34,29 @@ export const AllBooks = () => {
         setSortAZ(!sortAZ);
     };
 
-    const fetchBooks = async () => {
-        try {
-            const response = await fetch("http://localhost:8080/api/books/allBooks", {
-                method: "GET",
-                credentials: "include",
-            });
-
-            if (!response.ok) {
-                throw new Error("Failed to fetch books");
-            }
-
-            const data = await response.json();
-            setAllBooks(data);
-            setLoading(false);
-        } catch (error) {
-            console.error("Error fetching books:", error);
-            toast.error("Failed to load books. Please try again later.");
-        }
-    }
-
     useEffect(() => {
-        setLoading(true);
+        const fetchBooks = async () => {
+            setLoading(true);
+            try {
+                const response = await fetch("http://localhost:8080/api/books/allBooks", {
+                    method: "GET",
+                    credentials: "include",
+                });
+
+                if (!response.ok) {
+                    throw new Error("Failed to fetch books");
+                }
+
+                const data = await response.json();
+                setAllBooks(data);
+            } catch (error) {
+                console.error("Error fetching books:", error);
+                toast.error("Failed to load books. Please try again later.");
+            } finally {
+                setLoading(false);
+            }
+        }
+
         fetchBooks();
     }, []);
 

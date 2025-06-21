@@ -43,80 +43,48 @@ export const BorrowRequests = () => {
     const [showApprovalModal, setShowApprovalModal] = useState(false);
     const [loading, setLoading] = useState(true);
 
-    const fetchBooks = async () => {
-        try {
-            const response = await fetch("http://localhost:8080/api/books/allBooks", {
-                method: "GET",
-                credentials: "include",
-            });
-
-            if (!response.ok) {
-                throw new Error("Failed to fetch books");
-            }
-
-            const data = await response.json();
-            setAllBooks(data);
-            setLoading(false);
-        } catch (error) {
-            console.error("Error fetching books:", error);
-            toast.error("Failed to load books. Please try again later.");
-        }
-    }
-
-    const fetchStudents = async () => {
-        try {
-            const studentsRes = await fetch("http://localhost:8080/api/user/allUsers", {
-                method: "GET",
-                headers: { "Content-Type": "application/json" },
-                credentials: "include",
-            })
-
-            if (!studentsRes.ok) {
-                throw new Error("Failed to fetch users");
-            }
-
-            const students = await studentsRes.json()
-            setAllStudents(students);
-            setLoading(false);
-        } catch (error) {
-            console.error("Error fetching users:", error);
-        }
-    }
-
-    const fetchBorrowRequests = async () => {
-        try {
-            const response = await fetch("http://localhost:8080/api/borrow-requests/all-borrow-requests", {
-                method: "GET",
-                credentials: "include"
-            })
-
-            if (!response.ok) {
-                throw new Error("Failed to fetch borrow requests");
-            }
-
-            const data = await response.json();
-            console.log("Borrow Requests Data:", data);
-            setAllBorrowRequests(data);
-            setLoading(false);
-        } catch (error) {
-            console.error("Error fetching borrow requests:", error);
-        }
-    }
-
     useEffect(() => {
-        setLoading(true);
-        fetchBorrowRequests();
-    }, []);
+        const fetchData = async () => {
+            setLoading(true);
+            try {
+                const [booksRes, studentsRes, borrowRequestsRes] = await Promise.all([
+                    fetch("http://localhost:8080/api/books/allBooks", {
+                        method: "GET",
+                        credentials: "include",
+                    }),
+                    fetch("http://localhost:8080/api/user/allUsers", {
+                        method: "GET",
+                        headers: { "Content-Type": "application/json" },
+                        credentials: "include",
+                    }),
+                    fetch("http://localhost:8080/api/borrow-requests/all-borrow-requests", {
+                        method: "GET",
+                        credentials: "include",
+                    }),
+                ]);
 
+                if (!booksRes.ok || !studentsRes.ok || !borrowRequestsRes.ok) {
+                    throw new Error("One or more fetches failed");
+                }
 
-    useEffect(() => {
-        setLoading(true);
-        fetchStudents();
-    }, []);
+                const [books, students, borrowRequests] = await Promise.all([
+                    booksRes.json(),
+                    studentsRes.json(),
+                    borrowRequestsRes.json(),
+                ]);
 
-    useEffect(() => {
-        setLoading(true);
-        fetchBooks();
+                setAllBooks(books);
+                setAllStudents(students);
+                setAllBorrowRequests(borrowRequests);
+            } catch (error) {
+                console.error("Error fetching data:", error);
+                toast.error("Something went wrong while loading data.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
     }, []);
 
     const handleApproveRequest = async (request) => {
