@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext.jsx'
 import { NavBar } from '@/components/NavBar'
 import { Loader } from '@/components/Loader'
@@ -43,8 +42,6 @@ export const BorrowRequests = () => {
     const [sortOldestFirst, setSortOldestFirst] = useState(true);
     const [showApprovalModal, setShowApprovalModal] = useState(false);
     const [loading, setLoading] = useState(true);
-
-    const navigate = useNavigate();
 
     const fetchBooks = async () => {
         try {

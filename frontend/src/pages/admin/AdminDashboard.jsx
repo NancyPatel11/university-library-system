@@ -17,13 +17,13 @@ const getInitials = (name) => {
   return initials.toUpperCase();
 };
 
-const AvatarFallback = ({ name }) => {
+const AvatarFallback = ({ name, height, width, textSize }) => {
   const initials = getInitials(name);
   const { bg, text, border } = { bg: "bg-blue-200", text: "text-blue-700", border: "border-blue-700" }
 
   return (
     <div
-      className={`h-14 w-14 rounded-full flex items-center justify-center font-semibold text-sm ${bg} ${text} ${border} border`}
+      className={`h-${height} w-${width} rounded-full flex items-center justify-center font-semibold ${textSize} ${bg} ${text} ${border} border`}
     >
       {initials}
     </div>
@@ -36,60 +36,69 @@ export const AdminDashboard = () => {
   const [allStudents, setAllStudents] = useState([]);
   const [pendingStudents, setPendingStudents] = useState([]);
   const [allBooks, setAllBooks] = useState([]);
+  const [allBorrowRequests, setAllBorrowRequests] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    setLoading(true);
-    const fetchBooks = async () => {
+    const fetchData = async () => {
+      setLoading(true);
       try {
-        const response = await fetch("http://localhost:8080/api/books/allBooks", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        });
+        // Fetch all data in parallel
+        const [booksRes, usersRes, requestsRes] = await Promise.all([
+          fetch("http://localhost:8080/api/books/allBooks", {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+          }),
+          fetch("http://localhost:8080/api/user/allUsers", {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+          }),
+          fetch("http://localhost:8080/api/borrow-requests/all-borrow-requests", {
+            method: "GET",
+            credentials: "include",
+          }),
+        ]);
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch books");
+        if (!booksRes.ok || !usersRes.ok || !requestsRes.ok) {
+          throw new Error("One or more fetches failed");
         }
 
-        const data = await response.json();
-        setAllBooks(data);
-      } catch (error) {
-        console.error("Error fetching books:", error);
-      }
-    }
+        const [books, users, borrowRequests] = await Promise.all([
+          booksRes.json(),
+          usersRes.json(),
+          requestsRes.json(),
+        ]);
 
-    const fetchUsers = async () => {
-      try {
-        const response = await fetch("http://localhost:8080/api/user/allUsers", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        });
+        setAllBooks(books);
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch students");
-        }
-
-        const data = await response.json();
-        setAllStudents(data);
-        const pending = data.filter(student => student.accountStatus === "Verification Pending");
+        setAllStudents(users);
+        const pending = users.filter((student) => student.accountStatus === "Verification Pending");
         setPendingStudents(pending);
-        setLoading(false);
+
+        const sortedRequests = sortBorrowRequests(borrowRequests);
+        setAllBorrowRequests(sortedRequests);
       } catch (error) {
-        console.error("Error fetching students:", error);
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchBooks();
-    fetchUsers();
-  }, [])
+    fetchData();
+  }, []);
+
+  const sortBorrowRequests = (requests) => {
+    return requests.sort((a, b) => {
+      const dateA = new Date(a.requestDate);
+      const dateB = new Date(b.requestDate);
+      return dateB - dateA; // Sort by most recent date first
+    });
+  };
+
 
   if (loading) {
     return <Loader message={"Loading Admin Dashboard 🖥️"} role={auth.userRole} />;
@@ -129,7 +138,15 @@ export const AdminDashboard = () => {
         <div className='flex gap-5 ibm-plex-sans-600 mt-10'>
           <div className='bg-white rounded-2xl w-1/3 p-5'>
             <p className='ibm-plex-sans-400 text-admin-secondary-black mb-7'>Borrowed Books</p>
-            <h1 className='text-3xl'>145</h1>
+            <h1 className='text-3xl'>
+              {
+                allBooks.reduce((borrowed, book) => {
+                  const total = book.total_copies || 0;
+                  const available = book.available_copies || 0;
+                  return borrowed + (total - available);
+                }, 0)
+              }
+            </h1>
           </div>
           <div className='bg-white rounded-2xl w-1/3 p-5'>
             <p className='ibm-plex-sans-400 text-admin-secondary-black mb-7'>Total Students</p>
@@ -137,7 +154,9 @@ export const AdminDashboard = () => {
           </div>
           <div className='bg-white rounded-2xl w-1/3 p-5'>
             <p className='ibm-plex-sans-400 text-admin-secondary-black mb-7'>Total Books</p>
-            <h1 className='text-3xl'>{allBooks.length}</h1>
+            <h1 className='text-3xl'>
+              {allBooks.reduce((total, book) => total + (book.total_copies || 0), 0)}
+            </h1>
           </div>
         </div>
 
@@ -146,35 +165,89 @@ export const AdminDashboard = () => {
             <div className='bg-white p-5 rounded-2xl flex-1 flex flex-col justify-between'>
               <div className='flex justify-between items-center'>
                 <h1 className='text-xl'>Borrow Requests</h1>
-                <Button className="bg-admin-bg text-admin-primary-blue hover:bg-admin-primary-blue hover:text-white hover:cursor-pointer">
+                <Button
+                  onClick={() => navigate('/borrow-requests')}
+                  className="bg-admin-bg text-admin-primary-blue hover:bg-admin-primary-blue hover:text-white hover:cursor-pointer"
+                >
                   View All
                 </Button>
               </div>
-              <div className='flex flex-col items-center gap-3 my-10'>
-                <img src={illustration1} alt="" className='h-[144px] w-[193px]' />
-                <h1>No Pending Book Requests</h1>
-                <p className='ibm-plex-sans-300 text-admin-secondary-black text-center'>
-                  There are no borrow book requests awaiting your review at this time.
-                </p>
-              </div>
+              {allBorrowRequests.length > 0 ?
+                <div className="flex flex-wrap justify-start mt-5 gap-3 flex-col">
+                  {allBorrowRequests.slice(0, 3).map((request, index) => {
+                    const book = allBooks.find(book => book.id === request.bookId);
+                    const student = allStudents.find(student => student.email === request.studentEmail);
+
+                    if (!book || !student) return null;
+
+                    return (
+                      <div
+                        key={index}
+                        className="bg-admin-bg rounded-lg p-3 flex gap-3 items-center text-center ibm-plex-sans-500 text-admin-primary-black"
+                        onClick={() => navigate(`/bookdetails/${request.bookId}`)}
+                      >
+                        <div className="relative">
+                          <BookCoverSvg coverColor={book.color} width={60} height={85} />
+                          <img
+                            src={book.cover}
+                            alt={book.title}
+                            className="absolute top-0 left-1 w-[56px] h-[75px] object-fit rounded-xs"
+                          />
+                        </div>
+                        <div className='flex flex-col gap-1 items-start'>
+                          <h1>{book.title}</h1>
+                          <p className='text-admin-secondary-black ibm-plex-sans-300 text-sm'>By {book.author} · {book.genre}</p>
+                          <div className='flex flex-wrap gap-5 mt-2 items-center'>
+                            <div className='flex gap-1 items-center'>
+                              <AvatarFallback name={student.fullName} height={6} width={6} textSize="text-xs" />
+                              <p className='ibm-plex-sans-300 text-admin-secondary-black text-[15px]'>{student.fullName}</p>
+                            </div>
+                            <div className='flex gap-1 items-center'>
+                              <img src={calendarImg} alt="calendar" className='h-6 w-6' />
+                              <p className='ibm-plex-sans-300 text-admin-secondary-black text-[15px]'>
+                                {new Date(request.requestDate).toLocaleDateString("en-GB", {
+                                  day: "2-digit",
+                                  month: "2-digit",
+                                  year: "2-digit",
+                                })}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+                :
+                <div className='flex flex-col items-center gap-3 my-10'>
+                  <img src={illustration1} alt="" className='h-[144px] w-[193px]' />
+                  <h1>No Pending Book Requests</h1>
+                  <p className='ibm-plex-sans-300 text-admin-secondary-black text-center'>
+                    There are no borrow book requests awaiting your review at this time.
+                  </p>
+                </div>}
+
             </div>
 
             <div className='bg-white p-5 rounded-2xl flex-1 flex flex-col'>
               <div className='flex justify-between items-center'>
                 <h1 className='text-xl'>Account Requests</h1>
-                <Button className="bg-admin-bg text-admin-primary-blue hover:bg-admin-primary-blue hover:text-white hover:cursor-pointer">
+                <Button
+                  onClick={() => navigate('/account-requests')}
+                  className="bg-admin-bg text-admin-primary-blue hover:bg-admin-primary-blue hover:text-white hover:cursor-pointer"
+                >
                   View All
                 </Button>
               </div>
               {pendingStudents.length > 0 ?
-                <div className="flex flex-wrap justify-between mt-5 gap-3">
+                <div className="flex flex-wrap justify-start mt-5 gap-3">
                   {pendingStudents.map((student, index) => (
                     <div
                       key={index}
                       className="basis-[32%] flex-none bg-admin-bg rounded-lg p-5 flex flex-col items-center text-center ibm-plex-sans-500 text-admin-primary-black"
                     >
                       <div className="mb-3">
-                        <AvatarFallback name={student.fullName} />
+                        <AvatarFallback name={student.fullName} height={14} width={14} textSize={"text-2xl"} />
                       </div>
                       <h2 className="text-lg">{student.fullName}</h2>
                       <p className="text-sm text-admin-secondary-black ibm-plex-sans-300">{student.email}</p>
@@ -196,7 +269,10 @@ export const AdminDashboard = () => {
           <div className='w-1/2 bg-white p-5 rounded-2xl flex flex-col'>
             <div className='flex justify-between items-center'>
               <h1 className='text-xl'>Recently Added Books</h1>
-              <Button className="bg-admin-bg text-admin-primary-blue hover:bg-admin-primary-blue hover:text-white hover:cursor-pointer">
+              <Button
+                onClick={() => navigate('/all-books')}
+                className="bg-admin-bg text-admin-primary-blue hover:bg-admin-primary-blue hover:text-white hover:cursor-pointer"
+              >
                 View All
               </Button>
             </div>
