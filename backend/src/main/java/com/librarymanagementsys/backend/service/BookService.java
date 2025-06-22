@@ -1,11 +1,13 @@
 package com.librarymanagementsys.backend.service;
 
+import com.librarymanagementsys.backend.dto.CreateBookRequest;
 import com.librarymanagementsys.backend.exception.BookNotFoundException;
 import com.librarymanagementsys.backend.model.Book;
 import com.librarymanagementsys.backend.repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -53,4 +55,29 @@ public class BookService {
             throw new RuntimeException("Error deleting book: " + e.getMessage());
         }
     }
+
+    public void createBook(CreateBookRequest request) {
+        Book book = new Book();
+        book.setTitle(request.getTitle());
+        book.setAuthor(request.getAuthor());
+        book.setGenre(request.getGenre());
+        book.setTotal_copies(request.getTotal_copies());
+        book.setColor(request.getColor());
+        book.setDescription(request.getDescription());
+        book.setCover(request.getCover());
+        book.setVideo(request.getVideo());
+        book.setSummary(request.getSummary());
+        book.setAvailable_copies(request.getTotal_copies()); // Initially, all copies are available
+        book.setRating(0); // Initial rating is set to 0
+        book.setNo_of_ratings(0); // Initial number of ratings is set to 0
+        book.setCreatedAt(new Date()); // Set the creation date to now
+
+        try {
+            bookRepository.save(book);
+        } catch (Exception e) {
+            throw new RuntimeException("Error creating book: " + e.getMessage());
+        }
+    }
+
+
 }

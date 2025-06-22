@@ -277,7 +277,10 @@ export const AdminDashboard = () => {
               </Button>
             </div>
 
-            <Button className="flex items-center justify-start gap-x-3 mt-5 py-10 text-xl bg-admin-bg text-admin-primary-blue hover:bg-admin-primary-blue hover:text-white hover:cursor-pointer">
+            <Button
+              onClick={() => navigate('/create-book-details')}
+              className="flex items-center justify-start gap-x-3 mt-5 py-10 text-xl bg-admin-bg text-admin-primary-blue hover:bg-admin-primary-blue hover:text-white hover:cursor-pointer"
+            >
               <img src={plusButton} alt="plus" className="h-10 w-10" />
               Add New Book
             </Button>

@@ -132,7 +132,10 @@ export const AllBooks = () => {
                                 {sortAZ ? "Sort A-Z" : "Sort Z-A"}
                                 <img src={swapIcon} alt="sort" />
                             </Button>
-                            <Button className="group flex items-center justify-start gap-3 border-admin-dark-border border-1 text-admin-bg bg-admin-primary-blue hover:text-admin-primary-blue hover:bg-admin-bg hover:cursor-pointer">
+                            <Button
+                                onClick={() => navigate('/create-book-details')}
+                                className="group flex items-center justify-start gap-3 border-admin-dark-border border-1 text-admin-bg bg-admin-primary-blue hover:text-admin-primary-blue hover:bg-admin-bg hover:cursor-pointer"
+                            >
                                 <div className="rounded-full bg-admin-primary-blue group-hover:bg-admin-bg transition-all">
                                     <img
                                         src={plusBlackIcon}

@@ -13,6 +13,7 @@ import { AllUsers } from './pages/admin/AllUsers';
 import { AccountRequests } from './pages/admin/AccountRequests';
 import { AllBooks } from './pages/admin/AllBooks';
 import { BorrowRequests } from './pages/admin/BorrowRequests';
+import { CreateBookDetails } from './pages/admin/CreateBookDetails';
 
 function App() {
   return (
@@ -96,6 +97,15 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
               <AccountRequests />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/create-book-details"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <CreateBookDetails />
             </ProtectedRoute>
           }
         />
