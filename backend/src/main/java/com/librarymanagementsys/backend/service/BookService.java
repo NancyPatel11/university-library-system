@@ -1,6 +1,7 @@
 package com.librarymanagementsys.backend.service;
 
 import com.librarymanagementsys.backend.dto.CreateBookRequest;
+import com.librarymanagementsys.backend.dto.UpdateBookRequest;
 import com.librarymanagementsys.backend.exception.BookNotFoundException;
 import com.librarymanagementsys.backend.model.Book;
 import com.librarymanagementsys.backend.repository.BookRepository;
@@ -42,6 +43,42 @@ public class BookService {
             return books;
         } catch (Exception e) {
             throw new RuntimeException("Error searching books: " + e.getMessage());
+        }
+    }
+
+    public void updateBook(String id, UpdateBookRequest updatedBookData) {
+        Book existingBook = bookRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Book not found"));
+
+        int originalTotal = existingBook.getTotal_copies();
+        int originalAvailable = existingBook.getAvailable_copies();
+        int borrowed = originalTotal - originalAvailable;
+
+        int newTotal = updatedBookData.getTotal_copies();
+
+        // Check if new total is less than books already borrowed
+        if (newTotal < borrowed) {
+            throw new IllegalArgumentException("Cannot reduce total copies below borrowed count (" + borrowed + ")");
+        }
+
+        // Safe to update — adjust available copies
+        int newAvailable = newTotal - borrowed;
+        existingBook.setAvailable_copies(newAvailable);
+        existingBook.setTotal_copies(newTotal);
+
+        existingBook.setTitle(updatedBookData.getTitle());
+        existingBook.setAuthor(updatedBookData.getAuthor());
+        existingBook.setGenre(updatedBookData.getGenre());
+        existingBook.setColor(updatedBookData.getColor());
+        existingBook.setDescription(updatedBookData.getDescription());
+        existingBook.setCover(updatedBookData.getCover());
+        existingBook.setVideo(updatedBookData.getVideo());
+        existingBook.setSummary(updatedBookData.getSummary());
+
+        try {
+            bookRepository.save(existingBook);
+        } catch (Exception e) {
+            throw new RuntimeException("Error updating book: " + e.getMessage());
         }
     }
 

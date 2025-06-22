@@ -155,8 +155,10 @@ export const AllBooks = () => {
                                     <th scope="col" className="p-4">Book Title</th>
                                     <th scope="col" className="">Author</th>
                                     <th scope="col" className="">Genre</th>
+                                    <th scope="col" className="">Total Copies</th>
+                                    <th scope="col" className="">Available Copies</th>
                                     <th scope="col" className="">Date Created</th>
-                                    <th scope="col" className="">Action</th>
+                                    <th scope="col" className="">Actions</th>
                                 </tr>
                             </thead>
                             <tbody className=''>
@@ -185,12 +187,16 @@ export const AllBooks = () => {
                                         </td>
                                         <td>{book.author}</td>
                                         <td>{book.genre}</td>
+                                        <td>{book.total_copies}</td>
+                                        <td>{book.available_copies}</td>
                                         <td>{new Date(book.createdAt).toLocaleDateString()}</td>
                                         <td>
                                             <div className="flex gap-2 items-center">
-                                                <Button className="bg-transparent hover:bg-transparent hover:cursor-pointer shadow-none border-none" onClick={() => {
-
-                                                }}>
+                                                <Button
+                                                    className="bg-transparent hover:bg-transparent hover:cursor-pointer shadow-none border-none"
+                                                    onClick={() => {
+                                                        navigate(`/edit-book-details/${book.id}`);
+                                                    }}>
                                                     <img src={editIcon} alt="edit" />
                                                 </Button>
                                                 <Button className="bg-transparent hover:bg-transparent hover:cursor-pointer shadow-none border-none" onClick={() => {

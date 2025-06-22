@@ -391,7 +391,10 @@ export const BookDetails = () => {
             <h1 className='text-4xl'>{book.title}</h1>
             <h1 className='text-2xl'>{book.author}</h1>
             <p className='text-lg text-admin-secondary-black ibm-plex-sans-300'>{book.genre}</p>
-            <Button className="py-6 text-lg w-full border-admin-dark-border border-1 text-admin-bg bg-admin-primary-blue hover:bg-admin-tertiary-blue hover:cursor-pointer">
+            <Button
+              className="py-6 text-lg w-full border-admin-dark-border border-1 text-admin-bg bg-admin-primary-blue hover:bg-admin-tertiary-blue hover:cursor-pointer"
+              onClick={() => navigate(`/edit-book-details/${book.id}`)}
+            >
               <img
                 src={editIcon}
                 alt="plus"

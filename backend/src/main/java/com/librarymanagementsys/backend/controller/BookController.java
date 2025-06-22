@@ -1,6 +1,7 @@
 package com.librarymanagementsys.backend.controller;
 
 import com.librarymanagementsys.backend.dto.CreateBookRequest;
+import com.librarymanagementsys.backend.dto.UpdateBookRequest;
 import com.librarymanagementsys.backend.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,12 @@ public class BookController {
     @GetMapping("/{bookId}")
     public ResponseEntity<?> getBookById(@PathVariable String bookId) {
         return ResponseEntity.ok(bookService.getBookById(bookId));
+    }
+
+    @PutMapping("/{bookId}")
+    public ResponseEntity<?> updateBook(@PathVariable String bookId, @RequestBody UpdateBookRequest request) {
+        bookService.updateBook(bookId, request);
+        return ResponseEntity.ok(Map.of("message", "Book updated successfully"));
     }
 
     @GetMapping("/search/{keyword}")
