@@ -8,6 +8,7 @@ import denyIcon from '../../assets/icons/admin/deny.png'
 import closeIcon from '../../assets/icons/admin/close.svg'
 import eyeIcon from '../../assets/icons/admin/eye.png'
 import swapIcon from '../../assets/icons/admin/arrow-swap.png'
+import { toast } from 'sonner'
 
 const getInitials = (name) => {
     if (!name) return "";
@@ -83,6 +84,11 @@ export const AllUsers = () => {
 
     const handleDeleteUser = async (user) => {
         if (!user) return;
+  
+        if (user.role === "student" && user.noBooksBorrowed > 0) {
+            toast.error("Cannot delete user having active borrowed books.");
+            return;
+        }
 
         const url = user.role === "admin"
             ? `http://localhost:8080/api/admin/delete/${user.email}`
@@ -247,7 +253,7 @@ export const AllUsers = () => {
                                                 <Button
                                                     className="bg-transparent hover:bg-transparent hover:cursor-pointer shadow-none border-none"
                                                     onClick={() => {
-                                                        setSelectedUser({ email: user.email, role: user.role });
+                                                        setSelectedUser({ email: user.email, role: user.role, noBooksBorrowed: user.noBooksBorrowed });
                                                         setShowConfirm(true);
                                                     }}
                                                 >
