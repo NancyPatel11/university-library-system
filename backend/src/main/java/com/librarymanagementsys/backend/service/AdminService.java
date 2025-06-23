@@ -1,7 +1,9 @@
 package com.librarymanagementsys.backend.service;
 
 import com.librarymanagementsys.backend.dto.LoginAdminRequest;
+import com.librarymanagementsys.backend.dto.LoginResponse;
 import com.librarymanagementsys.backend.dto.RegisterAdminRequest;
+import com.librarymanagementsys.backend.dto.RegisterResponse;
 import com.librarymanagementsys.backend.exception.EmailAlreadyExistsException;
 import com.librarymanagementsys.backend.exception.InvalidCredentialsException;
 import com.librarymanagementsys.backend.exception.UserNotFoundException;
@@ -30,7 +32,7 @@ public class AdminService {
         this.passwordEncoder = new BCryptPasswordEncoder();
     }
 
-    public String registerAdmin(RegisterAdminRequest request) {
+    public RegisterResponse registerAdmin(RegisterAdminRequest request) {
         if (adminRepository.findByEmail(request.getEmail()) != null) {
             throw new EmailAlreadyExistsException("Email already in use");
         }
@@ -44,10 +46,14 @@ public class AdminService {
 
         adminRepository.save(admin);
 
-        return jwtUtil.generateToken(admin.getEmail());
+        RegisterResponse registerResponse = new RegisterResponse();
+        registerResponse.setUserId(admin.getId());
+        registerResponse.setJwt(jwtUtil.generateToken(admin.getEmail()));
+
+        return registerResponse;
     }
 
-    public String loginAdmin(LoginAdminRequest request, HttpSession session) {
+    public LoginResponse loginAdmin(LoginAdminRequest request, HttpSession session) {
         Admin admin = adminRepository.findByEmail(request.getEmail());
         if (admin == null) {
             throw new UserNotFoundException("Admin user not found with email: " + request.getEmail());
@@ -59,7 +65,12 @@ public class AdminService {
             throw new InvalidCredentialsException("Incorrect password");
         }
 
-        return jwtUtil.generateToken(admin.getEmail());
+        LoginResponse loginResponse = new LoginResponse();
+        loginResponse.setUserId(admin.getId());
+        loginResponse.setFullName(admin.getFullName());
+        loginResponse.setJwt(jwtUtil.generateToken(admin.getEmail()));
+
+        return loginResponse;
     }
 
     public List<Admin> getAllAdmins(){

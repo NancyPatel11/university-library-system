@@ -23,6 +23,7 @@ public class AuthController {
         String sessionEmail = (String) session.getAttribute("email");
         String sessionRole = (String) session.getAttribute("role");
         String sessionFullName = (String) session.getAttribute("fullName");
+        String sessionUserId = (String) session.getAttribute("userId");
 
         if (jwt == null || sessionEmail == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -46,7 +47,8 @@ public class AuthController {
                 "message", "User is authenticated",
                 "email", tokenEmail,
                 "role", sessionRole,
-                "name", sessionFullName
+                "name", sessionFullName,
+                "userId", sessionUserId
         ));
     }
 }

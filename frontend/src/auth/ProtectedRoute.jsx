@@ -28,7 +28,8 @@ export const ProtectedRoute = ({ children, allowedRoles }) => {
                 const userRole = data.role;
                 const email = data.email;
                 const name = data.name;
-                setAuth({ userRole, email , name });
+                const userId = data.userId;
+                setAuth({ userRole, email , name, userId });
 
                 if (allowedRoles && !allowedRoles.includes(userRole)) {
                     toast.error("Unauthorized: Access denied");

@@ -1,7 +1,9 @@
 package com.librarymanagementsys.backend.service;
 
 import com.librarymanagementsys.backend.dto.LoginRequest;
+import com.librarymanagementsys.backend.dto.LoginResponse;
 import com.librarymanagementsys.backend.dto.RegisterRequest;
+import com.librarymanagementsys.backend.dto.RegisterResponse;
 import com.librarymanagementsys.backend.exception.EmailAlreadyExistsException;
 import com.librarymanagementsys.backend.exception.ImageNotSaved;
 import com.librarymanagementsys.backend.exception.InvalidCredentialsException;
@@ -36,7 +38,7 @@ public class UserService {
         this.passwordEncoder = new BCryptPasswordEncoder();
     }
 
-    public String registerUser(RegisterRequest request, MultipartFile idCardImage) {
+    public RegisterResponse registerUser(RegisterRequest request, MultipartFile idCardImage) {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new EmailAlreadyExistsException("Email already in use");
         }
@@ -60,10 +62,13 @@ public class UserService {
         user.setRegistrationDate(new Date());
 
         userRepository.save(user);
-        return jwtUtil.generateToken(user.getEmail());
+        RegisterResponse response = new RegisterResponse();
+        response.setUserId(user.getId());
+        response.setJwt(jwtUtil.generateToken(user.getEmail()));
+        return response;
     }
 
-    public String loginUser(LoginRequest request, HttpSession session) {
+    public LoginResponse loginUser(LoginRequest request, HttpSession session) {
         User user = userRepository.findByEmail(request.getEmail());
         if (user == null) {
             throw new UserNotFoundException("User not found with email: " + request.getEmail());
@@ -75,7 +80,11 @@ public class UserService {
             throw new InvalidCredentialsException("Incorrect password");
         }
 
-        return jwtUtil.generateToken(user.getEmail());
+        LoginResponse response = new LoginResponse();
+        response.setUserId(user.getId());
+        response.setFullName(user.getFullName());
+        response.setJwt( jwtUtil.generateToken(user.getEmail()));
+        return response;
     }
 
     public ResponseEntity<byte[]> getUserIdCardResponse(String email) {

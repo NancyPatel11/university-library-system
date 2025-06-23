@@ -1,7 +1,9 @@
 package com.librarymanagementsys.backend.controller;
 
 import com.librarymanagementsys.backend.dto.LoginRequest;
+import com.librarymanagementsys.backend.dto.LoginResponse;
 import com.librarymanagementsys.backend.dto.RegisterRequest;
+import com.librarymanagementsys.backend.dto.RegisterResponse;
 import com.librarymanagementsys.backend.exception.UserNotFoundException;
 import com.librarymanagementsys.backend.service.UserService;
 import jakarta.servlet.http.HttpSession;
@@ -28,8 +30,9 @@ public class UserController {
             @RequestPart("idCardImage") MultipartFile idCardImage,
             HttpSession session) {
 
-        String jwt = userService.registerUser(request, idCardImage);
-        session.setAttribute("jwt", jwt);
+        RegisterResponse registerResponse = userService.registerUser(request, idCardImage);
+        session.setAttribute("jwt", registerResponse.getJwt());
+        session.setAttribute("userId", registerResponse.getUserId());
         session.setAttribute("email", request.getEmail());
         session.setAttribute("role", "student");
         session.setAttribute("fullName", request.getFullName());
@@ -43,12 +46,14 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody LoginRequest request, HttpSession session) {
-        String token = userService.loginUser(request,session);
+        LoginResponse loginResponse = userService.loginUser(request,session);
 
         // Store in session
-        session.setAttribute("jwt", token);
+        session.setAttribute("jwt", loginResponse.getJwt());
+        session.setAttribute("userId", loginResponse.getUserId());
         session.setAttribute("email", request.getEmail());
         session.setAttribute("role", "student");
+        session.setAttribute("fullName", loginResponse.getFullName());
 
 
         return ResponseEntity.ok(Map.of(

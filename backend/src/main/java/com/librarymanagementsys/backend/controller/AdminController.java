@@ -1,7 +1,9 @@
 package com.librarymanagementsys.backend.controller;
 
 import com.librarymanagementsys.backend.dto.LoginAdminRequest;
+import com.librarymanagementsys.backend.dto.LoginResponse;
 import com.librarymanagementsys.backend.dto.RegisterAdminRequest;
+import com.librarymanagementsys.backend.dto.RegisterResponse;
 import com.librarymanagementsys.backend.service.AdminService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +27,9 @@ public class AdminController {
             HttpSession session) {
         System.out.println("Registering admin: " + request.getEmail());
 
-        String jwt = adminService.registerAdmin(request);
-        session.setAttribute("jwt", jwt);
+        RegisterResponse registerResponse = adminService.registerAdmin(request);
+        session.setAttribute("jwt", registerResponse.getJwt());
+        session.setAttribute("userId", registerResponse.getUserId());
         session.setAttribute("email", request.getEmail());
         session.setAttribute("role", "admin");
         session.setAttribute("fullName", request.getFullName());
@@ -41,12 +44,14 @@ public class AdminController {
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> loginUser(@RequestBody LoginAdminRequest request,
                                                          HttpSession session) {
-        String jwt = adminService.loginAdmin(request, session);
+        LoginResponse loginResponse = adminService.loginAdmin(request, session);
 
         // Store in session
-        session.setAttribute("jwt", jwt);
+        session.setAttribute("jwt", loginResponse.getJwt());
+        session.setAttribute("userId", loginResponse.getUserId());
         session.setAttribute("email", request.getEmail());
         session.setAttribute("role", "admin");
+        session.setAttribute("fullName", loginResponse.getFullName());
 
         return ResponseEntity.ok(Map.of(
                 "timestamp", LocalDateTime.now(),
