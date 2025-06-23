@@ -92,7 +92,7 @@ export const BookDetails = () => {
     };
 
     fetchData();
-  }, [bookId]);
+  }, [bookId, auth.userRole]);
 
   useEffect(() => {
     setBook(null);
@@ -147,6 +147,11 @@ export const BookDetails = () => {
 
 
   const handleBorrowRequest = async () => {
+    if(book.available_copies <= 0) {
+      toast.error("No copies available for borrowing at the moment.");
+      return;
+    }
+
     try {
       const payload = {
         bookId: book.id,

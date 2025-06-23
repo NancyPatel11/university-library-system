@@ -115,6 +115,11 @@ export const Home = () => {
 
 
   const handleBorrowRequest = async () => {
+    if (book1.available_copies <= 0) {
+      toast.error("No copies available for borrowing at the moment.");
+      return;
+    }
+
     try {
       const payload = {
         bookId: book1.id,
