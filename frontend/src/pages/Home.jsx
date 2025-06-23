@@ -15,6 +15,7 @@ import warningIcon from "../assets/icons/warning.svg";
 
 export const Home = () => {
   const { auth } = useAuth();
+  const [studentAccountStatus, setStudentAccountStatus] = useState(null);
   const [allBooks, setAllBooks] = useState([]);
   const [book1, setBook1] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -22,7 +23,7 @@ export const Home = () => {
   const [showBorrowButton, setShowBorrowButton] = useState(true);
 
   useEffect(() => {
-    const fetchBooks = async () => {
+    const fetchData = async () => {
       try {
         const response = await fetch("http://localhost:8080/api/books/allBooks", {
           method: "GET",
@@ -42,6 +43,22 @@ export const Home = () => {
         }
         setAllBooks(data);
         setBook1(data[0]); // Set the first book as book1
+
+        const studentResponse = await fetch(`http://localhost:8080/api/user/accountStatus`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        });
+
+        const studentData = await studentResponse.json();
+
+        if (!studentResponse.ok) {
+          throw new Error(studentData.message || "Failed to fetch student account status");
+        }
+
+        setStudentAccountStatus(studentData.accountStatus);
       } catch (error) {
         console.error("Error fetching books:", error);
       } finally {
@@ -49,7 +66,7 @@ export const Home = () => {
       }
     };
 
-    fetchBooks();
+    fetchData();
   }, []);
 
 
@@ -70,13 +87,19 @@ export const Home = () => {
         body: JSON.stringify(payload),
       });
 
-      if (!response.ok) {
+      if (response.status === 204) {
+        // If no borrow request found, reset state
+        setBorrowRequest(null);
         setShowBorrowButton(true);
         return;
       }
 
-      // If the response is ok, parse the JSON
       const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to check borrow request status");
+      }
+
       setBorrowRequest(data);
       setShowBorrowButton(false);
     } catch (error) {
@@ -197,7 +220,13 @@ export const Home = () => {
               <p className='text-xl'>Available Books:  <span className='text-yellow ibm-plex-sans-600'>{book1.available_copies}</span></p>
             </div>
             <p className='text-xl text-light-blue mt-10'>{book1.description}</p>
-            {(showBorrowButton || borrowRequest.status === "Returned") &&
+            {studentAccountStatus === "Verification Pending" && (
+              <div className='flex gap-3 mt-5 text-lg ibm-plex-sans-300 bg-search-bar p-3 rounded-sm w-[650px] items-center justify-start'>
+                <img src={warningIcon} alt="warning" />
+                Book will be available for borrowing once your account is verified by admin.
+              </div>
+            )}
+            {((showBorrowButton || borrowRequest.status === "Returned") && studentAccountStatus != "Verification Pending") &&
               <Button onClick={handleBorrowRequest} className='text-2xl bebas-neue-400 bg-yellow text-dark-end mt-10 rounded-xs border-2 border-yellow hover:bg-yellow-dark hover:border-yellow-dark hover:cursor-pointer'>
                 <FontAwesomeIcon icon={faBookOpen} /> BORROW BOOK REQUEST
               </Button>

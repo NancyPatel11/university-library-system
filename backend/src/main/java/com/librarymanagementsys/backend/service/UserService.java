@@ -161,4 +161,12 @@ public class UserService {
             throw new RuntimeException("Failed to deny user: " + e.getMessage());
         }
     }
+
+    public String getUserStatus(String email) {
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new UserNotFoundException("User not found with email: " + email);
+        }
+        return user.getAccountStatus();
+    }
 }

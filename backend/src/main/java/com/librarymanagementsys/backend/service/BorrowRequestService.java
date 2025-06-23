@@ -38,14 +38,7 @@ public class BorrowRequestService {
     }
 
     public BorrowRequest checkBorrowRequestStatus(String studentEmail, String bookId) {
-        // Find the borrow request by student email and book ID
-        BorrowRequest borrowRequest = borrowRequestRepository.findByStudentEmailAndBookId(studentEmail, bookId);
-
-        if (borrowRequest == null) {
-            throw new RuntimeException("Borrow request not found for student: " + studentEmail + " and book: " + bookId);
-        }
-
-        return borrowRequest; // Return the found borrow request
+        return borrowRequestRepository.findByStudentEmailAndBookId(studentEmail, bookId);
     }
 
     public List<BorrowRequest> getMyBorrowedBooks(String studentEmail) {

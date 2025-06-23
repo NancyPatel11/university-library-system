@@ -17,18 +17,21 @@ import warningIcon from "../assets/icons/warning.svg";
 export const BookDetails = () => {
   const { auth } = useAuth();
   const { bookId } = useParams();
+  const [studentAccountStatus, setStudentAccountStatus] = useState(null);
   const [book, setBook] = useState(null);
   const [searchValue, setSearchValue] = useState("");
   const [showBorrowButton, setShowBorrowButton] = useState(true);
   const [borrowRequest, setBorrowRequest] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const navigate = useNavigate();
 
-  // Find the book based on the bookId from search params
   useEffect(() => {
-    const fetchCurrentBook = async () => {
+    const fetchData = async () => {
+      setLoading(true);
       try {
-        const response = await fetch(`http://localhost:8080/api/books/${bookId}`, {
+        // Fetch current book by ID
+        const bookRes = await fetch(`http://localhost:8080/api/books/${bookId}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -36,18 +39,59 @@ export const BookDetails = () => {
           credentials: "include",
         });
 
-        if (!response.ok) {
+        if (!bookRes.ok) {
           throw new Error("Failed to fetch book details");
         }
 
-        const data = await response.json();
-        setBook(data);
-      } catch (error) {
-        console.error("Error fetching book details:", error);
-      }
-    }
+        const bookData = await bookRes.json();
+        setBook(bookData);
 
-    fetchCurrentBook();
+        // Fetch all books
+        const allBooksRes = await fetch("http://localhost:8080/api/books/allBooks", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        });
+
+        if (!allBooksRes.ok) {
+          throw new Error("Failed to fetch books");
+        }
+
+        const allBooksData = await allBooksRes.json();
+
+        if (allBooksData.length === 0) {
+          toast.error("No books available at the moment. Please check back later.");
+        }
+
+        setAllBooks(allBooksData);
+
+        // Fetch student account status
+        if( auth.userRole !== "student") return; // Only fetch for students
+        const studentResponse = await fetch(`http://localhost:8080/api/user/accountStatus`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        });
+
+        const studentData = await studentResponse.json();
+
+        if (!studentResponse.ok) {
+          throw new Error(studentData.message || "Failed to fetch student account status");
+        }
+
+        setStudentAccountStatus(studentData.accountStatus);
+      } catch (error) {
+        console.error("Error fetching book or books:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, [bookId]);
 
   useEffect(() => {
@@ -73,14 +117,19 @@ export const BookDetails = () => {
         body: JSON.stringify(payload),
       });
 
-      if (!response.ok) {
+      if (response.status === 204) {
+        // If no borrow request found, reset state
         setBorrowRequest(null);
         setShowBorrowButton(true);
         return;
       }
 
-      // If the response is ok, parse the JSON
       const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to check borrow request status");
+      }
+
       setBorrowRequest(data);
       setShowBorrowButton(false);
     } catch (error) {
@@ -96,35 +145,6 @@ export const BookDetails = () => {
 
   const [allBooks, setAllBooks] = useState(null);
 
-  useEffect(() => {
-    const fetchBooks = async () => {
-      try {
-        const response = await fetch("http://localhost:8080/api/books/allBooks", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch books");
-        }
-
-        const data = await response.json();
-
-        if (data.length === 0) {
-          toast.error("No books available at the moment. Please check back later.");
-        }
-
-        setAllBooks(data);
-      } catch (error) {
-        console.error("Error fetching books:", error);
-      }
-    };
-
-    fetchBooks();
-  }, []);
 
   const handleBorrowRequest = async () => {
     try {
@@ -183,7 +203,7 @@ export const BookDetails = () => {
     }
   };
 
-  if (!allBooks || !book) {
+  if (loading) {
     return <Loader message={"Loading book details... 📘"} role={auth.userRole} />;
   }
 
@@ -211,7 +231,13 @@ export const BookDetails = () => {
               <p className='text-xl'>Available Books:  <span className='text-yellow ibm-plex-sans-600'>{book.available_copies}</span></p>
             </div>
             <p className='text-xl text-light-blue mt-10'>{book.description}</p>
-            {(showBorrowButton || borrowRequest.status === "Returned") &&
+            {studentAccountStatus === "Verification Pending" && (
+              <div className='flex gap-3 mt-5 text-lg ibm-plex-sans-300 bg-search-bar p-3 rounded-sm w-[650px] items-center justify-start'>
+                <img src={warningIcon} alt="warning" />
+                Book will be available for borrowing once your account is verified by admin.
+              </div>
+            )}
+            {((showBorrowButton || borrowRequest.status === "Returned") && studentAccountStatus != "Verification Pending") &&
               <Button onClick={handleBorrowRequest} className='text-2xl bebas-neue-400 bg-yellow text-dark-end mt-10 rounded-xs border-2 border-yellow hover:bg-yellow-dark hover:border-yellow-dark hover:cursor-pointer'>
                 <FontAwesomeIcon icon={faBookOpen} /> BORROW BOOK REQUEST
               </Button>

@@ -118,4 +118,16 @@ public class UserController {
         ));
     }
 
+    @GetMapping("/accountStatus")
+    public ResponseEntity<?> getUserStatus(HttpSession session) {
+        String email = (String) session.getAttribute("email");
+        String accountStatus = userService.getUserStatus(email);
+        return ResponseEntity.ok(Map.of(
+                "timestamp", LocalDateTime.now(),
+                "status", 200,
+                "message", "User status retrieved successfully",
+                "accountStatus", accountStatus
+        ));
+    }
+
 }

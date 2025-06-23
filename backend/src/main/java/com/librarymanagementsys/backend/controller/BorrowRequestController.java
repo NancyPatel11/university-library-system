@@ -28,6 +28,10 @@ public class BorrowRequestController {
                 borrowStatusRequest.getBookId()
         );
 
+        if (borrowRequest == null) {
+            return ResponseEntity.noContent().build();
+        }
+
         return ResponseEntity.ok(borrowRequest);
     }
 
