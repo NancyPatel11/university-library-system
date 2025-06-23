@@ -106,7 +106,7 @@ export const BookDetails = () => {
     try {
       const payload = {
         bookId: book.id,
-        studentEmail: auth.email
+        studentId: auth.userId
       };
       const response = await fetch(`http://localhost:8080/api/borrow-requests/check-status`, {
         method: "POST",
@@ -137,7 +137,7 @@ export const BookDetails = () => {
       setBorrowRequest(null);
       setShowBorrowButton(true);
     }
-  }, [book, auth.email, auth.userRole]);
+  }, [book, auth.userId, auth.userRole]);
 
   useEffect(() => {
     checkIfBookBorrowRequested();
@@ -147,7 +147,7 @@ export const BookDetails = () => {
 
 
   const handleBorrowRequest = async () => {
-    if(book.available_copies <= 0) {
+    if (book.available_copies <= 0) {
       toast.error("No copies available for borrowing at the moment.");
       return;
     }
@@ -156,6 +156,8 @@ export const BookDetails = () => {
       const payload = {
         bookId: book.id,
         studentEmail: auth.email,
+        studentId: auth.userId,
+        studentFullName: auth.name,
       };
 
       const response = await fetch(`http://localhost:8080/api/borrow-requests/create`, {

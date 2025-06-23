@@ -39,7 +39,6 @@ export const BorrowRequests = () => {
     const { auth } = useAuth();
     const [searchValue, setSearchValue] = useState("");
     const [allBooks, setAllBooks] = useState([]);
-    const [allStudents, setAllStudents] = useState([]);
     const [allBorrowRequests, setAllBorrowRequests] = useState([]);
     const [selectedRequest, setSelectedRequest] = useState(null);
     const [sortOldestFirst, setSortOldestFirst] = useState(true);
@@ -72,14 +71,9 @@ export const BorrowRequests = () => {
         const fetchData = async () => {
             setLoading(true);
             try {
-                const [booksRes, studentsRes, borrowRequestsRes] = await Promise.all([
+                const [booksRes, borrowRequestsRes] = await Promise.all([
                     fetch("http://localhost:8080/api/books/allBooks", {
                         method: "GET",
-                        credentials: "include",
-                    }),
-                    fetch("http://localhost:8080/api/user/allUsers", {
-                        method: "GET",
-                        headers: { "Content-Type": "application/json" },
                         credentials: "include",
                     }),
                     fetch("http://localhost:8080/api/borrow-requests/all-borrow-requests", {
@@ -88,18 +82,16 @@ export const BorrowRequests = () => {
                     }),
                 ]);
 
-                if (!booksRes.ok || !studentsRes.ok || !borrowRequestsRes.ok) {
+                if (!booksRes.ok || !borrowRequestsRes.ok) {
                     throw new Error("One or more fetches failed");
                 }
 
-                const [books, students, borrowRequests] = await Promise.all([
+                const [books, borrowRequests] = await Promise.all([
                     booksRes.json(),
-                    studentsRes.json(),
                     borrowRequestsRes.json(),
                 ]);
 
                 setAllBooks(books);
-                setAllStudents(students);
                 setAllBorrowRequests(borrowRequests);
             } catch (error) {
                 console.error("Error fetching data:", error);
@@ -222,9 +214,8 @@ export const BorrowRequests = () => {
                             <tbody className=''>
                                 {allBorrowRequests.length > 0 ? allBorrowRequests.map((request) => {
                                     const book = allBooks.find(book => book.id === request.bookId);
-                                    const student = allStudents.find(student => student.email === request.studentEmail);
 
-                                    if (!book || !student) return null;
+                                    if (!book) return null;
 
                                     return (
                                         <tr key={request.id} className="border-b hover:bg-admin-light-blue transition-colors duration-200">
@@ -244,10 +235,10 @@ export const BorrowRequests = () => {
                                             </td>
                                             <td>
                                                 <div className="flex gap-2 items-center">
-                                                    <AvatarFallback name={student.fullName} />
+                                                    <AvatarFallback name={request.studentFullName} />
                                                     <div className='flex flex-col items-start'>
-                                                        <div>{student.fullName}</div>
-                                                        <div className='text-admin-secondary-black ibm-plex-sans-300'>{student.email}</div>
+                                                        <div>{request.studentFullName}</div>
+                                                        <div className='text-admin-secondary-black ibm-plex-sans-300'>{request.studentEmail}</div>
                                                     </div>
                                                 </div>
                                             </td>
@@ -331,7 +322,7 @@ export const BorrowRequests = () => {
                                                 {request.status !== "Pending" &&
                                                     <button
                                                         onClick={() => {
-                                                            setSelectedReceiptRequest({ request, book, student });
+                                                            setSelectedReceiptRequest({ request, book });
                                                             setShowReceiptModal(true);
                                                         }}
                                                         className="hover:opacity-80 hover:cursor-pointer text-admin-primary-blue flex gap-1 bg-admin-bg p-2 rounded-sm"
@@ -428,7 +419,7 @@ export const BorrowRequests = () => {
                                                 <p className='text-lg ibm-plex-sans-300 mt-2'>
                                                     Issued for:
                                                     <span className='ps-2 ibm-plex-sans-500 text-yellow'>
-                                                        {selectedReceiptRequest.student.fullName} ({selectedReceiptRequest.student.email})
+                                                        {selectedReceiptRequest.request.studentFullName} ({selectedReceiptRequest.request.studentEmail})
                                                     </span>
                                                 </p>
                                             </div>

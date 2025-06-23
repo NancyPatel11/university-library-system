@@ -17,6 +17,8 @@ public class BorrowRequest {
     private String id;
 
     private String bookId; // ID of the book being requested
+    private String studentId; // ID of the student requesting the book
+    private String studentFullName; // full name of the student requesting the book
     private String studentEmail; // email of the student requesting the book
     private String status; // "Pending", "Approved", or "Rejected"
     private Date requestDate;  // the date when the request was made by the student

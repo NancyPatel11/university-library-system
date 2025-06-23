@@ -37,13 +37,13 @@ public class BorrowRequestService {
         }
     }
 
-    public BorrowRequest checkBorrowRequestStatus(String studentEmail, String bookId) {
-        return borrowRequestRepository.findByStudentEmailAndBookId(studentEmail, bookId);
+    public BorrowRequest checkBorrowRequestStatus(String studentId, String bookId) {
+        return borrowRequestRepository.findByStudentIdAndBookId(studentId, bookId);
     }
 
-    public List<BorrowRequest> getMyBorrowedBooks(String studentEmail) {
+    public List<BorrowRequest> getMyBorrowedBooks(String studentId) {
         // Fetch all borrow requests for the given student email
-        List<BorrowRequest> borrowedBooks = borrowRequestRepository.findByStudentEmail(studentEmail);
+        List<BorrowRequest> borrowedBooks = borrowRequestRepository.findByStudentId(studentId);
 
         if (borrowedBooks.isEmpty()) {
            return List.of(); // Return an empty list if no borrowed books found

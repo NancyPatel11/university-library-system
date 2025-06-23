@@ -24,7 +24,7 @@ public class BorrowRequestController {
     @PostMapping("/check-status")
     public ResponseEntity<?> checkBorrowRequestStatus(@RequestBody BorrowStatusRequest borrowStatusRequest) {
         BorrowRequest borrowRequest = borrowRequestService.checkBorrowRequestStatus(
-                borrowStatusRequest.getStudentEmail(),
+                borrowStatusRequest.getStudentId(),
                 borrowStatusRequest.getBookId()
         );
 
@@ -37,11 +37,11 @@ public class BorrowRequestController {
 
     @GetMapping("/my-borrowed-books")
     public ResponseEntity<?> getMyBorrowedBooks(HttpSession session) {
-        String studentEmail = (String) session.getAttribute("email");
-        if (studentEmail == null) {
-            return ResponseEntity.badRequest().body("No student email found in session");
+        String studentId = (String) session.getAttribute("userId");
+        if (studentId == null) {
+            return ResponseEntity.badRequest().body("No student id found in session");
         }
-        return ResponseEntity.ok(borrowRequestService.getMyBorrowedBooks(studentEmail));
+        return ResponseEntity.ok(borrowRequestService.getMyBorrowedBooks(studentId));
     }
 
     @GetMapping("/all-borrow-requests")

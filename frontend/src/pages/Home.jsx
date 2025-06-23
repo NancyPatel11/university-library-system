@@ -76,7 +76,7 @@ export const Home = () => {
     try {
       const payload = {
         bookId: book1.id,
-        studentEmail: auth.email
+        studentId: auth.userId
       };
       const response = await fetch(`http://localhost:8080/api/borrow-requests/check-status`, {
         method: "POST",
@@ -107,7 +107,7 @@ export const Home = () => {
       setBorrowRequest(null);
       setShowBorrowButton(true);
     }
-  }, [book1, auth.email, auth.userRole]);
+  }, [book1, auth.userId, auth.userRole]);
 
   useEffect(() => {
     checkIfBookBorrowRequested();
@@ -124,6 +124,8 @@ export const Home = () => {
       const payload = {
         bookId: book1.id,
         studentEmail: auth.email,
+        studentId: auth.userId,
+        studentFullName: auth.name,
       };
 
       const response = await fetch(`http://localhost:8080/api/borrow-requests/create`, {
