@@ -8,6 +8,6 @@ import java.util.List;
 
 @Repository
 public interface BorrowRequestRepository extends MongoRepository<BorrowRequest, String> {
-     BorrowRequest findByStudentIdAndBookId(String studentId, String bookId);
+     List<BorrowRequest> findByStudentIdAndBookId(String studentId, String bookId);
      List<BorrowRequest> findByStudentId(String studentId);
 }

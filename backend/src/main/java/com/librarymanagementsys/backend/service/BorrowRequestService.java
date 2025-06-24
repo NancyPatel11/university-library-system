@@ -9,6 +9,7 @@ import com.librarymanagementsys.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -38,7 +39,16 @@ public class BorrowRequestService {
     }
 
     public BorrowRequest checkBorrowRequestStatus(String studentId, String bookId) {
-        return borrowRequestRepository.findByStudentIdAndBookId(studentId, bookId);
+        List<BorrowRequest> borrowRequests = borrowRequestRepository.findByStudentIdAndBookId(studentId, bookId);
+
+        if (borrowRequests == null || borrowRequests.isEmpty()) {
+            return null; // No borrow requests found
+        }
+
+        // Return the most recent request by requestDate
+        return borrowRequests.stream()
+                .max(Comparator.comparing(BorrowRequest::getRequestDate))
+                .orElse(null);
     }
 
     public List<BorrowRequest> getMyBorrowedBooks(String studentId) {
