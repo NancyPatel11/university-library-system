@@ -233,33 +233,38 @@ export const EditBookDetails = () => {
 
                             <FormField
                                 name="color"
-                                render={({ field: { value, onChange, ...rest } }) => (
-                                    <FormItem>
-                                        <FormLabel>Book Primary Color</FormLabel>
-                                        <FormControl>
-                                            <div className="relative w-full">
-                                                {/* Color Picker Inside Input */}
-                                                <input
-                                                    type="color"
-                                                    value={value}
-                                                    onChange={(e) => onChange(e.target.value)}
-                                                    className="absolute left-3 top-1/2 transform -translate-y-1/2 w-6 h-6 p-0 border-none cursor-pointer bg-transparent"
-                                                    style={{ appearance: "none" }}
-                                                />
-                                                {/* Text Input */}
-                                                <Input
-                                                    type="text"
-                                                    value={value}
-                                                    onChange={(e) => onChange(e.target.value)}
-                                                    placeholder="#000000"
-                                                    className="pl-12 pr-4 py-5 rounded-xs text-admin-primary-black placeholder-admin-secondary-black ibm-plex-sans-400 bg-white"
-                                                    {...rest}
-                                                />
-                                            </div>
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
+                                render={({ field: { value, onChange, ...rest } }) => {
+                                    // Valid hex check: 7 characters starting with #
+                                    const isValidHex = /^#([0-9A-Fa-f]{6})$/.test(value);
+
+                                    return (
+                                        <FormItem>
+                                            <FormLabel>Book Primary Color</FormLabel>
+                                            <FormControl>
+                                                <div className="relative w-full">
+                                                    {/* Color Picker Inside Input */}
+                                                    <input
+                                                        type="color"
+                                                        value={isValidHex ? value : "#000000"} // fallback during typing
+                                                        onChange={(e) => onChange(e.target.value)}
+                                                        className="absolute left-3 top-1/2 transform -translate-y-1/2 w-6 h-6 p-0 border-none cursor-pointer bg-transparent"
+                                                        style={{ appearance: "none" }}
+                                                    />
+                                                    {/* Text Input */}
+                                                    <Input
+                                                        type="text"
+                                                        value={value}
+                                                        onChange={(e) => onChange(e.target.value)}
+                                                        placeholder="#000000"
+                                                        className="pl-12 pr-4 py-5 rounded-xs text-admin-primary-black placeholder-admin-secondary-black ibm-plex-sans-400 bg-white"
+                                                        {...rest}
+                                                    />
+                                                </div>
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    );
+                                }}
                             />
 
                             <FormField name="video" render={({ field }) => (
