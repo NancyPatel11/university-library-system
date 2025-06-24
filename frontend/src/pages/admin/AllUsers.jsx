@@ -85,9 +85,28 @@ export const AllUsers = () => {
     const handleDeleteUser = async (user) => {
         if (!user) return;
 
-        if (user.role === "student" && user.noBooksBorrowed > 0) {
-            toast.error("Cannot delete user having active borrowed books.");
-            return;
+        const url = user.role === "admin"
+            ? `http://localhost:8080/api/admin/delete/${user.email}`
+            : `http://localhost:8080/api/user/delete/${user.email}`;
+
+        try {
+            const res = await fetch(url, {
+                method: "DELETE",
+                credentials: "include",
+            });
+
+            const response = await res.json();
+            if (user.role === "student" && res.status === 409) {
+                toast.error(response.message);
+                return;
+            }
+
+            if (!res.ok) throw new Error("Failed to delete user");
+
+            toast.success("User deleted successfully.");
+            setCombinedUsers(prev => prev.filter(u => u.email !== user.email));
+        } catch (error) {
+            console.error("Error deleting user:", error);
         }
 
         const response = await fetch("http://localhost:8080/api/borrow-requests/all-borrow-requests", {
@@ -119,23 +138,6 @@ export const AllUsers = () => {
             console.log(`Deleted borrow request with ID: ${request.id}`);
         }
 
-        const url = user.role === "admin"
-            ? `http://localhost:8080/api/admin/delete/${user.email}`
-            : `http://localhost:8080/api/user/delete/${user.email}`;
-
-        try {
-            const res = await fetch(url, {
-                method: "DELETE",
-                credentials: "include",
-            });
-
-            if (!res.ok) throw new Error("Failed to delete user");
-
-            toast.success("User deleted successfully.");
-            setCombinedUsers(prev => prev.filter(u => u.email !== user.email));
-        } catch (error) {
-            console.error("Error deleting user:", error);
-        }
     };
 
     const fetchIdCard = async (email) => {

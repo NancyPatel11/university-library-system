@@ -95,12 +95,32 @@ public class UserController {
 
     @DeleteMapping("/delete/{email}")
     public ResponseEntity<?> deleteUser(@PathVariable String email) {
-        userService.deleteUser(email);
-        return ResponseEntity.ok(Map.of(
-                "timestamp", LocalDateTime.now(),
-                "status", 200,
-                "message", "User deleted successfully"
-        ));
+        try {
+            userService.deleteUser(email);
+            return ResponseEntity.ok(Map.of(
+                    "timestamp", LocalDateTime.now(),
+                    "status", 200,
+                    "message", "User deleted successfully"
+            ));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of(
+                    "timestamp", LocalDateTime.now(),
+                    "status", 409,
+                    "message", e.getMessage()
+            ));
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
+                    "timestamp", LocalDateTime.now(),
+                    "status", 404,
+                    "message", e.getMessage()
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "timestamp", LocalDateTime.now(),
+                    "status", 500,
+                    "message", "Failed to delete user: " + e.getMessage()
+            ));
+        }
     }
 
     @PutMapping("/approve/{email}")

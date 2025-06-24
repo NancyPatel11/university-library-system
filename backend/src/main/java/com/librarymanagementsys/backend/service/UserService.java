@@ -134,6 +134,11 @@ public class UserService {
         if (user == null) {
             throw new UserNotFoundException("User not found with email: " + email);
         }
+
+        if(user.getNoBooksBorrowed() > 0){
+            throw new IllegalStateException("Cannot delete user with borrowed books");
+        }
+
         try{
             userRepository.delete(user);
         } catch (Exception e) {
