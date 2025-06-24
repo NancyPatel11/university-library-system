@@ -11,6 +11,7 @@ import plusBlackIcon from '../../assets/icons/admin/plusBlack.svg'
 import closeIcon from '../../assets/icons/admin/close.svg'
 import swapIcon from '../../assets/icons/admin/arrow-swap.png'
 import denyIcon from '../../assets/icons/admin/deny.png'
+import illustration1 from '../../assets/icons/admin/illustration1.png'
 import { toast } from 'sonner'
 
 export const AllBooks = () => {
@@ -149,68 +150,81 @@ export const AllBooks = () => {
                     </div>
 
                     <div className="overflow-x-auto rounded-lg">
-                        <table className="min-w-full text-md text-left border-collapse">
-                            <thead className="text-md text-admin-primary-blue uppercase bg-admin-bg border-admin-bg">
-                                <tr>
-                                    <th scope="col" className="p-4">Book Title</th>
-                                    <th scope="col" className="">Author</th>
-                                    <th scope="col" className="">Genre</th>
-                                    <th scope="col" className="">Total Copies</th>
-                                    <th scope="col" className="">Available Copies</th>
-                                    <th scope="col" className="">Date Created</th>
-                                    <th scope="col" className="">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody className=''>
-                                {allBooks.map((book, index) => (
-                                    <tr key={index} className="border-b border-admin-bg">
-                                        <td className="p-4 font-medium text-admin-primary-black">
-                                            <div
-                                                className='flex items-center gap-2 hover:cursor-pointer'
-                                                onClick={
-                                                    () => {
-                                                        // Navigate to book details page
-                                                        navigate(`/bookdetails/${book.id}`)
-                                                    }
-                                                }
-                                            >
-                                                <div className="relative">
-                                                    <BookCoverSvg coverColor={book.color} width={45} height={60} />
-                                                    <img
-                                                        src={book.cover}
-                                                        alt={book.title}
-                                                        className="absolute top-0 left-1 w-[41px] h-[53px] object-fit rounded-xs"
-                                                    />
-                                                </div>
-                                                {book.title}
-                                            </div>
-                                        </td>
-                                        <td>{book.author}</td>
-                                        <td>{book.genre}</td>
-                                        <td>{book.total_copies}</td>
-                                        <td>{book.available_copies}</td>
-                                        <td>{new Date(book.createdAt).toLocaleDateString()}</td>
-                                        <td>
-                                            <div className="flex gap-2 items-center">
-                                                <Button
-                                                    className="bg-transparent hover:bg-transparent hover:cursor-pointer shadow-none border-none"
-                                                    onClick={() => {
-                                                        navigate(`/edit-book-details/${book.id}`);
-                                                    }}>
-                                                    <img src={editIcon} alt="edit" />
-                                                </Button>
-                                                <Button className="bg-transparent hover:bg-transparent hover:cursor-pointer shadow-none border-none" onClick={() => {
-                                                    setSelectedBook(book);
-                                                    setShowDeleteModal(true);
-                                                }}>
-                                                    <img src={trashIcon} alt="trash" />
-                                                </Button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                        {allBooks.length > 0 ?
+                            <div className="h-[calc(100vh-275px)] overflow-y-scroll rounded-md">
+                                <table className="min-w-full text-md text-left border-collapse">
+                                    <thead className="sticky top-0 z-10 text-md text-admin-primary-blue uppercase bg-admin-bg border-admin-bg">
+                                        <tr>
+                                            <th scope="col" className="p-4">Book Title</th>
+                                            <th scope="col" className="">Author</th>
+                                            <th scope="col" className="">Genre</th>
+                                            <th scope="col" className="">Total Copies</th>
+                                            <th scope="col" className="">Available Copies</th>
+                                            <th scope="col" className="">Date Created</th>
+                                            <th scope="col" className="">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className=''>
+                                        {allBooks.map((book, index) => (
+                                            <tr key={index} className="border-b border-admin-bg">
+                                                <td className="p-4 font-medium text-admin-primary-black">
+                                                    <div
+                                                        className='flex items-center gap-2 hover:cursor-pointer'
+                                                        onClick={
+                                                            () => {
+                                                                // Navigate to book details page
+                                                                navigate(`/bookdetails/${book.id}`)
+                                                            }
+                                                        }
+                                                    >
+                                                        <div className="relative">
+                                                            <BookCoverSvg coverColor={book.color} width={45} height={60} />
+                                                            <img
+                                                                src={book.cover}
+                                                                alt={book.title}
+                                                                className="absolute top-0 left-1 w-[41px] h-[53px] object-fit rounded-xs"
+                                                            />
+                                                        </div>
+                                                        {book.title}
+                                                    </div>
+                                                </td>
+                                                <td>{book.author}</td>
+                                                <td>{book.genre}</td>
+                                                <td>{book.total_copies}</td>
+                                                <td>{book.available_copies}</td>
+                                                <td>{new Date(book.createdAt).toLocaleDateString()}</td>
+                                                <td>
+                                                    <div className="flex gap-2 items-center">
+                                                        <Button
+                                                            className="bg-transparent hover:bg-transparent hover:cursor-pointer shadow-none border-none"
+                                                            onClick={() => {
+                                                                navigate(`/edit-book-details/${book.id}`);
+                                                            }}>
+                                                            <img src={editIcon} alt="edit" />
+                                                        </Button>
+                                                        <Button className="bg-transparent hover:bg-transparent hover:cursor-pointer shadow-none border-none" onClick={() => {
+                                                            setSelectedBook(book);
+                                                            setShowDeleteModal(true);
+                                                        }}>
+                                                            <img src={trashIcon} alt="trash" />
+                                                        </Button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                            :
+                            <div className='flex flex-col items-center gap-3 my-10 h-[720px] justify-center'>
+                                <img src={illustration1} alt="" className='h-[144px] w-[193px] mb-4' />
+                                <h1>No Books to Display</h1>
+                                <p className='ibm-plex-sans-300 text-admin-secondary-black text-center'>
+                                    There are no books in the library currently. Add new books to get started.
+                                </p>
+                            </div>
+                        }
+
                         {showDeleteModal && (
                             <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
                                 <div className="relative bg-white p-6 rounded-lg shadow-lg text-center w-[450px] flex flex-col items-center">

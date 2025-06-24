@@ -10,6 +10,7 @@ import approveIcon from '../../assets/icons/admin/approve.png'
 import receiptIcon from '../../assets/icons/admin/receipt.svg'
 import receiptBg from '../../assets/images/receipt-bg.png'
 import bookicon from "../../assets/icons/logo.svg";
+import illustration1 from '../../assets/icons/admin/illustration1.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCircleCheck } from '@fortawesome/free-solid-svg-icons'
 import { toast } from 'sonner'
@@ -198,151 +199,158 @@ export const BorrowRequests = () => {
                     </div>
 
                     <div className="overflow-x-auto rounded-lg">
-                        <table className="min-w-full text-md text-left border-collapse">
-                            <thead className="text-md text-admin-primary-blue uppercase bg-admin-bg border-admin-bg">
-                                <tr>
-                                    <th scope="col" className="p-4">Book</th>
-                                    <th scope="col">Requested By</th>
-                                    <th scope="col">Status</th>
-                                    <th scope="col">Request Date</th>
-                                    <th scope="col">Borrowed Date</th>
-                                    <th scope="col">Due Date</th>
-                                    <th scope="col">Return Date</th>
-                                    <th scope="col">Receipt</th>
-                                </tr>
-                            </thead>
-                            <tbody className=''>
-                                {allBorrowRequests.length > 0 ? allBorrowRequests.map((request) => {
-                                    const book = allBooks.find(book => book.id === request.bookId);
-
-                                    if (!book) return null;
-
-                                    return (
-                                        <tr key={request.id} className="border-b hover:bg-admin-light-blue transition-colors duration-200">
-                                            <td className="p-4 flex items-center gap-4">
-                                                <div className="relative">
-                                                    <BookCoverSvg coverColor={book.color} width={45} height={60} />
-                                                    <img
-                                                        src={book.cover}
-                                                        alt={book.title}
-                                                        className="absolute top-0 left-1 w-[41px] h-[53px] object-fit rounded-xs"
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <h3 className='text-admin-primary-black'>{book.title}</h3>
-                                                    <p className='text-admin-secondary-black text-sm'>{book.author}</p>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div className="flex gap-2 items-center">
-                                                    <AvatarFallback name={request.studentFullName} />
-                                                    <div className='flex flex-col items-start'>
-                                                        <div>{request.studentFullName}</div>
-                                                        <div className='text-admin-secondary-black ibm-plex-sans-300'>{request.studentEmail}</div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                {request.status === "Pending"
-                                                    ? <Button
-                                                        onClick={() => {
-                                                            setSelectedRequest(request);
-                                                            setShowApprovalModal(true);
-                                                        }}
-
-                                                        className={`py-1 bg-admin-green-bg shadow-none text-green-700 hover:bg-green-200 hover:cursor-pointer`}
-                                                    >
-                                                        Approve request
-                                                        <FontAwesomeIcon icon={faCircleCheck} className="text-green-700 " />
-                                                    </Button>
-                                                    : <span className={`${request.status === "Borrowed"
-                                                        ? "bg-light-blue text-admin-primary-blue"
-                                                        : request.status === "Returned"
-                                                            ? "bg-admin-green-bg text-green-700"
-                                                            :
-                                                            "bg-admin-red-bg text-red-700"
-
-                                                        } px-3 py-1 rounded-sm`}>
-                                                        {request.status}
-                                                    </span>
-                                                }
-                                            </td>
-                                            <td>
-                                                {new Date(request.requestDate).toLocaleDateString("en-US", {
-                                                    year: "numeric",
-                                                    month: "short",
-                                                    day: "2-digit",
-                                                })}
-                                            </td>
-                                            <td
-                                                className={
-                                                    request.status != "Pending"
-                                                        ? "text-admin-primary-black"
-                                                        : "text-admin-secondary-black italic"
-                                                }
-                                            >
-                                                {request.status !== "Pending"
-                                                    ? new Date(request.issueDate).toLocaleDateString("en-US", {
-                                                        year: "numeric",
-                                                        month: "short",
-                                                        day: "2-digit",
-                                                    })
-                                                    : "Approval Pending"}
-                                            </td>
-                                            <td
-                                                className={
-                                                    request.status != "Pending"
-                                                        ? "text-admin-primary-black"
-                                                        : "text-admin-secondary-black italic"
-                                                }
-                                            >
-                                                {request.status != "Pending" ? new Date(request.dueDate).toLocaleDateString("en-US", {
-                                                    year: "numeric",
-                                                    month: "short",
-                                                    day: "2-digit",
-                                                }) : "Approval Pending"}
-                                            </td>
-                                            <td
-                                                className={
-                                                    request.status === "Borrowed" || request.status === "Overdue"
-                                                        ? "text-admin-dark-red"
-                                                        :
-                                                        request.status != "Pending"
-                                                            ? "text-admin-primary-black"
-                                                            : "text-admin-secondary-black italic"
-                                                }
-                                            >
-                                                {request.returnDate ? new Date(request.returnDate).toLocaleDateString("en-US", {
-                                                    year: "numeric",
-                                                    month: "short",
-                                                    day: "2-digit",
-                                                }) : request.status === "Pending" ? "Approval Pending" : "Not Returned Yet"}
-                                            </td>
-                                            <td className="text-center align-middle">
-                                                {request.status !== "Pending" &&
-                                                    <button
-                                                        onClick={() => {
-                                                            setSelectedReceiptRequest({ request, book });
-                                                            setShowReceiptModal(true);
-                                                        }}
-                                                        className="hover:opacity-80 hover:cursor-pointer text-admin-primary-blue flex gap-1 bg-admin-bg p-2 rounded-sm"
-                                                    >
-                                                        <img src={receiptIcon} alt="receipt" className="h-6 mx-auto" />
-                                                        <p>Generate</p>
-                                                    </button>
-                                                }
-
-                                            </td>
+                        {allBorrowRequests.length > 0 ?
+                            <div className="h-[calc(100vh-275px)] overflow-y-scroll rounded-md">
+                                <table className="min-w-full text-md text-left border-collapse">
+                                    <thead className="sticky top-0 z-10 text-md text-admin-primary-blue uppercase bg-admin-bg border-admin-bg">
+                                        <tr>
+                                            <th scope="col" className="p-4">Book</th>
+                                            <th scope="col">Requested By</th>
+                                            <th scope="col">Status</th>
+                                            <th scope="col">Request Date</th>
+                                            <th scope="col">Borrowed Date</th>
+                                            <th scope="col">Due Date</th>
+                                            <th scope="col">Return Date</th>
+                                            <th scope="col">Receipt</th>
                                         </tr>
-                                    );
-                                }) : (
-                                    <tr>
-                                        <td colSpan="8" className="text-center p-6 text-admin-secondary-black">No borrow requests available.</td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
+                                    </thead>
+                                    <tbody className=''>
+                                        {allBorrowRequests.map((request) => {
+                                            const book = allBooks.find(book => book.id === request.bookId);
 
+                                            if (!book) return null;
+
+                                            return (
+                                                <tr key={request.id} className="border-b hover:bg-admin-light-blue transition-colors duration-200">
+                                                    <td className="p-4 flex items-center gap-4">
+                                                        <div className="relative">
+                                                            <BookCoverSvg coverColor={book.color} width={45} height={60} />
+                                                            <img
+                                                                src={book.cover}
+                                                                alt={book.title}
+                                                                className="absolute top-0 left-1 w-[41px] h-[53px] object-fit rounded-xs"
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <h3 className='text-admin-primary-black'>{book.title}</h3>
+                                                            <p className='text-admin-secondary-black text-sm'>{book.author}</p>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div className="flex gap-2 items-center">
+                                                            <AvatarFallback name={request.studentFullName} />
+                                                            <div className='flex flex-col items-start'>
+                                                                <div>{request.studentFullName}</div>
+                                                                <div className='text-admin-secondary-black ibm-plex-sans-300'>{request.studentEmail}</div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        {request.status === "Pending"
+                                                            ? <Button
+                                                                onClick={() => {
+                                                                    setSelectedRequest(request);
+                                                                    setShowApprovalModal(true);
+                                                                }}
+
+                                                                className={`py-1 bg-admin-green-bg shadow-none text-green-700 hover:bg-green-200 hover:cursor-pointer`}
+                                                            >
+                                                                Approve request
+                                                                <FontAwesomeIcon icon={faCircleCheck} className="text-green-700 " />
+                                                            </Button>
+                                                            : <span className={`${request.status === "Borrowed"
+                                                                ? "bg-light-blue text-admin-primary-blue"
+                                                                : request.status === "Returned"
+                                                                    ? "bg-admin-green-bg text-green-700"
+                                                                    :
+                                                                    "bg-admin-red-bg text-red-700"
+
+                                                                } px-3 py-1 rounded-sm`}>
+                                                                {request.status}
+                                                            </span>
+                                                        }
+                                                    </td>
+                                                    <td>
+                                                        {new Date(request.requestDate).toLocaleDateString("en-US", {
+                                                            year: "numeric",
+                                                            month: "short",
+                                                            day: "2-digit",
+                                                        })}
+                                                    </td>
+                                                    <td
+                                                        className={
+                                                            request.status != "Pending"
+                                                                ? "text-admin-primary-black"
+                                                                : "text-admin-secondary-black italic"
+                                                        }
+                                                    >
+                                                        {request.status !== "Pending"
+                                                            ? new Date(request.issueDate).toLocaleDateString("en-US", {
+                                                                year: "numeric",
+                                                                month: "short",
+                                                                day: "2-digit",
+                                                            })
+                                                            : "Approval Pending"}
+                                                    </td>
+                                                    <td
+                                                        className={
+                                                            request.status != "Pending"
+                                                                ? "text-admin-primary-black"
+                                                                : "text-admin-secondary-black italic"
+                                                        }
+                                                    >
+                                                        {request.status != "Pending" ? new Date(request.dueDate).toLocaleDateString("en-US", {
+                                                            year: "numeric",
+                                                            month: "short",
+                                                            day: "2-digit",
+                                                        }) : "Approval Pending"}
+                                                    </td>
+                                                    <td
+                                                        className={
+                                                            request.status === "Borrowed" || request.status === "Overdue"
+                                                                ? "text-admin-dark-red"
+                                                                :
+                                                                request.status != "Pending"
+                                                                    ? "text-admin-primary-black"
+                                                                    : "text-admin-secondary-black italic"
+                                                        }
+                                                    >
+                                                        {request.returnDate ? new Date(request.returnDate).toLocaleDateString("en-US", {
+                                                            year: "numeric",
+                                                            month: "short",
+                                                            day: "2-digit",
+                                                        }) : request.status === "Pending" ? "Approval Pending" : "Not Returned Yet"}
+                                                    </td>
+                                                    <td className="text-center align-middle">
+                                                        {request.status !== "Pending" &&
+                                                            <button
+                                                                onClick={() => {
+                                                                    setSelectedReceiptRequest({ request, book });
+                                                                    setShowReceiptModal(true);
+                                                                }}
+                                                                className="hover:opacity-80 hover:cursor-pointer text-admin-primary-blue flex gap-1 bg-admin-bg p-2 rounded-sm"
+                                                            >
+                                                                <img src={receiptIcon} alt="receipt" className="h-6 mx-auto" />
+                                                                <p>Generate</p>
+                                                            </button>
+                                                        }
+
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })}
+                                    </tbody>
+                                </table>
+                            </div>
+                            :
+                            <div className='flex flex-col items-center gap-3 my-10 h-[720px] justify-center'>
+                                <img src={illustration1} alt="" className='h-[144px] w-[193px] mb-4' />
+                                <h1>No Book Requests</h1>
+                                <p className='ibm-plex-sans-300 text-admin-secondary-black text-center'>
+                                    There are no borrow book requests awaiting your review at this time.
+                                </p>
+                            </div>
+                        }
 
                         {showApprovalModal && (
                             <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">

@@ -73,7 +73,13 @@ export const AdminDashboard = () => {
           requestsRes.json(),
         ]);
 
-        setAllBooks(books);
+        const sortedBooks = books.sort((a, b) => {
+          const dateA = new Date(a.createdAt);
+          const dateB = new Date(b.createdAt);
+          return dateB - dateA; // Sort by most recent date first
+        })
+
+        setAllBooks(sortedBooks);
 
         setAllStudents(users);
         const pending = users.filter((student) => student.accountStatus === "Verification Pending");
@@ -162,7 +168,7 @@ export const AdminDashboard = () => {
 
         <div className='flex gap-5 mt-8 mb-5'>
           <div className='w-1/2 flex flex-col gap-5'>
-            <div className='bg-white p-5 rounded-2xl flex-1 flex flex-col justify-between'>
+            <div className='bg-white p-5 rounded-2xl flex-1 flex flex-col justify-start'>
               <div className='flex justify-between items-center'>
                 <h1 className='text-xl'>Borrow Requests</h1>
                 <Button
@@ -175,6 +181,9 @@ export const AdminDashboard = () => {
               {allBorrowRequests.length > 0 ?
                 <div className="flex flex-wrap justify-start mt-5 gap-3 flex-col">
                   {allBorrowRequests.slice(0, 3).map((request, index) => {
+                    if (request.status != "Pending")
+                      return;
+
                     const book = allBooks.find(book => book.id === request.bookId);
                     const student = allStudents.find(student => student.email === request.studentEmail);
 
@@ -183,7 +192,7 @@ export const AdminDashboard = () => {
                     return (
                       <div
                         key={index}
-                        className="bg-admin-bg rounded-lg p-3 flex gap-3 items-center text-center ibm-plex-sans-500 text-admin-primary-black"
+                        className="bg-admin-bg rounded-lg p-3 flex gap-3 items-center text-center ibm-plex-sans-500 text-admin-primary-black hover:cursor-pointer"
                         onClick={() => navigate(`/bookdetails/${request.bookId}`)}
                       >
                         <div className="relative">
@@ -314,7 +323,11 @@ export const AdminDashboard = () => {
                       </div>
                       <div className='flex gap-2 items-center justify-start mt-1'>
                         <img src={calendarImg} alt="calendar icon" />
-                        <p className="text-sm text-admin-secondary-black ibm-plex-sans-300">Date</p>
+                        <p className="text-sm text-admin-secondary-black ibm-plex-sans-300"> {new Date(book.createdAt).toLocaleDateString("en-GB", {
+                          day: "2-digit",
+                          month: "2-digit",
+                          year: "2-digit",
+                        })}</p>
                       </div>
                     </div>
                   </div>
@@ -324,9 +337,9 @@ export const AdminDashboard = () => {
               <div className="flex-grow flex items-center justify-center">
                 <div className='flex flex-col items-center gap-3'>
                   <img src={illustration1} alt="" className='h-[144px] w-[193px]' />
-                  <h1>No New Books Added Recently</h1>
+                  <h1>No Books to Display</h1>
                   <p className='ibm-plex-sans-300 text-admin-secondary-black text-center'>
-                    There are no new books added at this time.
+                    There are no books in the library currently. Add new books to get started.
                   </p>
                 </div>
               </div>}

@@ -9,6 +9,7 @@ import closeIcon from '../../assets/icons/admin/close.svg'
 import closeCircleIcon from '../../assets/icons/admin/close-circle.svg'
 import eyeIcon from '../../assets/icons/admin/eye.png'
 import swapIcon from '../../assets/icons/admin/arrow-swap.png'
+import illustration2 from '../../assets/icons/admin/illustration2.png'
 import { toast } from 'sonner'
 
 const getInitials = (name) => {
@@ -211,96 +212,109 @@ export const AccountRequests = () => {
                     </div>
 
                     <div className="overflow-x-auto rounded-lg">
-                        <table className="min-w-full text-md text-left border-collapse">
-                            <thead className="text-md text-admin-primary-blue uppercase bg-admin-bg border-admin-bg">
-                                <tr>
-                                    <th scope="col" className="p-4">Name</th>
-                                    <th scope="col" className="">Date Joined</th>
-                                    <th scope="col" className="">University ID</th>
-                                    <th scope="col" className="">University ID Card</th>
-                                    <th scope="col" className="">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody className=''>
-                                {allStudents.map((student, index) => (
-                                    <tr key={index} className="border-b border-admin-bg">
-                                        <td className="p-4">
-                                            <div className="flex gap-3 items-center">
-                                                <div>
-                                                    <div className="flex items-center gap-2">
-                                                        <AvatarFallback name={student.fullName} />
+                        {allStudents.length > 0 ?
+                            <div className="h-[calc(100vh-275px)] overflow-y-scroll rounded-md">
+                                <table className="min-w-full text-md text-left border-collapse">
+                                    <thead className="sticky top-0 z-10 text-md text-admin-primary-blue uppercase bg-admin-bg border-admin-bg">
+                                        <tr>
+                                            <th scope="col" className="p-4">Name</th>
+                                            <th scope="col" className="">Date Joined</th>
+                                            <th scope="col" className="">University ID</th>
+                                            <th scope="col" className="">University ID Card</th>
+                                            <th scope="col" className="">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className=''>
+                                        {allStudents.map((student, index) => (
+                                            <tr key={index} className="border-b border-admin-bg">
+                                                <td className="p-4">
+                                                    <div className="flex gap-3 items-center">
+                                                        <div>
+                                                            <div className="flex items-center gap-2">
+                                                                <AvatarFallback name={student.fullName} />
+                                                            </div>
+                                                        </div>
+                                                        <div className='flex flex-col items-start'>
+                                                            <div className=''>
+                                                                {student.fullName}
+                                                            </div>
+                                                            <div className='text-admin-secondary-black ibm-plex-sans-300'>
+                                                                {student.email}
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div className='flex flex-col items-start'>
-                                                    <div className=''>
-                                                        {student.fullName}
-                                                    </div>
-                                                    <div className='text-admin-secondary-black ibm-plex-sans-300'>
-                                                        {student.email}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            {student.registrationDate
-                                                ? new Date(student.registrationDate).toLocaleDateString("en-US", {
-                                                    month: "short",
-                                                    day: "2-digit",
-                                                    year: "numeric",
-                                                })
-                                                : "—"}
-                                        </td>
-                                        <td>{student.universityId}</td>
-                                        <td>
-                                            <Button
-                                                className="flex items-center flex-wrap text-admin-primary-blue bg-transparent hover:bg-transparent hover:cursor-pointer shadow-none border-none"
-                                                onClick={() => {
-                                                    setSelectedUser(student.email);
-                                                    fetchIdCard(student.email);
-                                                    setShowIdCard(true);
-                                                }}
-                                            >
-                                                <img src={eyeIcon} alt="eye" />
-                                                View Id Card
-                                            </Button>
-                                        </td>
-                                        <td>
-                                            {student.accountStatus != "Verified" && student.accountStatus != "Denied" ?
-                                                <div className='flex items-start gap-2'>
+                                                </td>
+                                                <td>
+                                                    {student.registrationDate
+                                                        ? new Date(student.registrationDate).toLocaleDateString("en-US", {
+                                                            month: "short",
+                                                            day: "2-digit",
+                                                            year: "numeric",
+                                                        })
+                                                        : "—"}
+                                                </td>
+                                                <td>{student.universityId}</td>
+                                                <td>
                                                     <Button
-                                                        className="m-0 p-0 bg-transparent hover:bg-transparent hover:cursor-pointer shadow-none border-none"
+                                                        className="flex items-center flex-wrap text-admin-primary-blue bg-transparent hover:bg-transparent hover:cursor-pointer shadow-none border-none"
                                                         onClick={() => {
                                                             setSelectedUser(student.email);
-                                                            setShowApprove(true);
+                                                            fetchIdCard(student.email);
+                                                            setShowIdCard(true);
                                                         }}
                                                     >
-                                                        <span className='bg-admin-green-bg text-green-600 rounded-sm ibm-plex-sans-600 py-3 px-2'>Approve Account</span>
+                                                        <img src={eyeIcon} alt="eye" />
+                                                        View Id Card
                                                     </Button>
-                                                    <Button
-                                                        onClick={() => {
-                                                            setSelectedUser(student.email);
-                                                            setShowReject(true);
-                                                        }}
-                                                        className="p-0 m-0 bg-transparent hover:bg-transparent shadow-none border-none hover:shadow-none focus:outline-none hover:cursor-pointer"
-                                                    >
-                                                        <img src={closeCircleIcon} alt="close" className="h-6 w-8" />
-                                                    </Button>
-                                                </div>
-                                                :
-                                                <span
-                                                    className={`rounded-sm ibm-plex-sans-600 py-3 px-2 ${student.accountStatus === "Verified"
-                                                        ? "bg-admin-green-bg text-green-600"
-                                                        : "bg-admin-red-bg text-red-600"
-                                                        }`}
-                                                >
-                                                    {student.accountStatus}
-                                                </span>
-                                            }
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                                </td>
+                                                <td>
+                                                    {student.accountStatus != "Verified" && student.accountStatus != "Denied" ?
+                                                        <div className='flex items-start gap-2'>
+                                                            <Button
+                                                                className="m-0 p-0 bg-transparent hover:bg-transparent hover:cursor-pointer shadow-none border-none"
+                                                                onClick={() => {
+                                                                    setSelectedUser(student.email);
+                                                                    setShowApprove(true);
+                                                                }}
+                                                            >
+                                                                <span className='bg-admin-green-bg text-green-600 rounded-sm ibm-plex-sans-600 py-3 px-2'>Approve Account</span>
+                                                            </Button>
+                                                            <Button
+                                                                onClick={() => {
+                                                                    setSelectedUser(student.email);
+                                                                    setShowReject(true);
+                                                                }}
+                                                                className="p-0 m-0 bg-transparent hover:bg-transparent shadow-none border-none hover:shadow-none focus:outline-none hover:cursor-pointer"
+                                                            >
+                                                                <img src={closeCircleIcon} alt="close" className="h-6 w-8" />
+                                                            </Button>
+                                                        </div>
+                                                        :
+                                                        <span
+                                                            className={`rounded-sm ibm-plex-sans-600 py-3 px-2 ${student.accountStatus === "Verified"
+                                                                ? "bg-admin-green-bg text-green-600"
+                                                                : "bg-admin-red-bg text-red-600"
+                                                                }`}
+                                                        >
+                                                            {student.accountStatus}
+                                                        </span>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                            :
+                            <div className='flex flex-col items-center gap-3 my-10 h-[720px] justify-center'>
+                                <img src={illustration2} alt="" className='h-[144px] w-[210px] mb-4' />
+                                <h1>No Pending Account Requests</h1>
+                                <p className='ibm-plex-sans-300 text-admin-secondary-black text-center'>
+                                    There are currently no account requests awaiting approval.
+                                </p>
+                            </div>
+                        }
+
                         {showApprove && (
                             <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
                                 <div className="relative bg-white p-6 rounded-lg shadow-lg text-center w-[450px] flex flex-col items-center">
