@@ -84,10 +84,39 @@ export const AllUsers = () => {
 
     const handleDeleteUser = async (user) => {
         if (!user) return;
-  
+
         if (user.role === "student" && user.noBooksBorrowed > 0) {
             toast.error("Cannot delete user having active borrowed books.");
             return;
+        }
+
+        const response = await fetch("http://localhost:8080/api/borrow-requests/all-borrow-requests", {
+            method: "GET",
+            credentials: "include",
+        })
+
+        if (!response.ok)
+            throw new Error("Failed to fetch borrow requests");
+
+        const borrowRequests = await response.json();
+        const filteredRequests = borrowRequests.filter(request => request.studentId === user.id);
+
+        // filter to get only pending borrowrequests
+        const pendingRequests = filteredRequests.filter(request => request.status === "Pending");
+        console.log("Pending Requests:", pendingRequests);
+
+        // call delete borrow requests API for each pending request
+        for (const request of pendingRequests) {
+            const deleteResponse = await fetch(`http://localhost:8080/api/borrow-requests/delete-request/${request.id}`, {
+                method: "DELETE",
+                credentials: "include",
+            });
+
+            if (!deleteResponse.ok) {
+                throw new Error("Failed to delete borrow request");
+            }
+
+            console.log(`Deleted borrow request with ID: ${request.id}`);
         }
 
         const url = user.role === "admin"
@@ -102,6 +131,7 @@ export const AllUsers = () => {
 
             if (!res.ok) throw new Error("Failed to delete user");
 
+            toast.success("User deleted successfully.");
             setCombinedUsers(prev => prev.filter(u => u.email !== user.email));
         } catch (error) {
             console.error("Error deleting user:", error);
@@ -253,7 +283,7 @@ export const AllUsers = () => {
                                                 <Button
                                                     className="bg-transparent hover:bg-transparent hover:cursor-pointer shadow-none border-none"
                                                     onClick={() => {
-                                                        setSelectedUser({ email: user.email, role: user.role, noBooksBorrowed: user.noBooksBorrowed });
+                                                        setSelectedUser({ email: user.email, role: user.role, noBooksBorrowed: user.noBooksBorrowed, id: user.id });
                                                         setShowConfirm(true);
                                                     }}
                                                 >

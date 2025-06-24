@@ -58,4 +58,10 @@ public class BorrowRequestController {
     public ResponseEntity<String> returnBook(@PathVariable String requestId) {
         return ResponseEntity.ok(borrowRequestService.returnBook(requestId));
     }
+
+    @DeleteMapping("/delete-request/{requestId}")
+    public ResponseEntity<String> deleteBorrowRequest(@PathVariable String requestId) {
+        borrowRequestService.deleteBorrowRequest(requestId);
+        return ResponseEntity.ok("Borrow request deleted successfully");
+    }
 }

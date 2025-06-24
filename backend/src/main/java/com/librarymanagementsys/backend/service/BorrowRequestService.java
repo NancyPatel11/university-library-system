@@ -69,7 +69,8 @@ public class BorrowRequestService {
         Book book = bookRepository.findById(borrowRequest.getBookId())
                 .orElseThrow(() -> new RuntimeException("Book not found with ID: " + borrowRequest.getBookId()));
 
-        User user = userRepository.findByEmail(borrowRequest.getStudentEmail());
+        User user = userRepository.findById(borrowRequest.getStudentId())
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + borrowRequest.getStudentId()));
 
         try {
             user.setNoBooksBorrowed(user.getNoBooksBorrowed() + 1); // Increment the number of books borrowed by the user
@@ -95,7 +96,8 @@ public class BorrowRequestService {
         Book book = bookRepository.findById(borrowRequest.getBookId())
                 .orElseThrow(() -> new RuntimeException("Book not found with ID: " + borrowRequest.getBookId()));
 
-        User user = userRepository.findByEmail(borrowRequest.getStudentEmail());
+        User user = userRepository.findById(borrowRequest.getStudentId())
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + borrowRequest.getStudentId()));
 
         try {
             user.setNoBooksBorrowed(user.getNoBooksBorrowed() - 1); // Decrement the number of books borrowed by the user
@@ -104,10 +106,23 @@ public class BorrowRequestService {
             borrowRequest.setReturnDate(new Date()); // Set the return date to the current date
             borrowRequestRepository.save(borrowRequest); // Save the updated borrow request
             bookRepository.save(book); // Save the updated book information
+            userRepository.save(user); // Save the updated user information
             return "Book returned successfully";
         }
         catch (Exception e) {
             throw new RuntimeException("Error returning book: " + e.getMessage());
+        }
+    }
+
+    public void deleteBorrowRequest(String requestId) {
+        // Find the borrow request by ID
+        BorrowRequest borrowRequest = borrowRequestRepository.findById(requestId)
+                .orElseThrow(() -> new RuntimeException("Borrow request not found with ID: " + requestId));
+
+        try {
+            borrowRequestRepository.delete(borrowRequest); // Delete the borrow request
+        } catch (Exception e) {
+            throw new RuntimeException("Error deleting borrow request: " + e.getMessage());
         }
     }
 }
