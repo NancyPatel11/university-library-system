@@ -85,7 +85,9 @@ export const AdminDashboard = () => {
         const pending = users.filter((student) => student.accountStatus === "Verification Pending");
         setPendingStudents(pending);
 
-        const sortedRequests = sortBorrowRequests(borrowRequests);
+        const pendingBorrowRequests = borrowRequests.filter((request) => request.status === "Pending");
+        const sortedRequests = sortBorrowRequests(pendingBorrowRequests);
+        
         setAllBorrowRequests(sortedRequests);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -181,8 +183,6 @@ export const AdminDashboard = () => {
               {allBorrowRequests.length > 0 ?
                 <div className="flex flex-wrap justify-start mt-5 gap-3 flex-col">
                   {allBorrowRequests.slice(0, 3).map((request, index) => {
-                    if (request.status != "Pending")
-                      return;
 
                     const book = allBooks.find(book => book.id === request.bookId);
                     const student = allStudents.find(student => student.email === request.studentEmail);
