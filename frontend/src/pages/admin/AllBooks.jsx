@@ -242,11 +242,15 @@ export const AllBooks = () => {
 
                                     <h1 className='mt-5'>Delete Book</h1>
                                     <p className='text-sm ibm-plex-sans-300 text-admin-secondary-black'>
-                                        Deleting this book will remove it from the library and notify the student who borrowed it. Are you sure you want to proceed?
+                                        Deleting this book will remove it from the library. Are you sure you want to proceed?
                                     </p>
 
                                     <Button
                                         onClick={() => {
+                                            if (selectedBook.total_copies != selectedBook.available_copies) {
+                                                toast.error("Cannot delete book while it is currently borrowed. Notification is automatically sent to students to return the book urgently.")
+                                                return;
+                                            }
                                             handleDeleteBook(selectedBook.id);
                                             setShowDeleteModal(false);
                                         }}

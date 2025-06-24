@@ -216,24 +216,20 @@ export const BorrowRequests = () => {
                                     </thead>
                                     <tbody className=''>
                                         {allBorrowRequests.map((request) => {
-                                            const book = allBooks.find(book => book.id === request.bookId);
-
-                                            if (!book) return null;
-
                                             return (
                                                 <tr key={request.id} className="border-b hover:bg-admin-light-blue transition-colors duration-200">
                                                     <td className="p-4 flex items-center gap-4">
                                                         <div className="relative">
-                                                            <BookCoverSvg coverColor={book.color} width={45} height={60} />
+                                                            <BookCoverSvg coverColor={request.bookColor} width={45} height={60} />
                                                             <img
-                                                                src={book.cover}
-                                                                alt={book.title}
+                                                                src={request.bookCover}
+                                                                alt={request.bookTitle}
                                                                 className="absolute top-0 left-1 w-[41px] h-[53px] object-fit rounded-xs"
                                                             />
                                                         </div>
                                                         <div>
-                                                            <h3 className='text-admin-primary-black'>{book.title}</h3>
-                                                            <p className='text-admin-secondary-black text-sm'>{book.author}</p>
+                                                            <h3 className='text-admin-primary-black'>{request.bookTitle}</h3>
+                                                            <p className='text-admin-secondary-black text-sm'>{request.bookAuthor}</p>
                                                         </div>
                                                     </td>
                                                     <td>
@@ -325,7 +321,7 @@ export const BorrowRequests = () => {
                                                         {request.status !== "Pending" &&
                                                             <button
                                                                 onClick={() => {
-                                                                    setSelectedReceiptRequest({ request, book });
+                                                                    setSelectedReceiptRequest(request);
                                                                     setShowReceiptModal(true);
                                                                 }}
                                                                 className="hover:opacity-80 hover:cursor-pointer text-admin-primary-blue flex gap-1 bg-admin-bg p-2 rounded-sm"
@@ -427,7 +423,7 @@ export const BorrowRequests = () => {
                                                 <p className='text-lg ibm-plex-sans-300 mt-2'>
                                                     Issued for:
                                                     <span className='ps-2 ibm-plex-sans-500 text-yellow'>
-                                                        {selectedReceiptRequest.request.studentFullName} ({selectedReceiptRequest.request.studentEmail})
+                                                        {selectedReceiptRequest.studentFullName} ({selectedReceiptRequest.studentEmail})
                                                     </span>
                                                 </p>
                                             </div>
@@ -439,23 +435,19 @@ export const BorrowRequests = () => {
                                                 <div className="space-y-1 pl-2">
                                                     <div className="flex items-start gap-2">
                                                         <span className="text-white ">•</span>
-                                                        <span>Title: <span className="ibm-plex-sans-500 text-white">{selectedReceiptRequest.book.title}</span></span>
+                                                        <span>Title: <span className="ibm-plex-sans-500 text-white">{selectedReceiptRequest.bookTitle}</span></span>
                                                     </div>
                                                     <div className="flex items-start gap-2">
                                                         <span className="text-white">•</span>
-                                                        <span>Author: <span className="ibm-plex-sans-500 text-white">{selectedReceiptRequest.book.author}</span></span>
+                                                        <span>Author: <span className="ibm-plex-sans-500 text-white">{selectedReceiptRequest.bookAuthor}</span></span>
                                                     </div>
                                                     <div className="flex items-start gap-2">
                                                         <span className="text-white">•</span>
-                                                        <span>Genre: <span className="ibm-plex-sans-500 text-white">{selectedReceiptRequest.book.genre}</span></span>
+                                                        <span>Borrowed On: <span className="ibm-plex-sans-500 text-white"> {new Date(selectedReceiptRequest.issueDate).toLocaleDateString()}</span></span>
                                                     </div>
                                                     <div className="flex items-start gap-2">
                                                         <span className="text-white">•</span>
-                                                        <span>Borrowed On: <span className="ibm-plex-sans-500 text-white"> {new Date(selectedReceiptRequest.request.issueDate).toLocaleDateString()}</span></span>
-                                                    </div>
-                                                    <div className="flex items-start gap-2">
-                                                        <span className="text-white">•</span>
-                                                        <span>Due Date: <span className="ibm-plex-sans-500 text-white"> {new Date(selectedReceiptRequest.request.dueDate).toLocaleDateString()}</span></span>
+                                                        <span>Due Date: <span className="ibm-plex-sans-500 text-white"> {new Date(selectedReceiptRequest.dueDate).toLocaleDateString()}</span></span>
                                                     </div>
 
                                                 </div>

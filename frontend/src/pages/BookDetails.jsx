@@ -155,6 +155,10 @@ export const BookDetails = () => {
     try {
       const payload = {
         bookId: book.id,
+        bookTitle: book.title,
+        bookAuthor: book.author,
+        bookCover: book.cover,
+        bookColor: book.color,
         studentEmail: auth.email,
         studentId: auth.userId,
         studentFullName: auth.name,

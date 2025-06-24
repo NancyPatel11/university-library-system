@@ -123,6 +123,10 @@ export const Home = () => {
     try {
       const payload = {
         bookId: book1.id,
+        bookTitle: book1.title,
+        bookAuthor: book1.author,
+        bookCover: book1.cover,
+        bookColor: book1.color,
         studentEmail: auth.email,
         studentId: auth.userId,
         studentFullName: auth.name,
