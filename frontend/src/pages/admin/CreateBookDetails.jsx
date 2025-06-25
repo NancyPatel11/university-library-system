@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import {
@@ -35,7 +35,6 @@ const formSchema = z.object({
 export const CreateBookDetails = () => {
     const { auth } = useAuth()
     const navigate = useNavigate();
-    const [searchValue, setSearchValue] = useState("");
 
     const form = useForm({
         resolver: zodResolver(formSchema),
@@ -91,29 +90,9 @@ export const CreateBookDetails = () => {
         <div className="flex">
             <NavBar />
             <div className="h-full min-h-screen bg-admin-bg border-1 border-admin-border w-full ibm-plex-sans-600 px-5 rounded-xl pt-5">
-                <div className="flex flex-wrap gap-4 justify-between items-center">
-                    <div>
-                        <h1 className='text-admin-primary-black text-2xl'>Welcome, {auth.name}</h1>
-                        <p className='text-admin-secondary-black ibm-plex-sans-300 mt-2'>Create a new book entry below</p>
-                    </div>
-                    <div>
-                        <form className="ibm-plex-sans-300 w-[350px]">
-                            <div className="relative">
-                                <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-                                    <svg className="w-4 h-4 text-admin-primary-blue" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                                        <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
-                                    </svg>
-                                </div>
-                                <input
-                                    type="search"
-                                    value={searchValue}
-                                    onChange={(e) => setSearchValue(e.target.value)}
-                                    className="block w-full p-3 ps-10 text-sm border border-admin-dark-border rounded-sm bg-white text-admin-secondary-black focus:outline-none caret-admin-primary-blue"
-                                    placeholder="Search users, books by title, author, genre."
-                                />
-                            </div>
-                        </form>
-                    </div>
+                <div>
+                    <h1 className='text-admin-primary-black text-2xl'>Hey, {auth.name}</h1>
+                    <p className='text-admin-secondary-black ibm-plex-sans-300 mt-2'>Expand your library by adding new books with accurate details</p>
                 </div>
 
                 <Button
