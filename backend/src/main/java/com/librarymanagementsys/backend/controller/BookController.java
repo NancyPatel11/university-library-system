@@ -2,11 +2,15 @@ package com.librarymanagementsys.backend.controller;
 
 import com.librarymanagementsys.backend.dto.CreateBookRequest;
 import com.librarymanagementsys.backend.dto.UpdateBookRequest;
+import com.librarymanagementsys.backend.exception.BookNotFoundException;
+import com.librarymanagementsys.backend.exception.UserNotFoundException;
 import com.librarymanagementsys.backend.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 @RestController
@@ -38,8 +42,32 @@ public class BookController {
 
     @DeleteMapping("/{bookId}")
     public ResponseEntity<?> deleteBook(@PathVariable String bookId) {
-        bookService.deleteBook(bookId);
-        return ResponseEntity.ok(Map.of("message", "Book deleted successfully"));
+        try{
+            bookService.deleteBook(bookId);
+            return ResponseEntity.ok(Map.of(
+                    "timestamp", System.currentTimeMillis(),
+                    "status", 200,
+                    "message", "Book deleted successfully"
+            ));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of(
+                    "timestamp", LocalDateTime.now(),
+                    "status", 409,
+                    "message", e.getMessage()
+            ));
+        } catch (BookNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
+                    "timestamp", LocalDateTime.now(),
+                    "status", 404,
+                    "message", e.getMessage()
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "timestamp", LocalDateTime.now(),
+                    "status", 500,
+                    "message", "Failed to delete book: " + e.getMessage()
+            ));
+        }
     }
 
     @PostMapping("/createBook")

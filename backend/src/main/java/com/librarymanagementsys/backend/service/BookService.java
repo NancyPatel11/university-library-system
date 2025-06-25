@@ -86,6 +86,10 @@ public class BookService {
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new BookNotFoundException("Book not found with id: " + bookId));
 
+        if(book.getAvailable_copies() != book.getTotal_copies()){
+            throw new IllegalStateException("Cannot delete book with borrowed copies.");
+        }
+
         try {
             bookRepository.delete(book);
         } catch (Exception e) {

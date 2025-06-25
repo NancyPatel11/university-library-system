@@ -70,8 +70,12 @@ export const AllBooks = () => {
 
             const data = await response.json();
 
+            if (response.status === 409) {
+                toast.error(data.message);
+                return;
+            }
+
             if (!response.ok) {
-                toast.error(data.message || "Failed to delete book");
                 throw new Error("Failed to delete book");
             }
 
@@ -224,10 +228,6 @@ export const AllBooks = () => {
 
                                     <Button
                                         onClick={() => {
-                                            if (selectedBook.total_copies != selectedBook.available_copies) {
-                                                toast.error("Cannot delete book while it is currently borrowed. Notification is automatically sent to students to return the book urgently.")
-                                                return;
-                                            }
                                             handleDeleteBook(selectedBook.id);
                                             setShowDeleteModal(false);
                                         }}
