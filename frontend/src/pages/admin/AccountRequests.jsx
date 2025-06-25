@@ -299,13 +299,14 @@ export const AccountRequests = () => {
                                     <Button
                                         onClick={() => setShowApprove(false)}
                                         className="absolute top-2 right-4 p-0 m-0 bg-transparent hover:bg-transparent shadow-none border-none hover:shadow-none focus:outline-none hover:cursor-pointer"
+                                        disabled={actionLoading}
                                     >
                                         <img src={closeIcon} alt="close" className="h-4 w-4" />
                                     </Button>
 
                                     {actionLoading ? (
-                                        <div className="flex flex-col items-center py-10">
-                                            <div className="animate-spin rounded-full h-8 w-8 border-2 border-admin-primary-blue border-t-transparent mb-4" />
+                                        <div className="flex gap-3 items-center justify-center mt-2 mb-3">
+                                            <Loader small admin />
                                             <p className="text-admin-primary-blue font-medium">Approving student...</p>
                                         </div>
                                     ) : (
@@ -337,13 +338,14 @@ export const AccountRequests = () => {
                                     <Button
                                         onClick={() => setShowReject(false)}
                                         className="absolute top-2 right-4 p-0 m-0 bg-transparent hover:bg-transparent shadow-none border-none hover:shadow-none focus:outline-none hover:cursor-pointer"
+                                        disabled={actionLoading}
                                     >
                                         <img src={closeIcon} alt="close" className="h-4 w-4" />
                                     </Button>
 
                                     {actionLoading ? (
-                                        <div className="flex flex-col items-center py-10">
-                                            <div className="animate-spin rounded-full h-8 w-8 border-2 border-admin-primary-blue border-t-transparent mb-4" />
+                                        <div className="flex gap-3 items-center justify-center mt-2 mb-3">
+                                            <Loader small admin />
                                             <p className="text-admin-primary-blue font-medium">Rejecting student...</p>
                                         </div>
                                     ) : (

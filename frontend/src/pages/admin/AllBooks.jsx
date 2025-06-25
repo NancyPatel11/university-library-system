@@ -21,6 +21,7 @@ export const AllBooks = () => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [sortAZ, setSortAZ] = useState(true);
     const [loading, setLoading] = useState(true);
+    const [deleting, setDeleting] = useState(false);
 
     const navigate = useNavigate();
 
@@ -61,6 +62,7 @@ export const AllBooks = () => {
     }, []);
 
     const handleDeleteBook = async (bookId) => {
+        setDeleting(true);
         try {
             console.log("Deleting book with ID:", bookId);
             const response = await fetch(`http://localhost:8080/api/books/${bookId}`, {
@@ -84,6 +86,8 @@ export const AllBooks = () => {
         } catch (error) {
             console.error("Error deleting book:", error);
             toast.error("Failed to delete book. Please try again later.");
+        } finally {
+            setDeleting(false);
         }
         setSelectedBook(null);
     };
@@ -213,28 +217,38 @@ export const AllBooks = () => {
                                     <Button
                                         onClick={() => setShowDeleteModal(false)}
                                         className="absolute top-2 right-4 p-0 m-0 bg-transparent hover:bg-transparent shadow-none border-none hover:shadow-none focus:outline-none hover:cursor-pointer"
+                                        disabled={deleting}
                                     >
                                         <img src={closeIcon} alt="close" className="h-4 w-4" />
                                     </Button>
 
-                                    <div className='p-4 bg-admin-red-bg rounded-full'>
-                                        <img src={denyIcon} alt="" className='h-15 w-15' />
-                                    </div>
+                                    {deleting ? (
+                                        <div className="flex gap-3 items-center justify-center mt-2 mb-3">
+                                            <Loader small admin />
+                                            <p className='text-admin-primary-blue font-medium'>Deleting book, please wait...</p>
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <div className='p-4 bg-admin-red-bg rounded-full'>
+                                                <img src={denyIcon} alt="" className='h-15 w-15' />
+                                            </div>
 
-                                    <h1 className='mt-5'>Delete Book</h1>
-                                    <p className='text-sm ibm-plex-sans-300 text-admin-secondary-black'>
-                                        Deleting this book will remove it from the library. Are you sure you want to proceed?
-                                    </p>
+                                            <h1 className='mt-5'>Delete Book</h1>
+                                            <p className='text-sm ibm-plex-sans-300 text-admin-secondary-black'>
+                                                Deleting this book will remove it from the library. Are you sure you want to proceed?
+                                            </p>
 
-                                    <Button
-                                        onClick={() => {
-                                            handleDeleteBook(selectedBook.id);
-                                            setShowDeleteModal(false);
-                                        }}
-                                        className="bg-admin-red mt-5 w-full p-5 hover:cursor-pointer hover:bg-admin-dark-red"
-                                    >
-                                        Delete
-                                    </Button>
+                                            <Button
+                                                onClick={() => {
+                                                    handleDeleteBook(selectedBook.id);
+                                                    setShowDeleteModal(false);
+                                                }}
+                                                className="bg-admin-red mt-5 w-full p-5 hover:cursor-pointer hover:bg-admin-dark-red"
+                                            >
+                                                Delete
+                                            </Button>
+                                        </>
+                                    )}
                                 </div>
                             </div>
                         )}

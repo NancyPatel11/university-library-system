@@ -39,6 +39,7 @@ export const AllUsers = () => {
     const [showIdCard, setShowIdCard] = useState(false);
     const [sortAZ, setSortAZ] = useState(true);
     const [loading, setLoading] = useState(true);
+    const [deleting, setDeleting] = useState(false);
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -84,6 +85,8 @@ export const AllUsers = () => {
     const handleDeleteUser = async (user) => {
         if (!user) return;
 
+        setDeleting(true); // start loader
+
         const url = user.role === "admin"
             ? `http://localhost:8080/api/admin/delete/${user.email}`
             : `http://localhost:8080/api/user/delete/${user.email}`;
@@ -97,6 +100,7 @@ export const AllUsers = () => {
             const response = await res.json();
             if (user.role === "student" && res.status === 409) {
                 toast.error(response.message);
+                setDeleting(false);
                 return;
             }
 
@@ -104,39 +108,33 @@ export const AllUsers = () => {
 
             toast.success("User deleted successfully.");
             setCombinedUsers(prev => prev.filter(u => u.email !== user.email));
-        } catch (error) {
-            console.error("Error deleting user:", error);
-        }
 
-        const response = await fetch("http://localhost:8080/api/borrow-requests/all-borrow-requests", {
-            method: "GET",
-            credentials: "include",
-        })
-
-        if (!response.ok)
-            throw new Error("Failed to fetch borrow requests");
-
-        const borrowRequests = await response.json();
-        const filteredRequests = borrowRequests.filter(request => request.studentId === user.id);
-
-        // filter to get only pending borrowrequests
-        const pendingRequests = filteredRequests.filter(request => request.status === "Pending");
-        console.log("Pending Requests:", pendingRequests);
-
-        // call delete borrow requests API for each pending request
-        for (const request of pendingRequests) {
-            const deleteResponse = await fetch(`http://localhost:8080/api/borrow-requests/delete-request/${request.id}`, {
-                method: "DELETE",
+            const response2 = await fetch("http://localhost:8080/api/borrow-requests/all-borrow-requests", {
+                method: "GET",
                 credentials: "include",
             });
 
-            if (!deleteResponse.ok) {
-                throw new Error("Failed to delete borrow request");
+            if (!response2.ok) throw new Error("Failed to fetch borrow requests");
+
+            const borrowRequests = await response2.json();
+            const pendingRequests = borrowRequests
+                .filter(req => req.studentId === user.id && req.status === "Pending");
+
+            for (const request of pendingRequests) {
+                const deleteResponse = await fetch(`http://localhost:8080/api/borrow-requests/delete-request/${request.id}`, {
+                    method: "DELETE",
+                    credentials: "include",
+                });
+
+                if (!deleteResponse.ok) throw new Error("Failed to delete borrow request");
             }
-
-            console.log(`Deleted borrow request with ID: ${request.id}`);
+        } catch (error) {
+            console.error("Error deleting user:", error);
+            toast.error("An error occurred while deleting user.");
+        } finally {
+            setDeleting(false); // stop loader
+            setShowConfirm(false);
         }
-
     };
 
     const fetchIdCard = async (email) => {
@@ -279,30 +277,37 @@ export const AllUsers = () => {
                                 <div className="relative bg-white p-6 rounded-lg shadow-lg text-center w-[450px] flex flex-col items-center">
 
                                     <Button
-                                        onClick={() => setShowConfirm(false)}
+                                        onClick={() => !deleting && setShowConfirm(false)}
                                         className="absolute top-2 right-4 p-0 m-0 bg-transparent hover:bg-transparent shadow-none border-none hover:shadow-none focus:outline-none hover:cursor-pointer"
+                                        disabled={deleting}
                                     >
                                         <img src={closeIcon} alt="close" className="h-4 w-4" />
                                     </Button>
 
-                                    <div className='p-4 bg-admin-red-bg rounded-full'>
-                                        <img src={denyIcon} alt="" className='h-15 w-15' />
-                                    </div>
+                                    {deleting ? (
+                                        <div className="flex gap-3 items-center justify-center mt-2 mb-3">
+                                            <Loader small admin />
+                                            <p className='text-admin-primary-blue font-medium'>Deleting user, please wait...</p>
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <div className='p-4 bg-admin-red-bg rounded-full'>
+                                                <img src={denyIcon} alt="" className='h-15 w-15' />
+                                            </div>
 
-                                    <h1 className='mt-5'>Confirm Delete</h1>
-                                    <p className='text-sm ibm-plex-sans-300 text-admin-secondary-black'>
-                                        Confirming will lead to permanent deletion of the selected user account.
-                                    </p>
+                                            <h1 className='mt-5'>Confirm Delete</h1>
+                                            <p className='text-sm ibm-plex-sans-300 text-admin-secondary-black'>
+                                                Confirming will lead to permanent deletion of the selected user account.
+                                            </p>
 
-                                    <Button
-                                        onClick={() => {
-                                            handleDeleteUser(selectedUser);
-                                            setShowConfirm(false);
-                                        }}
-                                        className="bg-admin-red mt-5 w-full p-5 hover:cursor-pointer hover:bg-admin-dark-red"
-                                    >
-                                        Delete User
-                                    </Button>
+                                            <Button
+                                                onClick={() => handleDeleteUser(selectedUser)}
+                                                className="bg-admin-red mt-5 w-full p-5 hover:cursor-pointer hover:bg-admin-dark-red"
+                                            >
+                                                Delete User
+                                            </Button>
+                                        </>
+                                    )}
                                 </div>
                             </div>
                         )}
