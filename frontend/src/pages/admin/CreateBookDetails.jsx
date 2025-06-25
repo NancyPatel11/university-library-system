@@ -79,6 +79,7 @@ export const CreateBookDetails = () => {
 
             const result = await response.json();
             toast.success(result.message);
+            navigate("/bookdetails/" + result.bookId);
             form.reset(); // reset the form after submission
         } catch (error) {
             console.error("Error creating book:", error);

@@ -97,7 +97,7 @@ public class BookService {
         }
     }
 
-    public void createBook(CreateBookRequest request) {
+    public String createBook(CreateBookRequest request) {
         Book book = new Book();
         book.setTitle(request.getTitle());
         book.setAuthor(request.getAuthor());
@@ -115,6 +115,7 @@ public class BookService {
 
         try {
             bookRepository.save(book);
+            return book.getId(); // Return the ID of the newly created book
         } catch (Exception e) {
             throw new RuntimeException("Error creating book: " + e.getMessage());
         }

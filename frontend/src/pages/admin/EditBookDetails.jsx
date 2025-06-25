@@ -109,7 +109,7 @@ export const EditBookDetails = () => {
             }
 
             toast.success(result.message);
-            navigate("/all-books");
+            navigate("/bookdetails/" + bookId);
         } catch (error) {
             console.error(error);
             toast.error(error.message || "Something went wrong while updating the book");

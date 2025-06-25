@@ -72,11 +72,12 @@ public class BookController {
 
     @PostMapping("/createBook")
     public ResponseEntity<?> createBook(@RequestBody CreateBookRequest request) {
-        bookService.createBook(request);
-        return ResponseEntity.ok(Map.of(
-                "timestamp", System.currentTimeMillis(),
-                "status", 200,
-                "message", "Book created successfully"
+        String bookId = bookService.createBook(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
+                "timestamp", LocalDateTime.now(),
+                "status", 201,
+                "message", "Book created successfully",
+                "bookId", bookId
         ));
     }
 }
