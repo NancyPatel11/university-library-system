@@ -19,6 +19,7 @@ export const Home = () => {
   const [allBooks, setAllBooks] = useState([]);
   const [book1, setBook1] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [buttonLoading, setButtonLoading] = useState(false);
   const [borrowRequest, setBorrowRequest] = useState(null);
   const [showBorrowButton, setShowBorrowButton] = useState(true);
 
@@ -121,6 +122,7 @@ export const Home = () => {
     }
 
     try {
+      setButtonLoading(true);
       const payload = {
         bookId: book1.id,
         bookTitle: book1.title,
@@ -152,10 +154,13 @@ export const Home = () => {
     } catch (error) {
       console.error("Error sending borrow request:", error);
       toast.error(error.message || "Something went wrong while sending the borrow request.");
+    } finally {
+      setButtonLoading(false);
     }
   };
 
   const handleReturnBook = async (borrowRequestId) => {
+    setButtonLoading(true);
     try {
       const response = await fetch(`http://localhost:8080/api/borrow-requests/return-book/${borrowRequestId}`, {
         method: "PUT",
@@ -176,6 +181,8 @@ export const Home = () => {
     } catch (error) {
       console.error("Error returning book:", error);
       toast.error(error.message || "Something went wrong while returning the book.");
+    } finally {
+      setButtonLoading(false);
     }
   };
 
@@ -238,8 +245,8 @@ export const Home = () => {
               </div>
             )}
             {((showBorrowButton || borrowRequest.status === "Returned") && studentAccountStatus != "Verification Pending") &&
-              <Button onClick={handleBorrowRequest} className='text-2xl bebas-neue-400 bg-yellow text-dark-end mt-10 rounded-xs border-2 border-yellow hover:bg-yellow-dark hover:border-yellow-dark hover:cursor-pointer'>
-                <FontAwesomeIcon icon={faBookOpen} /> BORROW BOOK REQUEST
+              <Button disabled={buttonLoading} onClick={handleBorrowRequest} className='text-2xl bebas-neue-400 bg-yellow text-dark-end mt-10 rounded-xs border-2 border-yellow hover:bg-yellow-dark hover:border-yellow-dark hover:cursor-pointer'>
+                <FontAwesomeIcon icon={faBookOpen} /> {buttonLoading ? <Loader small/> : "BORROW BOOK REQUEST"}
               </Button>
             }
             {borrowRequest && borrowRequest?.status === "Pending" && (
@@ -265,11 +272,12 @@ export const Home = () => {
                   </span>
                 </div>
                 <Button
+                  disabled={buttonLoading}
                   onClick={() => {
                     handleReturnBook(borrowRequest.id);
                   }}
                   className={`bg-yellow-dark text-black hover:cursor-pointer hover:bg-yellow ibm-plex-sans-500`}>
-                  Return Book
+                  {buttonLoading ? <Loader small/> : "Return Book"}
                 </Button>
               </div>
             )}
@@ -280,8 +288,11 @@ export const Home = () => {
                     <img src={warningIcon} alt="warning" />
                     <span className='text-yellow ibm-plex-sans-600'>Your book is overdue!</span>
                   </div>
-                  <Button className={`bg-yellow-dark text-black hover:cursor-pointer hover:bg-yellow ibm-plex-sans-500`}>
-                    Return Book
+                  <Button
+                    disabled={buttonLoading}
+                    className={`bg-yellow-dark text-black hover:cursor-pointer hover:bg-yellow ibm-plex-sans-500`}
+                  >
+                    {buttonLoading ? <Loader small/> : "Return Book"}
                   </Button>
                 </div>
               )

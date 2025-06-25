@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import bg from "../assets/images/bg.png";
 
-export const Loader = ({ role, message }) => {
+export const Loader = ({ role, message, small = false }) => {
 
     useEffect(() => {
         // Inject keyframes only once
@@ -31,6 +31,10 @@ export const Loader = ({ role, message }) => {
         animationTimingFunction: 'ease-in-out',
         animationIterationCount: 'infinite',
     };
+
+    if (small) {
+        return <div className={`animate-spin h-5 w-5 border-2 border-t-transparent rounded-full border-white`}></div>
+    }
 
     if (role === "student") {
         return (
