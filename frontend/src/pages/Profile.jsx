@@ -3,15 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/authContext';
 import { NavBar } from '@/components/NavBar';
 import { Loader } from '@/components/Loader';
-import BookCoverSvg from '@/components/BookCoverSvg';
+import { BorrowedBookCard } from '@/components/BorrowedBookCard';
 import bg from "../assets/images/bg.png";
 import profileBg from "../assets/images/profile-bg.png";
 import verifiedImg from "../assets/icons/verified.svg";
 import verificationPendingImg from "../assets/icons/warning.svg";
-import borrowedBookImg from "../assets/icons/book-2.svg";
-import CalendarImg from "../assets/icons/calendar.svg";
 import userFallbackImg from "../assets/icons/user-fill.svg";
-import tickIcon from "../assets/icons/tick.svg";
 
 export const Profile = () => {
   const { auth } = useAuth();
@@ -150,19 +147,18 @@ export const Profile = () => {
       <div className='px-20 py-12'>
         <NavBar userColor={'yellow'} />
 
-        <div className='flex gap-30'>
+        <div className='flex gap-10 justify-center mt-20'>
           <div
-            className='w-1/3 bg-center bg-no-repeat rounded-lg ibm-plex-sans-600 text-white h-[965px] min-w-[750px]'
+            className='bg-center bg-no-repeat rounded-4xl ibm-plex-sans-600 text-white h-[1185px] w-[1130px]'
             style={{
               backgroundImage: `url(${profileBg})`,
               backgroundSize: 'cover',
               backgroundPosition: 'top',
             }}
           >
-            <div className='px-30 mt-60'>
-
-              <div className='flex gap-8'>
-                <div className="w-25 h-25 rounded-full p-2 ring-10 ring-search-bar flex items-center justify-center overflow-hidden">
+            <div className='px-15 mt-50'>
+              <div className='flex gap-8 items-center'>
+                <div className="w-50 h-50 rounded-full p-2 ring-10 ring-search-bar flex items-center justify-center overflow-hidden">
                   {user.profilePic ? (
                     <img
                       src={user.profilePic}
@@ -178,178 +174,76 @@ export const Profile = () => {
                   )}
                 </div>
                 <div>
-                  <div className='flex gap-2'>
-                    {user.accountStatus === 'Verified' ? <img src={verifiedImg} alt="h-5" /> :
-                      <img src={verificationPendingImg} alt="h-5" />
+                  <div className='flex gap-2 items-center'>
+                    {user.accountStatus === 'Verified' ? <img src={verifiedImg} alt="" className='h-10' /> :
+                      <img src={verificationPendingImg} alt="" className='h-10' />
                     }
-                    <h3 className='ibm-plex-sans-300 text-sm  block text-light-blue'>{user.accountStatus}</h3>
+                    <h3 className='ibm-plex-sans-300 text-2xl  block text-light-blue'>{user.accountStatus}</h3>
+                  </div>
+                  <div className='mt-3 flex gap-2 ibm-plex-sans-300 text-xl'>
+                    <h3 className='text-light-blue'>Registered on</h3>
+                    <p className='text-yellow'>
+                      {new Date(user.registrationDate).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })}
+                    </p>
                   </div>
 
-                  <div className='mt-3'>
-                    <h1 className='ibm-plex-sans-500 text-xl '>{user.fullName}</h1>
-                    <p className='ibm-plex-sans-300 text-lg  text-light-blue'>{user.email}</p>
+                  <div className='mt-8'>
+                    <h1 className='ibm-plex-sans-500 text-3xl '>{user.fullName}</h1>
+                    <p className='mt-3 ibm-plex-sans-300 text-2xl  text-light-blue'>{user.email}</p>
                   </div>
                 </div>
               </div>
 
-              <div className='mt-10'>
-                <p className='ibm-plex-sans-300 text-lg  text-light-blue'>University</p>
-                <h1 className='ibm-plex-sans-500 text-2xl '>NP University</h1>
+              <div className='mt-15'>
+                <p className='ibm-plex-sans-300 text-3xl  text-light-blue'>University</p>
+                <h1 className='mt-3 ibm-plex-sans-500 text-4xl '>NP University</h1>
               </div>
 
               <div className='mt-7'>
-                <p className='ibm-plex-sans-300 text-lg  text-light-blue'>Student ID</p>
-                <h1 className='ibm-plex-sans-500 text-2xl '>{user.universityId}</h1>
+                <p className='ibm-plex-sans-300 text-3xl  text-light-blue'>Student ID</p>
+                <h1 className='mt-3 ibm-plex-sans-500 text-4xl '>{user.universityId}</h1>
               </div>
 
               {idCardUrl ? (
-                <img src={idCardUrl} alt="ID Card" className='mt-10 rounded-md ' />
+                <img src={idCardUrl} alt="ID Card" className='mt-15 rounded-md' />
               ) : (
                 <p>Loading ID card...</p>
               )}
             </div>
           </div>
-          <div className='w2/3 mt-20 ibm-plex-sans-400'>
-            <h1 className='text-3xl text-light-blue mb-10 ibm-plex-sans-600'>Borrowed Books</h1>
-
+          <div className='w-2/3 ibm-plex-sans-400'>
+            <h1 className='text-4xl text-light-blue ibm-plex-sans-600'>Borrowed Books</h1>
             <div className='flex flex-wrap gap-7 mt-5 text-white justify-start'>
-              {borrowedBooks.map((book, index) => (
-                <div
-                  onClick={
-                    () => navigate(`/bookdetails/${book.id}`)
-                  }
-                  key={index}
-                  className="bg-search-bar p-5 rounded-lg gap-4 items-center hover:cursor-pointer">
-                  {/* Wrapper with overlay */}
-                  <div className="relative px-10 py-5 rounded-lg overflow-hidden">
-                    {/* Color overlay with 30% opacity */}
-                    <div
-                      className="absolute inset-0 z-0"
-                      style={{
-                        backgroundColor: book.color,
-                        opacity: 0.5,
-                      }}
-                    />
+              {borrowedBooks.length != 0 ? (
 
-                    {/* Actual content (full opacity) */}
-                    <div className="relative z-10">
-                      <BookCoverSvg coverColor={book.color} width={200} height={280} />
-                      <img
-                        src={book.cover}
-                        alt={book.title}
-                        className="absolute top-0 left-4 w-[183px] h-[245px] object-fit rounded-lg"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Book details */}
-                  <div className="mt-3 w-[270px] ibm-plex-sans-400">
-                    <div className='min-h-[80px]'>
-                      <h2 className="text-xl ibm-plex-sans-500">
-                        {book.title} - By {book.author}
-                      </h2>
-                      <p className="text-sm text-light-blue italic truncate mt-2 mb-5">{book.genre}</p>
-                    </div>
-                    {book.status == "Pending" ?
-                      <div className='flex gap-2 flex-wrap text-light-blue'>
-                        <img src={verificationPendingImg} alt="Book Requesnt Pending" />
-                        <p>Book Request Approval Pending</p>
-                      </div>
-                      :
-                      book.status == "Borrowed" ?
-                        <div className='flex flex-col gap-2 text-light-blue'>
-                          <div className='flex gap-2 flex-wrap'>
-                            <img src={borrowedBookImg} alt="Borrowed" />
-                            <p>Borrowed on {
-                              new Date(book.issueDate).toLocaleDateString('en-US', {
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric'
-                              })
-                            }</p>
-                          </div>
-                          <div className='flex gap-2 flex-wrap'>
-                            <img src={CalendarImg} alt="Borrowed" />
-                            <p>To be returned on {new Date(book.dueDate).toLocaleDateString('en-US', {
-                              year: 'numeric',
-                              month: 'long',
-                              day: 'numeric'
-                            })}</p>
-                          </div>
-                        </div>
-                        :
-                        book.status == "Returned" ?
-                          <div className='flex flex-col gap-2 text-light-blue'>
-                            <div className='flex gap-2 flex-wrap'>
-                              <img src={borrowedBookImg} alt="Borrowed" />
-                              <p>Borrowed on {new Date(book.issueDate).toLocaleDateString('en-US', {
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric'
-                              })}</p>
-                            </div>
-                            <div className='flex gap-2 flex-wrap'>
-                              <img src={tickIcon} alt="Borrowed" />
-                              <p>Returned on {new Date(book.returnDate).toLocaleDateString('en-US', {
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric'
-                              })}</p>
-                            </div>
-                          </div>
-                          :
-                          book.status == "Overdue" ?
-                            <div className='flex flex-col gap-2 text-light-blue'>
-                              <div className='flex gap-2 flex-wrap'>
-                                <img src={borrowedBookImg} alt="Borrowed" />
-                                <p>Borrowed on {new Date(book.issueDate).toLocaleDateString('en-US', {
-                                  year: 'numeric',
-                                  month: 'long',
-                                  day: 'numeric'
-                                })}</p>
-                              </div>
-                              <div className='flex gap-2 flex-wrap'>
-                                <img src={CalendarImg} alt="Borrowed" />
-                                <p>Was due on {new Date(book.dueDate).toLocaleDateString('en-US', {
-                                  year: 'numeric',
-                                  month: 'long',
-                                  day: 'numeric'
-                                })}</p>
-                              </div>
-                              <div className='flex gap-2 flex-wrap'>
-                                <img src={verificationPendingImg} alt="Borrowed" />
-                                <p className='text-red-400'>Overdue</p>
-                              </div>
-                            </div>
-                            :
-                            <div className='flex flex-col gap-2 text-light-blue'>
-                              <div className='flex gap-2 flex-wrap'>
-                                <img src={borrowedBookImg} alt="Borrowed" />
-                                <p>Borrowed on {new Date(book.issueDate).toLocaleDateString('en-US', {
-                                  year: 'numeric',
-                                  month: 'long',
-                                  day: 'numeric'
-                                })}</p>
-                              </div>
-                              <div className='flex gap-2 flex-wrap'>
-                                <img src={tickIcon} alt="Borrowed" />
-                                <p>Returned (Late) on {new Date(book.returnDate).toLocaleDateString('en-US', {
-                                  year: 'numeric',
-                                  month: 'long',
-                                  day: 'numeric'
-                                })}</p>
-                              </div>
-                              <div className='flex gap-2 flex-wrap'>
-                                <img src={verificationPendingImg} alt="Borrowed" />
-                                <p className='text-red-400'>Late Return</p>
-                              </div>
-                            </div>
-                    }
-                  </div>
-                </div>
-              ))}
+                borrowedBooks.slice(0, 4).map((book, index) => (
+                  <BorrowedBookCard
+                    key={index}
+                    book={book}
+                    onClick={() => navigate(`/bookdetails/${book.id}`)}
+                  />
+                )))
+                :
+                <h1 className='text-xl text-yellow'>Your requested, borrowed, returned books will be displayed here.</h1>
+              }
             </div>
           </div>
+        </div>
+
+        <div className='flex flex-wrap gap-7 mt-7 text-white justify-end px-10'>
+          {borrowedBooks.length > 4 && (
+            borrowedBooks.slice(4).map((book, index) => (
+              <BorrowedBookCard
+                key={index}
+                book={book}
+                onClick={() => navigate(`/bookdetails/${book.id}`)}
+              />
+            ))
+          )}
         </div>
 
       </div>
