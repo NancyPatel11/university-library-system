@@ -42,7 +42,9 @@ export const Home = () => {
         if (data.length === 0) {
           toast.error("No books available at the moment. Please check back later.");
         }
-        setAllBooks(data);
+
+        const sortedBooks = data.sort((a, b) => b.rating - a.rating); // Sort books by rating in descending order
+        setAllBooks(sortedBooks);
         setBook1(data[0]); // Set the first book as book1
 
         const studentResponse = await fetch(`http://localhost:8080/api/user/accountStatus`, {

@@ -61,11 +61,11 @@ export const BookDetails = () => {
 
         const allBooksData = await allBooksRes.json();
 
-        if (allBooksData.length === 0) {
-          toast.error("No books available at the moment. Please check back later.");
-        }
+        const sortedBooks = allBooksData.sort((a, b) => {
+          return b.rating - a.rating; // Sort by rating in descending order
+        });
 
-        setAllBooks(allBooksData);
+        setAllBooks(sortedBooks);
 
         // Fetch student account status
         if (auth.userRole !== "student") return; // Only fetch for students
@@ -358,18 +358,21 @@ export const BookDetails = () => {
             <h1 className='text-2xl text-light-blue mb-10'>Popular Books</h1>
 
             <div className='flex flex-wrap gap-6 justify-start'>
-              {allBooks.slice(1, 7).map((book, index) => (
-                <div key={index} className="relative">
-                  <Link to={`/bookdetails/${book.id}`}>
-                    <BookCoverSvg coverColor={book.color} width={160} height={220} />
-                    <img
-                      src={book.cover}
-                      alt={book.title}
-                      className="absolute top-0 left-4 w-[143px] h-[193px] object-fit rounded-lg"
-                    />
-                  </Link>
-                </div>
-              ))}
+              {allBooks
+                .filter(book => book.id !== bookId)
+                .slice(0, 6)
+                .map((book, index) => (
+                  <div key={index} className="relative">
+                    <Link to={`/bookdetails/${book.id}`}>
+                      <BookCoverSvg coverColor={book.color} width={160} height={220} />
+                      <img
+                        src={book.cover}
+                        alt={book.title}
+                        className="absolute top-0 left-4 w-[143px] h-[193px] object-fit rounded-lg"
+                      />
+                    </Link>
+                  </div>
+                ))}
             </div>
           </div>
         </div>

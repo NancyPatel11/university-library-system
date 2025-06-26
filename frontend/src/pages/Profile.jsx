@@ -115,8 +115,16 @@ export const Profile = () => {
           })
         );
 
-        console.log("Fetched all book details:", bookDetails);
-        setBorrowedBooks(bookDetails);
+        const sortedBorrowedBooks = bookDetails.sort((a, b) => {
+          // if status is pending, put it at the start
+          if (a.status === "Pending") return -1;
+
+          const dateA = new Date(a.issueDate);
+          const dateB = new Date(b.issueDate);
+          return dateB - dateA; // Sort by issueDate in descending order
+        });
+
+        setBorrowedBooks(sortedBorrowedBooks);
       } catch (error) {
         console.error("Error fetching borrowed book details:", error);
       }

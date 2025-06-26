@@ -44,7 +44,13 @@ export const Search = () => {
             }
 
             const data = await response.json();
-            setAllBooks(data);
+
+            const sortedData = data.sort((a, b) => {
+                // Sort by title alphabetically
+                return a.title.localeCompare(b.title);
+            });
+
+            setAllBooks(sortedData);
             if (data.length === 0) {
                 toast.error("No books available at the moment. Please check back later.");
                 setFlag(true); // Set flag to true if no books found
