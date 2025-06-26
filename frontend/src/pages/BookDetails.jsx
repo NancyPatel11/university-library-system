@@ -300,6 +300,9 @@ export const BookDetails = () => {
                   </div>
                   <Button
                     disabled={buttonLoading}
+                    onClick={() => {
+                      handleReturnBook(borrowRequest.id);
+                    }}
                     className={`bg-yellow-dark text-black hover:cursor-pointer hover:bg-yellow ibm-plex-sans-500`}
                   >
                     {buttonLoading ? <Loader small /> : "Return Book"}
