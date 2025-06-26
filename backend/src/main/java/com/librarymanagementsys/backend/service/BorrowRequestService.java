@@ -7,8 +7,11 @@ import com.librarymanagementsys.backend.repository.BookRepository;
 import com.librarymanagementsys.backend.repository.BorrowRequestRepository;
 import com.librarymanagementsys.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -24,6 +27,13 @@ public class BorrowRequestService {
 
     @Autowired
     private UserRepository userRepository;
+
+    // Only checking if today's date is after the due date (ignoring the time part)
+    private boolean isDateAfter(Date d1, Date d2) {
+        LocalDate date1 = d1.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate date2 = d2.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        return date1.isAfter(date2);
+    }
 
     public void createBorrowRequest(BorrowRequest borrowRequest) {
         borrowRequest.setStatus("Pending"); // Set default status to "Pending"
@@ -112,7 +122,14 @@ public class BorrowRequestService {
         try {
             user.setNoBooksBorrowed(user.getNoBooksBorrowed() - 1); // Decrement the number of books borrowed by the user
             book.setAvailable_copies(book.getAvailable_copies() + 1); // Increase the available copies of the book
-            borrowRequest.setStatus("Returned"); // Update the status to "Returned"
+
+            Date today = new Date();
+            if(borrowRequest.getDueDate() != null && isDateAfter(today, borrowRequest.getDueDate())) {
+                // If the book is returned after the due date
+                borrowRequest.setStatus("Late Return");
+            } else {
+                borrowRequest.setStatus("Returned");
+            }
             borrowRequest.setReturnDate(new Date()); // Set the return date to the current date
             borrowRequestRepository.save(borrowRequest); // Save the updated borrow request
             bookRepository.save(book); // Save the updated book information
@@ -133,6 +150,23 @@ public class BorrowRequestService {
             borrowRequestRepository.delete(borrowRequest); // Delete the borrow request
         } catch (Exception e) {
             throw new RuntimeException("Error deleting borrow request: " + e.getMessage());
+        }
+    }
+
+    @Scheduled(cron = "0 0 0 * * *") // daily at midnight
+    public void checkOverdueBorrowRequests() {
+        List<BorrowRequest> allRequests = borrowRequestRepository.findAll();
+        Date today = new Date();
+
+        for (BorrowRequest request : allRequests) {
+            if ("Borrowed".equals(request.getStatus())
+                    && request.getDueDate() != null
+                    && request.getReturnDate() == null
+                    && isDateAfter(today, request.getDueDate())) {
+
+                request.setStatus("Overdue");
+                borrowRequestRepository.save(request);
+            }
         }
     }
 }
