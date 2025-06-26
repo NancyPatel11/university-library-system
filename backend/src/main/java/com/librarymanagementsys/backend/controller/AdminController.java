@@ -5,8 +5,10 @@ import com.librarymanagementsys.backend.dto.LoginResponse;
 import com.librarymanagementsys.backend.dto.RegisterAdminRequest;
 import com.librarymanagementsys.backend.dto.RegisterResponse;
 import com.librarymanagementsys.backend.service.AdminService;
+import com.librarymanagementsys.backend.session.SessionRegistry;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +19,12 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/admin")
 public class AdminController {
+
+    @Autowired
+    private SessionRegistry sessionRegistry;
+
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
 
     @Autowired
     private AdminService adminService;
@@ -33,6 +41,8 @@ public class AdminController {
         session.setAttribute("email", request.getEmail());
         session.setAttribute("role", "admin");
         session.setAttribute("fullName", request.getFullName());
+
+        sessionRegistry.registerSession(request.getEmail(), session); // add tracking in session registry
 
         return ResponseEntity.ok(Map.of(
                 "timestamp", LocalDateTime.now(),
@@ -53,6 +63,8 @@ public class AdminController {
         session.setAttribute("role", "admin");
         session.setAttribute("fullName", loginResponse.getFullName());
 
+        sessionRegistry.registerSession(request.getEmail(), session); // add tracking in session registry
+
         return ResponseEntity.ok(Map.of(
                 "timestamp", LocalDateTime.now(),
                 "status", 200,
@@ -62,6 +74,11 @@ public class AdminController {
 
     @GetMapping("/logout")
     public ResponseEntity<?> logoutAdmin(HttpSession session) {
+        String email = (String) session.getAttribute("email");
+        if (email != null) {
+            sessionRegistry.removeSession(email); // Remove tracking from session registry
+        }
+
         session.invalidate();
         return ResponseEntity.noContent().build();
     }
@@ -73,6 +90,13 @@ public class AdminController {
 
     @DeleteMapping("/delete/{email}")
     public ResponseEntity<?> deleteAdmin(@PathVariable String email) {
+        String sessionId = sessionRegistry.getSessionId(email);
+        if (sessionId != null) {
+            String redisKey = "spring:session:sessions:" + sessionId;
+            redisTemplate.delete(redisKey); // manually removes session from Redis
+            sessionRegistry.removeSession(email);
+        }
+
         adminService.deleteAdmin(email);
         return ResponseEntity.ok(Map.of(
                 "timestamp", LocalDateTime.now(),

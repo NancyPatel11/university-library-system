@@ -6,8 +6,10 @@ import com.librarymanagementsys.backend.dto.RegisterRequest;
 import com.librarymanagementsys.backend.dto.RegisterResponse;
 import com.librarymanagementsys.backend.exception.UserNotFoundException;
 import com.librarymanagementsys.backend.service.UserService;
+import com.librarymanagementsys.backend.session.SessionRegistry;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +22,12 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
+
+    @Autowired
+    private SessionRegistry sessionRegistry;
+
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
 
     @Autowired
     private UserService userService;
@@ -36,6 +44,8 @@ public class UserController {
         session.setAttribute("email", request.getEmail());
         session.setAttribute("role", "student");
         session.setAttribute("fullName", request.getFullName());
+
+        sessionRegistry.registerSession(request.getEmail(), session); // add tracking in session registry
 
         return ResponseEntity.ok(Map.of(
                 "timestamp", LocalDateTime.now(),
@@ -55,6 +65,7 @@ public class UserController {
         session.setAttribute("role", "student");
         session.setAttribute("fullName", loginResponse.getFullName());
 
+        sessionRegistry.registerSession(request.getEmail(), session); // add tracking in session registry
 
         return ResponseEntity.ok(Map.of(
                 "timestamp", LocalDateTime.now(),
@@ -84,6 +95,11 @@ public class UserController {
 
     @GetMapping("/logout")
     public ResponseEntity<?> logoutUser(HttpSession session) {
+        String email = (String) session.getAttribute("email");
+        if (email != null) {
+            sessionRegistry.removeSession(email); // Remove tracking from session registry
+        }
+
         session.invalidate();
         return ResponseEntity.noContent().build();
     }
@@ -96,6 +112,13 @@ public class UserController {
     @DeleteMapping("/delete/{email}")
     public ResponseEntity<?> deleteUser(@PathVariable String email) {
         try {
+            String sessionId = sessionRegistry.getSessionId(email);
+            if (sessionId != null) {
+                String redisKey = "spring:session:sessions:" + sessionId;
+                redisTemplate.delete(redisKey); // manually removes session from Redis
+                sessionRegistry.removeSession(email);
+            }
+
             userService.deleteUser(email);
             return ResponseEntity.ok(Map.of(
                     "timestamp", LocalDateTime.now(),
