@@ -254,7 +254,7 @@ export const BookDetails = () => {
                 Book will be available for borrowing once your account is verified by admin.
               </div>
             )}
-            {((showBorrowButton || borrowRequest.status === "Returned") && studentAccountStatus != "Verification Pending") &&
+            {((showBorrowButton || borrowRequest.status === "Returned" || borrowRequest.status === "Late Return") && studentAccountStatus != "Verification Pending") &&
               <Button disabled={buttonLoading} onClick={handleBorrowRequest} className='text-2xl bebas-neue-400 bg-yellow text-dark-end mt-10 rounded-xs border-2 border-yellow hover:bg-yellow-dark hover:border-yellow-dark hover:cursor-pointer'>
                 <FontAwesomeIcon icon={faBookOpen} /> {buttonLoading ? <Loader small /> : "BORROW BOOK REQUEST"}
               </Button>

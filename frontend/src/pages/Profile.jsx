@@ -290,20 +290,52 @@ export const Profile = () => {
                             </div>
                           </div>
                           :
-                          <div className='flex flex-col gap-2 text-light-blue'>
-                            <div className='flex gap-2 flex-wrap'>
-                              <img src={borrowedBookImg} alt="Borrowed" />
-                              <p>Borrowed on {new Date(book.issueDate).toLocaleDateString('en-US', {
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric'
-                              })}</p>
+                          book.status == "Overdue" ?
+                            <div className='flex flex-col gap-2 text-light-blue'>
+                              <div className='flex gap-2 flex-wrap'>
+                                <img src={borrowedBookImg} alt="Borrowed" />
+                                <p>Borrowed on {new Date(book.issueDate).toLocaleDateString('en-US', {
+                                  year: 'numeric',
+                                  month: 'long',
+                                  day: 'numeric'
+                                })}</p>
+                              </div>
+                              <div className='flex gap-2 flex-wrap'>
+                                <img src={CalendarImg} alt="Borrowed" />
+                                <p>Was due on {new Date(book.dueDate).toLocaleDateString('en-US', {
+                                  year: 'numeric',
+                                  month: 'long',
+                                  day: 'numeric'
+                                })}</p>
+                              </div>
+                              <div className='flex gap-2 flex-wrap'>
+                                <img src={verificationPendingImg} alt="Borrowed" />
+                                <p className='text-red-400'>Overdue</p>
+                              </div>
                             </div>
-                            <div className='flex gap-2 flex-wrap'>
-                              <img src={verificationPendingImg} alt="Borrowed" />
-                              <p className='text-red-400'>Overdue Return</p>
+                            :
+                            <div className='flex flex-col gap-2 text-light-blue'>
+                              <div className='flex gap-2 flex-wrap'>
+                                <img src={borrowedBookImg} alt="Borrowed" />
+                                <p>Borrowed on {new Date(book.issueDate).toLocaleDateString('en-US', {
+                                  year: 'numeric',
+                                  month: 'long',
+                                  day: 'numeric'
+                                })}</p>
+                              </div>
+                              <div className='flex gap-2 flex-wrap'>
+                                <img src={tickIcon} alt="Borrowed" />
+                                <p>Returned (Late) on {new Date(book.returnDate).toLocaleDateString('en-US', {
+                                  year: 'numeric',
+                                  month: 'long',
+                                  day: 'numeric'
+                                })}</p>
+                              </div>
+                              <div className='flex gap-2 flex-wrap'>
+                                <img src={verificationPendingImg} alt="Borrowed" />
+                                <p className='text-red-400'>Late Return</p>
+                              </div>
                             </div>
-                          </div>
                     }
                   </div>
                 </div>
