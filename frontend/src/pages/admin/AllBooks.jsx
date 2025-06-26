@@ -49,7 +49,13 @@ export const AllBooks = () => {
                 }
 
                 const data = await response.json();
-                setAllBooks(data);
+                const sortedBooks = data.sort((a, b) => {
+                    const dateA = new Date(a.createdAt);
+                    const dateB = new Date(b.createdAt);
+                    return dateB - dateA; // Sort by createdAt in descending order
+                });
+
+                setAllBooks(sortedBooks);
             } catch (error) {
                 console.error("Error fetching books:", error);
                 toast.error("Failed to load books. Please try again later.");

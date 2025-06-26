@@ -71,7 +71,12 @@ export const AllUsers = () => {
                 const taggedStudents = students.map(student => ({ ...student, role: "student" }));
 
                 const combined = [...taggedAdmins, ...taggedStudents];
-                setCombinedUsers(combined);
+                const sortedCombined = combined.sort((a, b) => {
+                    const dateA = new Date(a.registrationDate);
+                    const dateB = new Date(b.registrationDate);
+                    return dateB - dateA; // Sort by registration date, newest first
+                });
+                setCombinedUsers(sortedCombined);
             } catch (error) {
                 console.error("Error fetching users:", error);
             } finally {

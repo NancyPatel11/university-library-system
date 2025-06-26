@@ -91,8 +91,13 @@ export const AdminDashboard = () => {
         setAllBooks(sortedBooks);
 
         setAllStudents(users);
-        const pending = users.filter((student) => student.accountStatus === "Verification Pending");
-        setPendingStudents(pending);
+        const pendingStudents = users.filter((student) => student.accountStatus === "Verification Pending");
+        const sortedPendingStudents = pendingStudents.sort((a, b) => {
+          const dateA = new Date(a.registrationDate);
+          const dateB = new Date(b.registrationDate);
+          return dateB - dateA; // Sort by most recent date first
+        });
+        setPendingStudents(sortedPendingStudents);
 
         setAllBorrowRequests(borrowRequests);
         const pendingBorrowRequests = borrowRequests.filter((request) => request.status === "Pending");

@@ -64,7 +64,13 @@ export const AccountRequests = () => {
             }
 
             const students = await studentsRes.json();
-            setAllStudents(students);
+            const sortedStudents = students.sort((a, b) => {
+                const DateA = new Date(a.registrationDate);
+                const DateB = new Date(b.registrationDate);
+                return DateB - DateA; // Sort by registration date, most recent first
+            });
+
+            setAllStudents(sortedStudents);
         } catch (error) {
             console.error("Error fetching users:", error);
             toast.error("Failed to fetch users. Please try again.");

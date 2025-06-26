@@ -93,7 +93,11 @@ export const BorrowRequests = () => {
                 ]);
 
                 setAllBooks(books);
-                setAllBorrowRequests(borrowRequests);
+
+                const sortedBorrowRequests = borrowRequests.sort((a, b) => {
+                    return new Date(b.requestDate) - new Date(a.requestDate); // Sort by recent to oldest
+                });
+                setAllBorrowRequests(sortedBorrowRequests);
             } catch (error) {
                 console.error("Error fetching data:", error);
                 toast.error("Something went wrong while loading data.");
