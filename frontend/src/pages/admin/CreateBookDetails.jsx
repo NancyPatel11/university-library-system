@@ -64,7 +64,7 @@ export const CreateBookDetails = () => {
         };
 
         try {
-            const response = await fetch("http://localhost:8080/api/books/createBook", {
+            const response = await fetch("/api/books/createBook", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

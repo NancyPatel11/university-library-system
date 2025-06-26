@@ -73,11 +73,11 @@ export const BorrowRequests = () => {
             setLoading(true);
             try {
                 const [booksRes, borrowRequestsRes] = await Promise.all([
-                    fetch("http://localhost:8080/api/books/allBooks", {
+                    fetch("/api/books/allBooks", {
                         method: "GET",
                         credentials: "include",
                     }),
-                    fetch("http://localhost:8080/api/borrow-requests/all-borrow-requests", {
+                    fetch("/api/borrow-requests/all-borrow-requests", {
                         method: "GET",
                         credentials: "include",
                     }),
@@ -119,7 +119,7 @@ export const BorrowRequests = () => {
                 return;
             }
 
-            const response = await fetch(`http://localhost:8080/api/borrow-requests/approve-request/${request.id}`, {
+            const response = await fetch(`/api/borrow-requests/approve-request/${request.id}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",

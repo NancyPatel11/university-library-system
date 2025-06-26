@@ -31,7 +31,7 @@ export const Search = () => {
     const fetchBooks = async () => {
         setFlag(false); // Reset flag before fetching books
         try {
-            const response = await fetch("http://localhost:8080/api/books/allBooks", {
+            const response = await fetch("/api/books/allBooks", {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -77,7 +77,7 @@ export const Search = () => {
         if (!searchValue.trim()) return;
 
         try {
-            const response = await fetch(`http://localhost:8080/api/books/search/${searchValue}`, {
+            const response = await fetch(`/api/books/search/${searchValue}`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",

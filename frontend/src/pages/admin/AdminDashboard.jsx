@@ -56,17 +56,17 @@ export const AdminDashboard = () => {
       try {
         // Fetch all data in parallel
         const [booksRes, usersRes, requestsRes] = await Promise.all([
-          fetch("http://localhost:8080/api/books/allBooks", {
+          fetch("/api/books/allBooks", {
             method: "GET",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
           }),
-          fetch("http://localhost:8080/api/user/allUsers", {
+          fetch("/api/user/allUsers", {
             method: "GET",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
           }),
-          fetch("http://localhost:8080/api/borrow-requests/all-borrow-requests", {
+          fetch("/api/borrow-requests/all-borrow-requests", {
             method: "GET",
             credentials: "include",
           }),

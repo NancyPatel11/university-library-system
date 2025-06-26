@@ -21,7 +21,7 @@ export const Profile = () => {
   useEffect(() => {
     const fetchIdCard = async () => {
       try {
-        const requestUrl = `http://localhost:8080/api/user/idcard/${auth.email}`;
+        const requestUrl = `/api/user/idcard/${auth.email}`;
         const response = await fetch(requestUrl, {
           method: "GET",
           credentials: "include"
@@ -45,7 +45,7 @@ export const Profile = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await fetch("http://localhost:8080/api/user/profile", {
+        const response = await fetch("/api/user/profile", {
           method: "GET",
           credentials: "include"
         });
@@ -69,7 +69,7 @@ export const Profile = () => {
       if (auth.userRole !== 'student') return;
 
       try {
-        const response = await fetch("http://localhost:8080/api/borrow-requests/my-borrowed-books", {
+        const response = await fetch("/api/borrow-requests/my-borrowed-books", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -87,7 +87,7 @@ export const Profile = () => {
           data.map(async (borrowRequest) => {
             const bookId = borrowRequest.bookId;
 
-            const res = await fetch(`http://localhost:8080/api/books/${bookId}`, {
+            const res = await fetch(`/api/books/${bookId}`, {
               method: "GET",
               headers: {
                 "Content-Type": "application/json",

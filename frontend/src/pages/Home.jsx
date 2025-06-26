@@ -26,7 +26,7 @@ export const Home = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("http://localhost:8080/api/books/allBooks", {
+        const response = await fetch("/api/books/allBooks", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -47,7 +47,7 @@ export const Home = () => {
         setAllBooks(sortedBooks);
         setBook1(data[0]); // Set the first book as book1
 
-        const studentResponse = await fetch(`http://localhost:8080/api/user/accountStatus`, {
+        const studentResponse = await fetch(`/api/user/accountStatus`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -81,7 +81,7 @@ export const Home = () => {
         bookId: book1.id,
         studentId: auth.userId
       };
-      const response = await fetch(`http://localhost:8080/api/borrow-requests/check-status`, {
+      const response = await fetch(`/api/borrow-requests/check-status`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -136,7 +136,7 @@ export const Home = () => {
         studentFullName: auth.name,
       };
 
-      const response = await fetch(`http://localhost:8080/api/borrow-requests/create`, {
+      const response = await fetch(`/api/borrow-requests/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -164,7 +164,7 @@ export const Home = () => {
   const handleReturnBook = async (borrowRequestId) => {
     setButtonLoading(true);
     try {
-      const response = await fetch(`http://localhost:8080/api/borrow-requests/return-book/${borrowRequestId}`, {
+      const response = await fetch(`/api/borrow-requests/return-book/${borrowRequestId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -248,7 +248,7 @@ export const Home = () => {
             )}
             {((showBorrowButton || borrowRequest.status === "Returned") && studentAccountStatus != "Verification Pending") &&
               <Button disabled={buttonLoading} onClick={handleBorrowRequest} className='text-2xl bebas-neue-400 bg-yellow text-dark-end mt-10 rounded-xs border-2 border-yellow hover:bg-yellow-dark hover:border-yellow-dark hover:cursor-pointer'>
-                <FontAwesomeIcon icon={faBookOpen} /> {buttonLoading ? <Loader small/> : "BORROW BOOK REQUEST"}
+                <FontAwesomeIcon icon={faBookOpen} /> {buttonLoading ? <Loader small /> : "BORROW BOOK REQUEST"}
               </Button>
             }
             {borrowRequest && borrowRequest?.status === "Pending" && (
@@ -279,7 +279,7 @@ export const Home = () => {
                     handleReturnBook(borrowRequest.id);
                   }}
                   className={`bg-yellow-dark text-black hover:cursor-pointer hover:bg-yellow ibm-plex-sans-500`}>
-                  {buttonLoading ? <Loader small/> : "Return Book"}
+                  {buttonLoading ? <Loader small /> : "Return Book"}
                 </Button>
               </div>
             )}
@@ -294,7 +294,7 @@ export const Home = () => {
                     disabled={buttonLoading}
                     className={`bg-yellow-dark text-black hover:cursor-pointer hover:bg-yellow ibm-plex-sans-500`}
                   >
-                    {buttonLoading ? <Loader small/> : "Return Book"}
+                    {buttonLoading ? <Loader small /> : "Return Book"}
                   </Button>
                 </div>
               )

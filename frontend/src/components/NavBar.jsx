@@ -39,7 +39,7 @@ export const NavBar = ({ homeColor, searchColor, userColor }) => {
 
     const handleLogout = async () => {
         try {
-            const endpoint = auth.userRole === "student" ? "http://localhost:8080/api/user/logout" : "http://localhost:8080/api/admin/logout";
+            const endpoint = auth.userRole === "student" ? "/api/user/logout" : "/api/admin/logout";
             const response = await fetch(endpoint, {
                 method: "GET",
                 credentials: "include",

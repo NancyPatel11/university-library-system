@@ -53,7 +53,7 @@ export const AccountRequests = () => {
 
     const fetchStudents = async () => {
         try {
-            const studentsRes = await fetch("http://localhost:8080/api/user/allUsers", {
+            const studentsRes = await fetch("/api/user/allUsers", {
                 method: "GET",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",
@@ -91,7 +91,7 @@ export const AccountRequests = () => {
         if (!userEmail) return;
         setActionLoading(true);
 
-        const url = `http://localhost:8080/api/user/approve/${userEmail}`;
+        const url = `/api/user/approve/${userEmail}`;
 
         try {
             const res = await fetch(url, {
@@ -119,7 +119,7 @@ export const AccountRequests = () => {
         setActionLoading(true);
 
         try {
-            const res = await fetch(`http://localhost:8080/api/user/deny/${userEmail}`, {
+            const res = await fetch(`/api/user/deny/${userEmail}`, {
                 method: "PUT",
                 credentials: "include",
             });
@@ -143,7 +143,7 @@ export const AccountRequests = () => {
 
     const fetchIdCard = async (email) => {
         try {
-            const requestUrl = `http://localhost:8080/api/user/idcard/${email}`;
+            const requestUrl = `/api/user/idcard/${email}`;
             const response = await fetch(requestUrl, {
                 method: "GET",
                 credentials: "include"

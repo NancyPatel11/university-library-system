@@ -39,7 +39,7 @@ export const AllBooks = () => {
         const fetchBooks = async () => {
             setLoading(true);
             try {
-                const response = await fetch("http://localhost:8080/api/books/allBooks", {
+                const response = await fetch("/api/books/allBooks", {
                     method: "GET",
                     credentials: "include",
                 });
@@ -71,7 +71,7 @@ export const AllBooks = () => {
         setDeleting(true);
         try {
             console.log("Deleting book with ID:", bookId);
-            const response = await fetch(`http://localhost:8080/api/books/${bookId}`, {
+            const response = await fetch(`/api/books/${bookId}`, {
                 method: "DELETE",
                 credentials: "include",
             });

@@ -12,7 +12,7 @@ export const ProtectedRoute = ({ children, allowedRoles }) => {
     useEffect(() => {
         const checkAuth = async () => {
             try {
-                const response = await fetch("http://localhost:8080/api/auth/check-token", {
+                const response = await fetch("/api/auth/check-token", {
                     method: "GET",
                     credentials: "include",
                 });
@@ -29,7 +29,7 @@ export const ProtectedRoute = ({ children, allowedRoles }) => {
                 const email = data.email;
                 const name = data.name;
                 const userId = data.userId;
-                setAuth({ userRole, email , name, userId });
+                setAuth({ userRole, email, name, userId });
 
                 if (allowedRoles && !allowedRoles.includes(userRole)) {
                     toast.error("Unauthorized: Access denied");

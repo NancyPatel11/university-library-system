@@ -54,7 +54,7 @@ export const EditBookDetails = () => {
         const fetchBook = async () => {
             setLoading(true);
             try {
-                const res = await fetch(`http://localhost:8080/api/books/${bookId}`, {
+                const res = await fetch(`/api/books/${bookId}`, {
                     credentials: "include"
                 });
                 const data = await res.json();
@@ -93,7 +93,7 @@ export const EditBookDetails = () => {
                 summary: values.summary
             };
 
-            const response = await fetch(`http://localhost:8080/api/books/${bookId}`, {
+            const response = await fetch(`/api/books/${bookId}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",

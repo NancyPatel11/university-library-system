@@ -46,12 +46,12 @@ export const AllUsers = () => {
             setLoading(true);
             try {
                 const [studentsRes, adminsRes] = await Promise.all([
-                    fetch("http://localhost:8080/api/user/allUsers", {
+                    fetch("/api/user/allUsers", {
                         method: "GET",
                         headers: { "Content-Type": "application/json" },
                         credentials: "include",
                     }),
-                    fetch("http://localhost:8080/api/admin/allAdmins", {
+                    fetch("/api/admin/allAdmins", {
                         method: "GET",
                         headers: { "Content-Type": "application/json" },
                         credentials: "include",
@@ -93,8 +93,8 @@ export const AllUsers = () => {
         setDeleting(true); // start loader
 
         const url = user.role === "admin"
-            ? `http://localhost:8080/api/admin/delete/${user.email}`
-            : `http://localhost:8080/api/user/delete/${user.email}`;
+            ? `/api/admin/delete/${user.email}`
+            : `/api/user/delete/${user.email}`;
 
         try {
             const res = await fetch(url, {
@@ -114,7 +114,7 @@ export const AllUsers = () => {
             toast.success("User deleted successfully.");
             setCombinedUsers(prev => prev.filter(u => u.email !== user.email));
 
-            const response2 = await fetch("http://localhost:8080/api/borrow-requests/all-borrow-requests", {
+            const response2 = await fetch("/api/borrow-requests/all-borrow-requests", {
                 method: "GET",
                 credentials: "include",
             });
@@ -126,7 +126,7 @@ export const AllUsers = () => {
                 .filter(req => req.studentId === user.id && req.status === "Pending");
 
             for (const request of pendingRequests) {
-                const deleteResponse = await fetch(`http://localhost:8080/api/borrow-requests/delete-request/${request.id}`, {
+                const deleteResponse = await fetch(`/api/borrow-requests/delete-request/${request.id}`, {
                     method: "DELETE",
                     credentials: "include",
                 });
@@ -144,7 +144,7 @@ export const AllUsers = () => {
 
     const fetchIdCard = async (email) => {
         try {
-            const requestUrl = `http://localhost:8080/api/user/idcard/${email}`;
+            const requestUrl = `/api/user/idcard/${email}`;
             const response = await fetch(requestUrl, {
                 method: "GET",
                 credentials: "include"

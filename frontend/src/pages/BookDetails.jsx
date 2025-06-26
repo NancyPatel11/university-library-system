@@ -31,7 +31,7 @@ export const BookDetails = () => {
       setLoading(true);
       try {
         // Fetch current book by ID
-        const bookRes = await fetch(`http://localhost:8080/api/books/${bookId}`, {
+        const bookRes = await fetch(`/api/books/${bookId}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -47,7 +47,7 @@ export const BookDetails = () => {
         setBook(bookData);
 
         // Fetch all books
-        const allBooksRes = await fetch("http://localhost:8080/api/books/allBooks", {
+        const allBooksRes = await fetch("/api/books/allBooks", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -69,7 +69,7 @@ export const BookDetails = () => {
 
         // Fetch student account status
         if (auth.userRole !== "student") return; // Only fetch for students
-        const studentResponse = await fetch(`http://localhost:8080/api/user/accountStatus`, {
+        const studentResponse = await fetch(`/api/user/accountStatus`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -108,7 +108,7 @@ export const BookDetails = () => {
         bookId: book.id,
         studentId: auth.userId
       };
-      const response = await fetch(`http://localhost:8080/api/borrow-requests/check-status`, {
+      const response = await fetch(`/api/borrow-requests/check-status`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -165,7 +165,7 @@ export const BookDetails = () => {
         studentFullName: auth.name,
       };
 
-      const response = await fetch(`http://localhost:8080/api/borrow-requests/create`, {
+      const response = await fetch(`/api/borrow-requests/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -193,7 +193,7 @@ export const BookDetails = () => {
   const handleReturnBook = async (borrowRequestId) => {
     setButtonLoading(true);
     try {
-      const response = await fetch(`http://localhost:8080/api/borrow-requests/return-book/${borrowRequestId}`, {
+      const response = await fetch(`/api/borrow-requests/return-book/${borrowRequestId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

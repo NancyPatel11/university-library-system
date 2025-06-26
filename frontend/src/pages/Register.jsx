@@ -102,8 +102,8 @@ export const Register = () => {
         if (role === "student") formData.append("idCardImage", values.idCard);
 
         const endpoint = role === "admin"
-            ? "http://localhost:8080/api/admin/register"
-            : "http://localhost:8080/api/user/register";
+            ? "/api/admin/register"
+            : "/api/user/register";
 
         try {
             const response = await fetch(endpoint, {

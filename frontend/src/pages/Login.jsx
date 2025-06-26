@@ -46,8 +46,8 @@ export const Login = () => {
         setLoading(true);
         try {
             const endpoint = role === "admin"
-                ? "http://localhost:8080/api/admin/login"
-                : "http://localhost:8080/api/user/login";
+                ? "/api/admin/login"
+                : "/api/user/login";
             const response = await fetch(endpoint, {
                 method: "POST",
                 headers: {
