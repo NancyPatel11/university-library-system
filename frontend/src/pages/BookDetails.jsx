@@ -473,11 +473,27 @@ export const BookDetails = () => {
             <div className='flex gap-2'>
               <p className='text-admin-secondary-black ibm-plex-sans-300'>Created at:  </p>
               <img src={calendarIcon} alt="" />
-              <p className='text-admin-secondary-black ibm-plex-sans-300'>{book.createdAt}</p>
+              <p className='text-admin-secondary-black ibm-plex-sans-300'>{new Date(book.createdAt).toLocaleDateString()}</p>
             </div>
             <h1 className='text-4xl'>{book.title}</h1>
             <h1 className='text-2xl'>{book.author}</h1>
             <p className='text-lg text-admin-secondary-black ibm-plex-sans-300'>{book.genre}</p>
+
+            {
+              book.ratedBy &&
+              <div className='flex gap-10'>
+                <p className='text-lg text-admin-secondary-black ibm-plex-sans-300'>
+                  <FontAwesomeIcon icon={solidStar} className='text-admin-primary-blue' />
+                  <span className='text-admin-primary-blue ibm-plex-sans-600 mx-1'>{book.rating}</span>/ 5
+                </p>
+                <p className='text-lg text-admin-secondary-black ibm-plex-sans-300'>
+                  Rated by:
+                  <span className='text-admin-primary-blue ibm-plex-sans-600 mx-1'>{book.ratedBy ? Object.keys(book.ratedBy).length : 0}</span>
+                  user(s)
+                </p>
+              </div>
+            }
+
             <Button
               className="py-6 text-lg w-full border-admin-dark-border border-1 text-admin-bg bg-admin-primary-blue hover:bg-admin-tertiary-blue hover:cursor-pointer"
               onClick={() => navigate(`/edit-book-details/${book.id}`)}
