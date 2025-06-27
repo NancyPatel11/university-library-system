@@ -74,6 +74,25 @@ public class UserController {
         ));
     }
 
+    @GetMapping("/{userId}")
+    public ResponseEntity<?> getUserById(@PathVariable String userId) {
+        try {
+            return ResponseEntity.ok(userService.getUserById(userId));
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
+                    "timestamp", LocalDateTime.now(),
+                    "status", 404,
+                    "message", e.getMessage()
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "timestamp", LocalDateTime.now(),
+                    "status", 500,
+                    "message", "Failed to fetch user: " + e.getMessage()
+            ));
+        }
+    }
+
     @GetMapping("/idcard/{email}")
     public ResponseEntity<byte[]> getIdCard(@PathVariable String email) {
         return userService.getUserIdCardResponse(email);

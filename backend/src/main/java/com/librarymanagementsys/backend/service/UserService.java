@@ -183,4 +183,9 @@ public class UserService {
         }
         return user.getAccountStatus();
     }
+
+    public User getUserById(String userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userId));
+    }
 }

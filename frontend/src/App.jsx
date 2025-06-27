@@ -16,6 +16,7 @@ import { BorrowRequests } from './pages/admin/BorrowRequests';
 import { CreateBookDetails } from './pages/admin/CreateBookDetails';
 import { EditBookDetails } from './pages/admin/EditBookDetails';
 import { BorrowRequest } from './pages/admin/BorrowRequest';
+import { AccountRequest } from './pages/admin/AccountRequest';
 
 function App() {
   return (
@@ -108,6 +109,15 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
               <AccountRequests />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/account-request/:userId"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AccountRequest />
             </ProtectedRoute>
           }
         />

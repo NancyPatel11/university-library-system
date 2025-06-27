@@ -253,7 +253,8 @@ export const AdminDashboard = () => {
                       {pendingStudents.map((student, index) => (
                         <div
                           key={index}
-                          className="basis-[32%] flex-none bg-admin-bg rounded-lg p-5 flex flex-col items-center text-center ibm-plex-sans-500 text-admin-primary-black"
+                          className="hover:cursor-pointer basis-[32%] flex-none bg-admin-bg rounded-lg p-5 flex flex-col items-center text-center ibm-plex-sans-500 text-admin-primary-black"
+                          onClick={() => navigate(`/account-request/${student.id}`)}
                         >
                           <div className="mb-3">
                             <AvatarFallback name={student.fullName} height={14} width={14} textSize={"text-2xl"} />

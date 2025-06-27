@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext.jsx'
 import { NavBar } from '@/components/NavBar'
 import { Loader } from '@/components/Loader'
@@ -41,6 +42,9 @@ const Spinner = ({ size = "sm" }) => (
 
 export const AccountRequests = () => {
     const { auth } = useAuth();
+
+    const navigate = useNavigate();
+
     const [allStudents, setAllStudents] = useState([]);
     const [showApprove, setShowApprove] = useState(false);
     const [showReject, setShowReject] = useState(false);
@@ -209,9 +213,14 @@ export const AccountRequests = () => {
                                     </thead>
                                     <tbody className=''>
                                         {allStudents.map((student, index) => (
-                                            <tr key={index} className="border-b border-admin-bg">
+                                            <tr key={index} className="border-b hover:bg-admin-bg transition-colors duration-200">
                                                 <td className="p-4">
-                                                    <div className="flex gap-3 items-center">
+                                                    <div
+                                                        className="flex gap-3 items-center hover:cursor-pointer"
+                                                        onClick={() => {
+                                                            navigate(`/account-request/${student.id}`)
+                                                        }}
+                                                    >
                                                         <div>
                                                             <div className="flex items-center gap-2">
                                                                 <AvatarFallback name={student.fullName} />
