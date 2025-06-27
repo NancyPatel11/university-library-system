@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import BookCoverSvg from "../BookCoverSvg";
 import calendarImg from "../../assets/icons/admin/calendar.svg";
 import noBooksFoundImg from "../../assets/images/no-books.png";
@@ -26,6 +26,7 @@ const AvatarFallback = ({ name, height, width, textSize }) => {
 
 export const SearchResults = ({ query, books, borrowRequests }) => {
 
+    const navigate = useNavigate();
 
     const q = query.toLowerCase();
 
@@ -81,6 +82,9 @@ export const SearchResults = ({ query, books, borrowRequests }) => {
                                 <div
                                     key={index}
                                     className="bg-white rounded-lg p-3 flex gap-3 items-center text-center ibm-plex-sans-500 text-admin-primary-black hover:cursor-pointer"
+                                    onClick={
+                                        () => navigate(`/borrow-request/${request.id}`)
+                                    }
                                 >
                                     <div className="relative">
                                         <BookCoverSvg coverColor={book.color} width={60} height={85} />

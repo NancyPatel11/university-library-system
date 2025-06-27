@@ -1,5 +1,6 @@
 package com.librarymanagementsys.backend.service;
 
+import com.librarymanagementsys.backend.exception.BookNotAvailableException;
 import com.librarymanagementsys.backend.model.Book;
 import com.librarymanagementsys.backend.model.BorrowRequest;
 import com.librarymanagementsys.backend.model.User;
@@ -92,6 +93,11 @@ public class BorrowRequestService {
         User user = userRepository.findById(borrowRequest.getStudentId())
                 .orElseThrow(() -> new RuntimeException("User not found with ID: " + borrowRequest.getStudentId()));
 
+        // Check if the book is available for borrowing
+        if (book.getAvailable_copies() <= 0) {
+            throw new BookNotAvailableException( book.getTitle() + " is not available for borrowing. Check the available copies and try again later.");
+        }
+
         try {
             user.setNoBooksBorrowed(user.getNoBooksBorrowed() + 1); // Increment the number of books borrowed by the user
             book.setAvailable_copies(book.getAvailable_copies() - 1); // Decrease the available copies of the book
@@ -168,5 +174,10 @@ public class BorrowRequestService {
                 borrowRequestRepository.save(request);
             }
         }
+    }
+
+    public BorrowRequest getBorrowRequestById(String borrowRequestId) {
+         return borrowRequestRepository.findById(borrowRequestId)
+                .orElseThrow(() -> new RuntimeException("Borrow request not found with ID: " + borrowRequestId));
     }
 }

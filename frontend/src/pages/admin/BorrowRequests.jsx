@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext.jsx'
+import { ReceiptModal } from '@/components/ReceiptModal'
 import { NavBar } from '@/components/NavBar'
 import { Loader } from '@/components/Loader'
 import { Button } from '@/components/ui/button'
@@ -8,8 +10,6 @@ import closeIcon from '../../assets/icons/admin/close.svg'
 import swapIcon from '../../assets/icons/admin/arrow-swap.png'
 import approveIcon from '../../assets/icons/admin/approve.png'
 import receiptIcon from '../../assets/icons/admin/receipt.svg'
-import receiptBg from '../../assets/images/receipt-bg.png'
-import bookicon from "../../assets/icons/logo.svg";
 import illustration1 from '../../assets/icons/admin/illustration1.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCircleCheck } from '@fortawesome/free-solid-svg-icons'
@@ -38,6 +38,7 @@ const AvatarFallback = ({ name }) => {
 
 export const BorrowRequests = () => {
     const { auth } = useAuth();
+    const navigate = useNavigate();
     const [allBooks, setAllBooks] = useState([]);
     const [allBorrowRequests, setAllBorrowRequests] = useState([]);
     const [selectedRequest, setSelectedRequest] = useState(null);
@@ -112,13 +113,6 @@ export const BorrowRequests = () => {
     const handleApproveRequest = async (request) => {
         setApproving(true);
         try {
-            const book = allBooks.find((b) => b.id === request.bookId);
-
-            if (!book || book.available_copies <= 0) {
-                toast.error("Can't issue this book to the student. No copies available right now. Check back later.");
-                return;
-            }
-
             const response = await fetch(`/api/borrow-requests/approve-request/${request.id}`, {
                 method: "PUT",
                 headers: {
@@ -126,6 +120,12 @@ export const BorrowRequests = () => {
                 },
                 credentials: "include",
             });
+
+            if (response.status === 409) {
+                const data = await response.json();
+                toast.error(data.message || "Book not available for borrowing.");
+                return;
+            }
 
             if (!response.ok) {
                 throw new Error("Failed to approve request");
@@ -203,8 +203,11 @@ export const BorrowRequests = () => {
                                     <tbody className=''>
                                         {allBorrowRequests.map((request) => {
                                             return (
-                                                <tr key={request.id} className="border-b hover:bg-admin-light-blue transition-colors duration-200">
-                                                    <td className="p-4 flex items-center gap-4">
+                                                <tr
+                                                    key={request.id}
+                                                    className="border-b hover:bg-admin-bg transition-colors duration-200"
+                                                >
+                                                    <td onClick={() => navigate(`/borrow-request/${request.id}`)} className="p-4 flex items-center gap-4 hover:cursor-pointer">
                                                         <div className="relative">
                                                             <BookCoverSvg coverColor={request.bookColor} width={45} height={60} />
                                                             <img
@@ -218,7 +221,7 @@ export const BorrowRequests = () => {
                                                             <p className='text-admin-secondary-black text-sm'>{request.bookAuthor}</p>
                                                         </div>
                                                     </td>
-                                                    <td>
+                                                    <td onClick={() => navigate(`/borrow-request/${request.id}`)} className='hover:cursor-pointer'>
                                                         <div className="flex gap-2 items-center">
                                                             <AvatarFallback name={request.studentFullName} />
                                                             <div className='flex flex-col items-start'>
@@ -310,7 +313,7 @@ export const BorrowRequests = () => {
                                                                     setSelectedReceiptRequest(request);
                                                                     setShowReceiptModal(true);
                                                                 }}
-                                                                className="hover:opacity-80 hover:cursor-pointer text-admin-primary-blue flex gap-1 bg-admin-bg p-2 rounded-sm"
+                                                                className="hover:bg-white hover:cursor-pointer text-admin-primary-blue flex gap-1 bg-admin-bg p-2 rounded-sm"
                                                             >
                                                                 <img src={receiptIcon} alt="receipt" className="h-6 mx-auto" />
                                                                 <p>Generate</p>
@@ -377,122 +380,11 @@ export const BorrowRequests = () => {
                         )}
 
                         {showReceiptModal && selectedReceiptRequest && (
-                            <div className="fixed inset-0 bg-black/50 z-50 flex justify-center items-center">
-                                <div
-                                    className="relative bg-white w-[625px] p-8 rounded-lg shadow-lg"
-                                >
-                                    <Button
-                                        onClick={() => setShowReceiptModal(false)}
-                                        className="absolute top-1 right-0 bg-transparent hover:bg-gray-100 shadow-none hover:cursor-pointer"
-                                    >
-                                        <img src={closeIcon} alt="close" className="h-3 w-3" />
-                                    </Button>
-
-                                    <div
-                                        id="receipt"
-                                        className='bg-admin-receipt-bg p-5'
-                                    >
-                                        <div
-                                            className="h-full bg-center bg-no-repeat p-8 text-white"
-                                            style={{
-                                                backgroundImage: `url(${receiptBg})`,
-                                                backgroundSize: 'cover',
-                                                backgroundPosition: 'top',
-                                            }}
-                                        >
-                                            <div className='flex items-center gap-3'>
-                                                <img src={bookicon} alt="book icon" className="h-8" />
-                                                <h3 className="ibm-plex-sans-500 text-3xl">
-                                                    <a href="/home">Bookademia</a>
-                                                </h3>
-                                            </div>
-
-                                            <div>
-                                                <h1 className='text-2xl mt-6'>Borrow Receipt</h1>
-                                                <p className='text-lg ibm-plex-sans-300 mt-2'>
-                                                    Date Issued:
-                                                    <span className='ps-2 ibm-plex-sans-500 text-yellow'>
-                                                        {new Date().toLocaleDateString("en-GB")}
-                                                    </span>
-                                                </p>
-                                                <p className='text-lg ibm-plex-sans-300 mt-2'>
-                                                    Issued for:
-                                                    <span className='ps-2 ibm-plex-sans-500 text-yellow'>
-                                                        {selectedReceiptRequest.studentFullName} ({selectedReceiptRequest.studentEmail})
-                                                    </span>
-                                                </p>
-                                            </div>
-
-                                            <hr className='my-5' style={{ border: "none", height: "1px", backgroundColor: "#D6E0FF1A" }} />
-
-                                            <div className='text-gray-300 ibm-plex-sans-300'>
-                                                <h1 className='text-xl text-white mb-2 ibm-plex-sans-500'>Book Details</h1>
-                                                <div className="space-y-1 pl-2">
-                                                    <div className="flex items-start gap-2">
-                                                        <span className="text-white ">•</span>
-                                                        <span>Title: <span className="ibm-plex-sans-500 text-white">{selectedReceiptRequest.bookTitle}</span></span>
-                                                    </div>
-                                                    <div className="flex items-start gap-2">
-                                                        <span className="text-white">•</span>
-                                                        <span>Author: <span className="ibm-plex-sans-500 text-white">{selectedReceiptRequest.bookAuthor}</span></span>
-                                                    </div>
-                                                    <div className="flex items-start gap-2">
-                                                        <span className="text-white">•</span>
-                                                        <span>Borrowed On: <span className="ibm-plex-sans-500 text-white"> {new Date(selectedReceiptRequest.issueDate).toLocaleDateString()}</span></span>
-                                                    </div>
-                                                    <div className="flex items-start gap-2">
-                                                        <span className="text-white">•</span>
-                                                        <span>Due Date: <span className="ibm-plex-sans-500 text-white"> {new Date(selectedReceiptRequest.dueDate).toLocaleDateString()}</span></span>
-                                                    </div>
-
-                                                </div>
-                                            </div>
-
-                                            <hr className='my-5' style={{ border: "none", height: "1px", backgroundColor: "#D6E0FF1A" }} />
-
-                                            <div className='text-gray-300 ibm-plex-sans-300'>
-                                                <h1 className='text-xl text-white mb-2 ibm-plex-sans-500'>Terms</h1>
-                                                <div className="space-y-1 pl-2">
-                                                    <div className="flex items-start gap-2">
-                                                        <span className="text-white">•</span>
-                                                        Ensure the book is returned by the due date.
-                                                    </div>
-                                                    <div className="flex items-start gap-2">
-                                                        <span className="text-white">•</span>
-                                                        Late returns may incur fines.
-                                                    </div>
-                                                    <div className="flex items-start gap-2">
-                                                        <span className="text-white">•</span>
-                                                        Lost or damaged books may incur replacement costs.
-                                                    </div>
-                                                    <div className="flex items-start gap-2">
-                                                        <span className="text-white">•</span>
-                                                        Contact us for any issues or concerns.
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <hr className='my-5' style={{ border: "none", height: "1px", backgroundColor: "#D6E0FF1A" }} />
-
-                                            <div className='text-gray-300 ibm-plex-sans-300'>
-                                                <p>Thank you for using <span className='ibm-plex-sans-500 text-white'>Bookademia!</span></p>
-                                                <p>Website: <span className='ibm-plex-sans-500 text-white'>bookademia.example.com</span></p>
-                                                <p>Email: <span className='ibm-plex-sans-500 text-white'>nancypatel5757@gmail.com</span></p>
-                                            </div>
-
-
-                                        </div>
-
-                                    </div>
-
-                                    <Button
-                                        onClick={downloadReceiptAsPNG}
-                                        className="mt-6 w-full bg-admin-primary-blue text-white hover:bg-admin-tertiary-blue hover:cursor-pointer"
-                                    >
-                                        Download Receipt
-                                    </Button>
-                                </div>
-                            </div>
+                            <ReceiptModal
+                                selectedReceiptRequest={selectedReceiptRequest}
+                                onClose={() => setShowReceiptModal(false)}
+                                downloadReceiptAsPNG={downloadReceiptAsPNG}
+                            />
                         )}
 
                     </div>

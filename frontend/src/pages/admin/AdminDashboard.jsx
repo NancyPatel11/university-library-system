@@ -193,7 +193,7 @@ export const AdminDashboard = () => {
                           <div
                             key={index}
                             className="bg-admin-bg rounded-lg p-3 flex gap-3 items-center text-center ibm-plex-sans-500 text-admin-primary-black hover:cursor-pointer"
-                            onClick={() => navigate(`/bookdetails/${request.bookId}`)}
+                            onClick={() => navigate(`/borrow-request/${request.id}`)}
                           >
                             <div className="relative">
                               <BookCoverSvg coverColor={book.color} width={60} height={85} />
