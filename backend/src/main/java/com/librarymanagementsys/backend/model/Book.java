@@ -7,6 +7,9 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 @Document(collection = "Books")
 @Data
@@ -19,8 +22,7 @@ public class Book {
     private String title;
     private String author;
     private String genre;
-    private int rating;
-    private int no_of_ratings;
+    private float rating;
     private String cover;
     private String color;
     private String description;
@@ -29,4 +31,6 @@ public class Book {
     private String video;
     private String summary;
     private Date createdAt;
+
+    private Map<String, Integer> ratedBy; // Map of userId to rating value
 }

@@ -33,7 +33,6 @@ public class AdminController {
     public ResponseEntity<Map<String, Object>> registerAdmin(
             @RequestPart("request") RegisterAdminRequest request,
             HttpSession session) {
-        System.out.println("Registering admin: " + request.getEmail());
 
         RegisterResponse registerResponse = adminService.registerAdmin(request);
         session.setAttribute("jwt", registerResponse.getJwt());

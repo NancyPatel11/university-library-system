@@ -1,6 +1,7 @@
 package com.librarymanagementsys.backend.service;
 
 import com.librarymanagementsys.backend.dto.CreateBookRequest;
+import com.librarymanagementsys.backend.dto.RatingRequest;
 import com.librarymanagementsys.backend.dto.UpdateBookRequest;
 import com.librarymanagementsys.backend.exception.BookNotFoundException;
 import com.librarymanagementsys.backend.model.Book;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 @Service
@@ -110,7 +112,7 @@ public class BookService {
         book.setSummary(request.getSummary());
         book.setAvailable_copies(request.getTotal_copies()); // Initially, all copies are available
         book.setRating(0); // Initial rating is set to 0
-        book.setNo_of_ratings(0); // Initial number of ratings is set to 0
+        book.setRatedBy(new HashMap<>()); // Initialize ratedBy map
         book.setCreatedAt(new Date()); // Set the creation date to now
 
         try {
@@ -121,5 +123,41 @@ public class BookService {
         }
     }
 
+    public void rateBook(RatingRequest request, String userId) {
+        Book book = bookRepository.findById(request.getBookId())
+                .orElseThrow(() -> new BookNotFoundException("Book not found with id: " + request.getBookId()));
+
+        // Initialize map if null
+        if (book.getRatedBy() == null) {
+            book.setRatedBy(new HashMap<>());
+        }
+
+        // Check if user already rated
+        if (book.getRatedBy().containsKey(userId)) {
+            throw new IllegalStateException("User has already rated this book");
+        }
+
+        try {
+            int newRating = request.getRating();
+
+            // Add the new rating to the map first
+            book.getRatedBy().put(userId, newRating);
+
+            // Recalculate the average rating
+            float total = 0;
+            for (int rating : book.getRatedBy().values()) {
+                total += rating;
+            }
+
+            float averageRating = total / book.getRatedBy().size();
+
+            // Update the book rating
+            book.setRating(averageRating);
+
+            bookRepository.save(book);
+        } catch (Exception e) {
+            throw new RuntimeException("Error updating book rating: " + e.getMessage());
+        }
+    }
 
 }
