@@ -17,6 +17,7 @@ import { CreateBookDetails } from './pages/admin/CreateBookDetails';
 import { EditBookDetails } from './pages/admin/EditBookDetails';
 import { BorrowRequest } from './pages/admin/BorrowRequest';
 import { AccountRequest } from './pages/admin/AccountRequest';
+import { Error404 } from './pages/Error404';
 
 function App() {
   return (
@@ -139,6 +140,16 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        <Route
+          path='*'
+          element={
+            <ProtectedRoute allowedRoles={["student", "admin"]}>
+              <Error404 />
+            </ProtectedRoute>
+          }
+        />
+
       </Routes>
     </BrowserRouter>
   )

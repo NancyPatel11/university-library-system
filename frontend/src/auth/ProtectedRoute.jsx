@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
+import { Error401 } from "@/pages/Error401";
 import { useAuth } from "@/context/AuthContext";
 import { Loader } from "@/components/Loader";
 import { toast } from "sonner";
@@ -25,19 +26,14 @@ export const ProtectedRoute = ({ children, allowedRoles }) => {
                     return;
                 }
 
-                const userRole = data.role;
-                const email = data.email;
-                const name = data.name;
-                const userId = data.userId;
-                setAuth({ userRole, email, name, userId });
+                const { role, email, name, userId } = data;
+                setAuth({ userRole: role, email, name, userId });
 
-                if (allowedRoles && !allowedRoles.includes(userRole)) {
-                    toast.error("Unauthorized: Access denied");
+                if (allowedRoles && !allowedRoles.includes(role)) {
                     setAuthState({ loading: false, authorized: false });
                     return;
                 }
 
-                // All good
                 setAuthState({ loading: false, authorized: true });
             } catch (err) {
                 console.error("Error during auth check:", err);
@@ -49,9 +45,14 @@ export const ProtectedRoute = ({ children, allowedRoles }) => {
         checkAuth();
     }, [allowedRoles, setAuth]);
 
-    if (authState.loading) return <Loader role={auth.userRole} message={"Authenticating... 🔒"} />;
+    if (authState.loading) {
+        return <Loader role={auth.userRole} message={"Authenticating... 🔒"} />;
+    }
 
     if (!authState.authorized) {
+        if (auth.userRole && !allowedRoles.includes(auth.userRole)) {
+            return <Error401 role={auth.userRole} />;
+        }
         return <Navigate to="/login" replace state={{ from: location }} />;
     }
 
