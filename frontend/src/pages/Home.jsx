@@ -63,6 +63,7 @@ export const Home = () => {
 
         setStudentAccountStatus(studentData.accountStatus);
       } catch (error) {
+        toast.error(error.message || "Something went wrong while fetching books.");
         console.error("Error fetching books:", error);
       } finally {
         setLoading(false); // loader stops here
@@ -106,6 +107,7 @@ export const Home = () => {
       setBorrowRequest(data);
       setShowBorrowButton(false);
     } catch (error) {
+      toast.error(error.message || "Something went wrong while checkin borrow request status.")
       console.error("Error checking borrow request status:", error);
       setBorrowRequest(null);
       setShowBorrowButton(true);
@@ -118,13 +120,8 @@ export const Home = () => {
 
 
   const handleBorrowRequest = async () => {
-    if (book1.available_copies <= 0) {
-      toast.error("No copies available for borrowing at the moment.");
-      return;
-    }
-
+    setButtonLoading(true);
     try {
-      setButtonLoading(true);
       const payload = {
         bookId: book1.id,
         bookTitle: book1.title,
@@ -146,8 +143,8 @@ export const Home = () => {
       });
 
       if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || "Failed to send borrow request");
+        const error = await response.json();
+        throw new Error(error.message || "Failed to send borrow request");
       }
 
       const result = await response.text(); // response is just a string, not JSON
@@ -182,7 +179,7 @@ export const Home = () => {
       checkIfBookBorrowRequested(); // Refresh borrow request status
     } catch (error) {
       console.error("Error returning book:", error);
-      toast.error(error.message || "Something went wrong while returning the book.");
+      toast.error(error.message || "Something went wrong while returning the book, please refresh and try again.");
     } finally {
       setButtonLoading(false);
     }

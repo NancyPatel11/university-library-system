@@ -45,7 +45,8 @@ export const AllBooks = () => {
                 });
 
                 if (!response.ok) {
-                    throw new Error("Failed to fetch books");
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || "Failed to fetch books");
                 }
 
                 const data = await response.json();
@@ -58,7 +59,7 @@ export const AllBooks = () => {
                 setAllBooks(sortedBooks);
             } catch (error) {
                 console.error("Error fetching books:", error);
-                toast.error("Failed to load books. Please try again later.");
+                toast.error(error.message || "Failed to load books. Please try again later.");
             } finally {
                 setLoading(false);
             }
@@ -84,14 +85,14 @@ export const AllBooks = () => {
             }
 
             if (!response.ok) {
-                throw new Error("Failed to delete book");
+                throw new Error(data.message || "Failed to delete book");
             }
 
             toast.success(data.message);
             setAllBooks(allBooks.filter(book => book.id !== bookId));
         } catch (error) {
             console.error("Error deleting book:", error);
-            toast.error("Failed to delete book. Please try again later.");
+            toast.error(error.message || "Failed to delete book. Please try again.");
         } finally {
             setDeleting(false);
         }

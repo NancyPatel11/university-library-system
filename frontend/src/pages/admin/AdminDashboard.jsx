@@ -11,6 +11,7 @@ import BookCoverSvg from '@/components/BookCoverSvg';
 import calendarImg from '../../assets/icons/admin/calendar.svg';
 import { SearchBar } from '@/components/admin/SearchBar';
 import { SearchResults } from '@/components/admin/SearchResults';
+import { toast } from 'sonner';
 
 const getInitials = (name) => {
   if (!name) return "";
@@ -73,7 +74,15 @@ export const AdminDashboard = () => {
         ]);
 
         if (!booksRes.ok || !usersRes.ok || !requestsRes.ok) {
-          throw new Error("One or more fetches failed");
+          const errorData = await Promise.all([
+            booksRes.json(),
+            usersRes.json(),
+            requestsRes.json(),
+          ]);
+          throw new Error(
+            errorData.find((data) => data.message)?.message ||
+            "Failed to fetch data"
+          );
         }
 
         const [books, users, borrowRequests] = await Promise.all([
@@ -105,6 +114,7 @@ export const AdminDashboard = () => {
 
         setPendingBorrowRequests(sortedRequests);
       } catch (error) {
+        toast.error(error.message || "Failed to fetch data");
         console.error("Error fetching data:", error);
       } finally {
         setLoading(false);

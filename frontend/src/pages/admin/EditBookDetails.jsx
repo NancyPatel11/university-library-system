@@ -58,6 +58,11 @@ export const EditBookDetails = () => {
                     credentials: "include"
                 });
                 const data = await res.json();
+
+                if (!res.ok) {
+                    throw new Error(data.message || "Failed to fetch book details");
+                }
+
                 form.reset({
                     title: data.title,
                     author: data.author,
@@ -69,8 +74,9 @@ export const EditBookDetails = () => {
                     description: data.description,
                     summary: data.summary,
                 });
-            } catch {
-                toast.error("Failed to load book details");
+            } catch (error) {
+                console.error("Error fetching book details:", error);
+                toast.error(error.message || "Failed to load book details");
             } finally {
                 setLoading(false);
             }

@@ -40,7 +40,8 @@ export const Search = () => {
             });
 
             if (!response.ok) {
-                throw new Error("Failed to fetch books");
+                const errorData = await response.json();
+                throw new Error(errorData.message || "Failed to fetch books");
             }
 
             const data = await response.json();
@@ -56,6 +57,7 @@ export const Search = () => {
                 setFlag(true); // Set flag to true if no books found
             }
         } catch (error) {
+            toast.error(error.message || "An error occurred while fetching books.");
             console.error("Error fetching books:", error);
         } finally {
             setLoading(false); // loader stops here
@@ -85,7 +87,10 @@ export const Search = () => {
                 credentials: "include",
             });
 
-            if (!response.ok) throw new Error("Search failed");
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || "Failed to search books");
+            }
 
             const data = await response.json();
             if (data.length === 0) {
@@ -96,6 +101,7 @@ export const Search = () => {
             toast.success("Books found!");
             setAllBooks(data); // Update the state with search results
         } catch (error) {
+            toast.error(error.message || "An error occurred while searching for books.");
             console.error("Error searching books:", error);
         }
     };

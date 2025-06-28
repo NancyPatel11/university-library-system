@@ -57,11 +57,12 @@ export const BorrowRequest = () => {
 
                 const data = await response.json();
                 if (!response.ok) {
-                    throw new Error(`Error fetching borrow request: ${data.message || 'Unknown error'}`);
+                    throw new Error(data.message || "Failed to fetch borrow request");
                 }
 
                 setBorrowedRequest(data);
             } catch (error) {
+                toast.error(error.message || "Failed to fetch borrow request");
                 console.error('Error fetching borrow request:', error);
             } finally {
                 setLoading(false);
@@ -88,7 +89,8 @@ export const BorrowRequest = () => {
             }
 
             if (!response.ok) {
-                throw new Error("Failed to approve request");
+                const errorData = await response.json();
+                throw new Error(errorData.message || "Failed to approve request");
             }
 
             toast.success("Request approved successfully!");
@@ -101,7 +103,7 @@ export const BorrowRequest = () => {
             }));
         } catch (error) {
             console.error("Error approving request:", error);
-            toast.error("Failed to approve request. Please try again later.");
+            toast.error(error.message || "Failed to approve request");
         } finally {
             setApproving(false);
         }

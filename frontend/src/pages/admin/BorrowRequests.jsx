@@ -85,7 +85,12 @@ export const BorrowRequests = () => {
                 ]);
 
                 if (!booksRes.ok || !borrowRequestsRes.ok) {
-                    throw new Error("One or more fetches failed");
+                    const errorDate = await Promise.all([
+                        booksRes.json(),
+                        borrowRequestsRes.json(),
+                    ]);
+                    const errorMessage = errorDate[0].message || errorDate[1].message || "Failed to fetch data";
+                    throw new Error(errorMessage || "Failed to fetch data");
                 }
 
                 const [books, borrowRequests] = await Promise.all([
@@ -101,7 +106,7 @@ export const BorrowRequests = () => {
                 setAllBorrowRequests(sortedBorrowRequests);
             } catch (error) {
                 console.error("Error fetching data:", error);
-                toast.error("Something went wrong while loading data.");
+                toast.error(error.message || "Failed to fetch borrow requests. Please try again later.");
             } finally {
                 setLoading(false);
             }
@@ -128,7 +133,8 @@ export const BorrowRequests = () => {
             }
 
             if (!response.ok) {
-                throw new Error("Failed to approve request");
+                const errorData = await response.json();
+                throw new Error(errorData.message || "Failed to approve request");
             }
 
             const data = await response.json();
@@ -142,7 +148,7 @@ export const BorrowRequests = () => {
             );
         } catch (error) {
             console.error("Error approving request:", error);
-            toast.error("Failed to approve request. Please try again later.");
+            toast.error(error.message || "Failed to approve request. Please try again later.");
         } finally {
             setApproving(false);
             setShowApprovalModal(false);

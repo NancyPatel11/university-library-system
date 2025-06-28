@@ -74,7 +74,8 @@ export const CreateBookDetails = () => {
             });
 
             if (!response.ok) {
-                throw new Error("Failed to create book");
+                const errorData = await response.json();
+                throw new Error(errorData.message || "Failed to create book");
             }
 
             const result = await response.json();
@@ -83,7 +84,7 @@ export const CreateBookDetails = () => {
             form.reset(); // reset the form after submission
         } catch (error) {
             console.error("Error creating book:", error);
-            toast.error("Something went wrong while creating the book.");
+            toast.error(error.message || "Failed to add book. Please try again.");
         }
     };
 

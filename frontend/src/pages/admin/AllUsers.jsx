@@ -59,7 +59,9 @@ export const AllUsers = () => {
                 ]);
 
                 if (!studentsRes.ok || !adminsRes.ok) {
-                    throw new Error("Failed to fetch users");
+                    const errorData = await studentsRes.json();
+                    const errorData2 = await adminsRes.json();
+                    throw new Error(errorData.message || errorData2.message || "Failed to fetch users");
                 }
 
                 const [students, admins] = await Promise.all([
@@ -78,6 +80,7 @@ export const AllUsers = () => {
                 });
                 setCombinedUsers(sortedCombined);
             } catch (error) {
+                toast.error(error.message || "Failed to fetch users");
                 console.error("Error fetching users:", error);
             } finally {
                 setLoading(false);
@@ -109,7 +112,9 @@ export const AllUsers = () => {
                 return;
             }
 
-            if (!res.ok) throw new Error("Failed to delete user");
+            if (!res.ok) {
+                throw new Error(response.message || "Failed to delete user");
+            }
 
             toast.success("User deleted successfully.");
             setCombinedUsers(prev => prev.filter(u => u.email !== user.email));
@@ -119,7 +124,10 @@ export const AllUsers = () => {
                 credentials: "include",
             });
 
-            if (!response2.ok) throw new Error("Failed to fetch borrow requests");
+            if (!response2.ok) {
+                const errorData = await response2.json();
+                throw new Error(errorData.message || "Failed to fetch borrow requests");
+            }
 
             const borrowRequests = await response2.json();
             const pendingRequests = borrowRequests
@@ -135,7 +143,7 @@ export const AllUsers = () => {
             }
         } catch (error) {
             console.error("Error deleting user:", error);
-            toast.error("An error occurred while deleting user.");
+            toast.error(error.message || "Failed to delete user");
         } finally {
             setDeleting(false); // stop loader
             setShowConfirm(false);
@@ -151,13 +159,15 @@ export const AllUsers = () => {
             });
 
             if (!response.ok) {
-                throw new Error("Failed to fetch ID card");
+                const errorData = await response.json();
+                throw new Error(errorData.message || "Failed to fetch ID card");
             }
 
             const blob = await response.blob();
             const idUrl = URL.createObjectURL(blob);
             setIdCardUrl(idUrl);
         } catch (error) {
+            toast.error(error.message || "Failed to fetch ID card");
             console.error("Error fetching ID card:", error);
         }
     };

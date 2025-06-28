@@ -64,7 +64,8 @@ export const AccountRequests = () => {
             });
 
             if (!studentsRes.ok) {
-                throw new Error("Failed to fetch users");
+                const errorData = await studentsRes.json();
+                throw new Error(errorData.message || "Failed to fetch users");
             }
 
             const students = await studentsRes.json();
@@ -77,7 +78,7 @@ export const AccountRequests = () => {
             setAllStudents(sortedStudents);
         } catch (error) {
             console.error("Error fetching users:", error);
-            toast.error("Failed to fetch users. Please try again.");
+            toast.error(error.message || "Failed to fetch users");
         }
     };
 
@@ -104,13 +105,14 @@ export const AccountRequests = () => {
             });
 
             if (!res.ok) {
-                toast.error("Failed to approve user account. Please try again.");
-                return;
+                const errorData = await res.json();
+                throw new Error(errorData.message || "Failed to approve user account");
             }
 
             toast.success(`Account for ${userEmail} approved successfully!`);
             await fetchStudents();
         } catch (error) {
+            toast.error(error.message || "Something went wrong while approving the user account.");
             console.error("Error approving user:", error);
         } finally {
             setActionLoading(false);
@@ -129,15 +131,15 @@ export const AccountRequests = () => {
             });
 
             if (!res.ok) {
-                toast.error("Failed to deny user account. Please try again.");
-                return;
+                const errorData = await res.json();
+                throw new Error(errorData.message || "Failed to deny user account");
             }
 
             toast.success(`Account for ${userEmail} denied successfully!`);
             await fetchStudents();
         } catch (error) {
             console.error("Error denying user:", error);
-            toast.error("Something went wrong.");
+            toast.error(error.message || "Something went wrong while denying the user account.");
         } finally {
             setActionLoading(false);
             setShowReject(false);
@@ -154,13 +156,15 @@ export const AccountRequests = () => {
             });
 
             if (!response.ok) {
-                throw new Error("Failed to fetch ID card");
+                const errorData = await response.json();
+                throw new Error(errorData.message || "Failed to fetch ID card");
             }
 
             const blob = await response.blob();
             const idUrl = URL.createObjectURL(blob);
             setIdCardUrl(idUrl);
         } catch (error) {
+            toast.error(error.message || "Failed to fetch ID card");
             console.error("Error fetching ID card:", error);
         }
     };

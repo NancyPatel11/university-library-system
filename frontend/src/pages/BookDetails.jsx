@@ -86,6 +86,7 @@ export const BookDetails = () => {
 
       setStudentAccountStatus(studentData.accountStatus);
     } catch (error) {
+      toast.error(error.message || "Something went wrong while fetching book details.");
       console.error("Error fetching book or books:", error);
     } finally {
       setLoading(false);
@@ -129,12 +130,13 @@ export const BookDetails = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "Failed to check borrow request status");
+        throw new Error(data.message);
       }
 
       setBorrowRequest(data);
       setShowBorrowButton(false);
     } catch (error) {
+      toast.error(error.message || "Something went wrong while checking borrow request status.");
       console.error("Error checking borrow request status:", error);
       setBorrowRequest(null);
       setShowBorrowButton(true);
@@ -149,11 +151,6 @@ export const BookDetails = () => {
 
 
   const handleBorrowRequest = async () => {
-    if (book.available_copies <= 0) {
-      toast.error("No copies available for borrowing at the moment.");
-      return;
-    }
-
     setButtonLoading(true);
     try {
       const payload = {
@@ -239,12 +236,18 @@ export const BookDetails = () => {
         return;
       }
 
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to submit rating");
+      }
+
       if (response.ok) {
         setRating(0); // Reset rating after submission
         toast.success("Rating submitted!");
         await fetchData();
       }
     } catch (err) {
+      toast.error(err.message || "Something went wrong while submitting the rating.");
       console.error("Rating error:", err);
     }
   };

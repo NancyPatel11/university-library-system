@@ -75,7 +75,8 @@ export const AccountRequest = () => {
             });
 
             if (!studentsRes.ok) {
-                throw new Error("Failed to fetch users");
+                const errorData = await studentsRes.json();
+                throw new Error(errorData.message || "Failed to fetch student data");
             }
 
             const student = await studentsRes.json();
@@ -83,7 +84,7 @@ export const AccountRequest = () => {
             return student;
         } catch (error) {
             console.error("Error fetching users:", error);
-            toast.error("Failed to fetch users. Please try again.");
+            toast.error(error.message || "Failed to fetch users. Please try again.");
             return null;
         }
     }, []);
@@ -97,7 +98,8 @@ export const AccountRequest = () => {
             });
 
             if (!response.ok) {
-                throw new Error("Failed to fetch ID card");
+                const errorData = await response.json();
+                throw new Error(errorData.message || "Failed to fetch ID card");
             }
 
             const blob = await response.blob();
@@ -105,7 +107,7 @@ export const AccountRequest = () => {
             return idUrl;
         } catch (error) {
             console.error("Error fetching ID card:", error);
-            toast.error("Failed to load ID card.");
+            toast.error(error.message || "Failed to load ID card.");
             return null;
         }
     };
@@ -143,13 +145,14 @@ export const AccountRequest = () => {
             });
 
             if (!res.ok) {
-                toast.error("Failed to approve user account. Please try again.");
-                return;
+                const errorData = await res.json();
+                throw new Error(errorData.message || "Failed to approve user account. Please try again.");
             }
 
             toast.success(`Account for ${userEmail} approved successfully!`);
             await fetchStudent(userId); // Refresh the student data after approval
         } catch (error) {
+            toast.error(error.message || "Something went wrong while approving the user.");
             console.error("Error approving user:", error);
         } finally {
             setActionLoading(false);
@@ -168,15 +171,15 @@ export const AccountRequest = () => {
             });
 
             if (!res.ok) {
-                toast.error("Failed to deny user account. Please try again.");
-                return;
+                const errorData = await res.json();
+                throw new Error(errorData.message || "Failed to deny user account. Please try again.");
             }
 
             toast.success(`Account for ${userEmail} denied successfully!`);
             await fetchStudent(userId); // Refresh the student data after denial
         } catch (error) {
             console.error("Error denying user:", error);
-            toast.error("Something went wrong.");
+            toast.error(error.message || "Something went wrong while denying the user.");
         } finally {
             setActionLoading(false);
             setShowReject(false);

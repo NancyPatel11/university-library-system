@@ -4,6 +4,7 @@ import { useAuth } from '@/context/authContext';
 import { NavBar } from '@/components/NavBar';
 import { Loader } from '@/components/Loader';
 import { BorrowedBookCard } from '@/components/BorrowedBookCard';
+import { toast } from 'sonner';
 import bg from "../assets/images/bg.png";
 import profileBg from "../assets/images/profile-bg.png";
 import verifiedImg from "../assets/icons/verified.svg";
@@ -28,13 +29,15 @@ export const Profile = () => {
         });
 
         if (!response.ok) {
-          throw new Error("Failed to fetch ID card");
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Failed to fetch ID card");
         }
 
         const blob = await response.blob();
         const url = URL.createObjectURL(blob);
         setIdCardUrl(url);
       } catch (error) {
+        toast.error(error.message || "Failed to fetch ID card");
         console.error("Error fetching ID card:", error);
       }
     };
@@ -51,12 +54,14 @@ export const Profile = () => {
         });
 
         if (!response.ok) {
-          throw new Error("Failed to fetch user profile");
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Failed to fetch user profile");
         }
 
         const data = await response.json();
         setUser(data);
       } catch (error) {
+        toast.error(error.message || "Failed to fetch user profile");
         console.error("Error fetching user profile:", error);
       }
     };
@@ -78,7 +83,8 @@ export const Profile = () => {
         });
 
         if (!response.ok) {
-          throw new Error("Failed to fetch borrowed books");
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Failed to fetch borrowed books");
         }
 
         const data = await response.json();
@@ -96,7 +102,8 @@ export const Profile = () => {
             });
 
             if (!res.ok) {
-              throw new Error(`Failed to fetch book with ID ${bookId}`);
+              const errorData = await res.json();
+              throw new Error(errorData.message || "Failed to fetch book details");
             }
 
             const bookData = await res.json();
@@ -123,6 +130,7 @@ export const Profile = () => {
 
         setBorrowedBooks(sortedBorrowedBooks);
       } catch (error) {
+        toast.error(error.message || "Failed to fetch borrowed book details");
         console.error("Error fetching borrowed book details:", error);
       }
     };
