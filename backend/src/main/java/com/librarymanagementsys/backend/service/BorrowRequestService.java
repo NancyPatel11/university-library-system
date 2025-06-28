@@ -37,6 +37,14 @@ public class BorrowRequestService {
     }
 
     public void createBorrowRequest(BorrowRequest borrowRequest) {
+
+        Book book = bookRepository.findById(borrowRequest.getBookId())
+                .orElseThrow(() -> new RuntimeException("Book not found with ID: " + borrowRequest.getBookId()));
+
+        if(book.getAvailable_copies() <= 0) {
+            throw new BookNotAvailableException(book.getTitle() + " is not available for borrowing. Check the available copies and try again later.");
+        }
+
         borrowRequest.setStatus("Pending"); // Set default status to "Pending"
         borrowRequest.setRequestDate(new Date()); // Set the request date to the current date
         borrowRequest.setIssueDate(null); // Initially, issue date is null
