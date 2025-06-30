@@ -243,7 +243,13 @@ export const Home = () => {
                 Book will be available for borrowing once your account is verified by admin.
               </div>
             )}
-            {((showBorrowButton || borrowRequest.status === "Returned") && studentAccountStatus != "Verification Pending") &&
+            {studentAccountStatus === "Denied" && (
+              <div className='flex gap-3 mt-5 text-lg ibm-plex-sans-300 bg-search-bar p-3 rounded-sm w-[650px] items-center justify-start'>
+                <img src={warningIcon} alt="warning" />
+                Your account has been denied by admin. Please contact admin for more details. Book borrowing is not allowed for denied accounts.
+              </div>
+            )}
+            {((showBorrowButton || borrowRequest.status === "Returned") && studentAccountStatus == "Verified") &&
               <Button disabled={buttonLoading} onClick={handleBorrowRequest} className='text-2xl bebas-neue-400 bg-yellow text-dark-end mt-10 rounded-xs border-2 border-yellow hover:bg-yellow-dark hover:border-yellow-dark hover:cursor-pointer'>
                 <FontAwesomeIcon icon={faBookOpen} /> {buttonLoading ? <Loader small /> : "BORROW BOOK REQUEST"}
               </Button>
