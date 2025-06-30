@@ -87,6 +87,14 @@ public class UserService {
         return response;
     }
 
+    public boolean checkEmailVerification(String email) {
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new UserNotFoundException("User not found with email: " + email);
+        }
+        return user.isEmailVerified();
+    }
+
     public ResponseEntity<byte[]> getUserIdCardResponse(String email) {
         try {
             User user = userRepository.findByEmail(email);

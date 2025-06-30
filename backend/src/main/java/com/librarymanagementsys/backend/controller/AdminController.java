@@ -9,6 +9,7 @@ import com.librarymanagementsys.backend.session.SessionRegistry;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -70,6 +71,26 @@ public class AdminController {
                 "message", "Login successful"
         ));
     }
+
+    @GetMapping("/check-email-verification")
+    public ResponseEntity<?> checkEmailVerification(HttpSession session) {
+        String sessionEmail = (String) session.getAttribute("email");
+        if (sessionEmail == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
+                    "timestamp", LocalDateTime.now(),
+                    "status", 401,
+                    "message", "Unauthorized access"
+            ));
+        }
+        boolean isVerified = adminService.checkEmailVerification(sessionEmail);
+        return ResponseEntity.ok(Map.of(
+                "timestamp", LocalDateTime.now(),
+                "status", 200,
+                "message", "Email verification status retrieved successfully",
+                "isVerified", isVerified
+        ));
+    }
+
 
     @GetMapping("/logout")
     public ResponseEntity<?> logoutAdmin(HttpSession session) {

@@ -8,6 +8,7 @@ import com.librarymanagementsys.backend.exception.EmailAlreadyExistsException;
 import com.librarymanagementsys.backend.exception.InvalidCredentialsException;
 import com.librarymanagementsys.backend.exception.UserNotFoundException;
 import com.librarymanagementsys.backend.model.Admin;
+import com.librarymanagementsys.backend.model.User;
 import com.librarymanagementsys.backend.repository.AdminRepository;
 import com.librarymanagementsys.backend.security.JwtUtil;
 import jakarta.servlet.http.HttpSession;
@@ -71,6 +72,14 @@ public class AdminService {
         loginResponse.setJwt(jwtUtil.generateToken(admin.getEmail()));
 
         return loginResponse;
+    }
+
+    public boolean checkEmailVerification(String email) {
+        Admin admin = adminRepository.findByEmail(email);
+        if (admin == null) {
+            throw new UserNotFoundException("Admin user not found with email: " + email);
+        }
+        return admin.isEmailVerified();
     }
 
     public List<Admin> getAllAdmins(){

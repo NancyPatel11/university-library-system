@@ -120,7 +120,6 @@ export const Register = () => {
                 return;
             }
 
-            toast.success("Registered successfully!");
             setTimeout(() => {
                 navigate(role === "student" ? "/home" : "/admin-dashboard");
             }, 1500);

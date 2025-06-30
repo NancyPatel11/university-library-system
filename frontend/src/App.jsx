@@ -18,6 +18,7 @@ import { EditBookDetails } from './pages/admin/EditBookDetails';
 import { BorrowRequest } from './pages/admin/BorrowRequest';
 import { AccountRequest } from './pages/admin/AccountRequest';
 import { Error404 } from './pages/Error404';
+import { VerifyEmail } from './pages/VerifyEmail';
 
 function App() {
   return (
@@ -27,6 +28,12 @@ function App() {
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route
+          path="/verify"
+          element={
+            <VerifyEmail />
+          }
+        />
         <Route
           path="/home"
           element={

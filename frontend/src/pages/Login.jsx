@@ -68,8 +68,6 @@ export const Login = () => {
                 return;
             }
 
-            toast.success("Login successful!");
-
             setTimeout(() => {
                 navigate(role === "student" ? "/home" : "/admin-dashboard");
             }, 1500);

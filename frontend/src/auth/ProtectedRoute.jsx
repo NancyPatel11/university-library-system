@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Navigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Error401 } from "@/pages/Error401";
 import { useAuth } from "@/context/AuthContext";
 import { Loader } from "@/components/Loader";
@@ -7,8 +7,10 @@ import { toast } from "sonner";
 
 export const ProtectedRoute = ({ children, allowedRoles }) => {
     const [authState, setAuthState] = useState({ loading: true, authorized: false });
+    const [redirectingToVerify, setRedirectingToVerify] = useState(false);
     const { auth, setAuth } = useAuth();
     const location = useLocation();
+    const navigate = useNavigate();
 
     useEffect(() => {
         const checkAuth = async () => {
@@ -34,7 +36,33 @@ export const ProtectedRoute = ({ children, allowedRoles }) => {
                     return;
                 }
 
+                const url = role === "student"
+                    ? "/api/user/check-email-verification"
+                    : "/api/admin/check-email-verification";
+
+                try {
+                    const emailVerifiedResponse = await fetch(url, {
+                        method: "GET",
+                        credentials: "include",
+                    });
+                    const emailVerifiedData = await emailVerifiedResponse.json();
+
+                    if (!emailVerifiedResponse.ok || !emailVerifiedData.isVerified) {
+                        toast.warning("Please verify your email to continue.");
+                        setRedirectingToVerify(true);
+                        navigate("/verify", { replace: true, state: { from: location } });
+                        return;
+                    }
+
+                } catch (emailErr) {
+                    console.error("Error checking email verification:", emailErr);
+                    toast.error("Could not verify email status.");
+                    setAuthState({ loading: false, authorized: false });
+                    return;
+                }
+
                 setAuthState({ loading: false, authorized: true });
+
             } catch (err) {
                 console.error("Error during auth check:", err);
                 toast.error("Could not verify authentication.");
@@ -43,9 +71,9 @@ export const ProtectedRoute = ({ children, allowedRoles }) => {
         };
 
         checkAuth();
-    }, [allowedRoles, setAuth]);
+    }, [allowedRoles, setAuth, location, navigate]);
 
-    if (authState.loading) {
+    if (redirectingToVerify || authState.loading) {
         return <Loader role={auth.userRole} message={"Authenticating... 🔒"} />;
     }
 
@@ -53,7 +81,11 @@ export const ProtectedRoute = ({ children, allowedRoles }) => {
         if (auth.userRole && !allowedRoles.includes(auth.userRole)) {
             return <Error401 role={auth.userRole} />;
         }
-        return <Navigate to="/login" replace state={{ from: location }} />;
+
+        return navigate("/login", {
+            replace: true,
+            state: { from: location },
+        });
     }
 
     return children;

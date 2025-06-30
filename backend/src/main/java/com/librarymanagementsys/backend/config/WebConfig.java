@@ -19,7 +19,9 @@ public class WebConfig implements WebMvcConfigurer {
                         "/api/user/register",
                         "/api/admin/login",
                         "/api/admin/register",
-                        "/api/auth/check-token"
+                        "/api/auth/check-token",
+                        "/api/verify/send-code",
+                        "/api/verify/verify-email"
                 ); // exclude public routes
     }
 }

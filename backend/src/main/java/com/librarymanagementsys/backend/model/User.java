@@ -7,7 +7,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Date;
-import java.util.List;
 
 @Document(collection = "Users")
 @Data
@@ -27,4 +26,5 @@ public class User {
     private int noBooksBorrowed = 0; // Default 0
     private Date registrationDate;
     private String accountStatus = "Verification Pending"; // Default status when a user is registered
+    private boolean isEmailVerified = false; // Default false, to be set after email verification
 }

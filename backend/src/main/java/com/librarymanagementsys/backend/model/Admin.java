@@ -21,4 +21,5 @@ public class Admin {
     private String password;
     private String mobileNumber;
     private Date registrationDate;
+    private boolean isEmailVerified = false; // Default false, to be set after email verification
 }

@@ -74,6 +74,26 @@ public class UserController {
         ));
     }
 
+    @GetMapping("/check-email-verification")
+    public ResponseEntity<?> checkEmailVerification(HttpSession session) {
+        String sessionEmail = (String) session.getAttribute("email");
+        if (sessionEmail == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
+                    "timestamp", LocalDateTime.now(),
+                    "status", 401,
+                    "message", "Unauthorized access"
+            ));
+        }
+        boolean isVerified = userService.checkEmailVerification(sessionEmail);
+        return ResponseEntity.ok(Map.of(
+                "timestamp", LocalDateTime.now(),
+                "status", 200,
+                "message", "Email verification status retrieved successfully",
+                "isVerified", isVerified
+        ));
+    }
+
+
     @GetMapping("/{userId}")
     public ResponseEntity<?> getUserById(@PathVariable String userId) {
         try {
