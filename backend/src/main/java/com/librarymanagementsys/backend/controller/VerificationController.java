@@ -44,6 +44,6 @@ public class VerificationController {
             return ResponseEntity.status(401).body(Map.of("message", "Invalid or expired code"));
         }
 
-        return ResponseEntity.ok(Map.of("message", "Email verified successfully"));
+        return ResponseEntity.ok(Map.of("message", "Email verified successfully, Welcome to Bookademia!"));
     }
 }

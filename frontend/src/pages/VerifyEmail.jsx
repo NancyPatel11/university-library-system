@@ -100,7 +100,7 @@ export const VerifyEmail = () => {
                 return;
             }
 
-            toast.success(data.message || "Email verified successfully", { id: toastId });
+            toast.success(data.message || "Email verified successfully, Welcome to Bookademia!", { id: toastId });
             navigate(auth.userRole === "student" ? "/home" : "/admin-dashboard");
 
         } catch (err) {
