@@ -22,6 +22,8 @@ public class SessionInterceptor implements HandlerInterceptor {
 
         if (session == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
             response.getWriter().write("{\"message\": \"No active session. Reload the page to login again.\"}");
             return false;
         }
@@ -30,12 +32,12 @@ public class SessionInterceptor implements HandlerInterceptor {
         String trackedSessionId = sessionRegistry.getSessionId(email);
 
         if (email == null || trackedSessionId == null || !trackedSessionId.equals(session.getId())) {
-            session.invalidate();
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("{\"message\": \"Session is invalid or user was deleted\"}");
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write("{\"message\": \"Session is invalid or user was deleted.\"}");
             return false;
         }
-
         return true;
     }
 }
