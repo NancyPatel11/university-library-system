@@ -30,12 +30,14 @@ public class UserService {
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final MailService mailService;
 
     @Autowired
-    public UserService(UserRepository userRepository, JwtUtil jwtUtil) {
+    public UserService(UserRepository userRepository, JwtUtil jwtUtil, MailService mailService) {
         this.userRepository = userRepository;
         this.jwtUtil = jwtUtil;
         this.passwordEncoder = new BCryptPasswordEncoder();
+        this.mailService = mailService;
     }
 
     public RegisterResponse registerUser(RegisterRequest request, MultipartFile idCardImage) {
@@ -163,9 +165,15 @@ public class UserService {
         user.setAccountStatus("Verified");
 
         try {
-            userRepository.save(user);
+            userRepository.save(user); // first save the user status in database
         } catch (Exception e) {
             throw new RuntimeException("Failed to approve user: " + e.getMessage());
+        }
+
+        try {
+            mailService.sendAccountApprovalMail(user.getEmail(), user.getFullName()); // then send the mail
+        } catch (Exception e) {
+            System.err.println("Warning: User approved but approval email not sent due to internal issues: " + e.getMessage());
         }
     }
 
