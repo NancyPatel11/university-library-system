@@ -190,6 +190,12 @@ public class UserService {
         } catch (Exception e) {
             throw new RuntimeException("Failed to deny user: " + e.getMessage());
         }
+
+        try {
+            mailService.sendAccountRejectionMail(user.getEmail(), user.getFullName());
+        } catch (Exception e) {
+            System.err.println("Warning: User denied but rejection email not sent due to internal issues: " + e.getMessage());
+        }
     }
 
     public String getUserStatus(String email) {

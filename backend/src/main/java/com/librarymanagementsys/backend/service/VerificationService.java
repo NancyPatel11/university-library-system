@@ -4,9 +4,7 @@ import com.librarymanagementsys.backend.model.Admin;
 import com.librarymanagementsys.backend.model.User;
 import com.librarymanagementsys.backend.repository.AdminRepository;
 import com.librarymanagementsys.backend.repository.UserRepository;
-import org.springframework.mail.MailException;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -16,24 +14,26 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class VerificationService {
 
-    private final JavaMailSender mailSender;
     private final UserRepository userRepository;
     private final AdminRepository adminRepository;
+
+    @Autowired
+    private MailService mailService;
 
     private final Map<String, String> emailCodeMap = new ConcurrentHashMap<>();
     private final Map<String, Long> expiryMap = new ConcurrentHashMap<>();
     private static final long EXPIRY_DURATION = 10 * 60 * 1000; // 10 minutes
 
-    public VerificationService(JavaMailSender mailSender,
-                               UserRepository userRepository,
-                               AdminRepository adminRepository) {
-        this.mailSender = mailSender;
+    public VerificationService(UserRepository userRepository, AdminRepository adminRepository) {
         this.userRepository = userRepository;
         this.adminRepository = adminRepository;
     }
 
     public void generateAndSendCode(String email) {
-        if (userRepository.findByEmail(email) == null && adminRepository.findByEmail(email) == null) {
+        User user = userRepository.findByEmail(email);
+        Admin admin = adminRepository.findByEmail(email);
+
+        if (user == null && admin == null) {
             throw new RuntimeException("User/Admin not found with email: " + email);
         }
 
@@ -42,7 +42,11 @@ public class VerificationService {
         emailCodeMap.put(email, code);
         expiryMap.put(email, System.currentTimeMillis() + EXPIRY_DURATION);
 
-        sendVerificationCode(email, code);
+        mailService.sendVerificationCode(
+                email,
+                user != null ? user.getFullName() : admin.getFullName(),
+                code
+        );
     }
 
     public boolean verifyCodeAndMarkVerified(String email, String code) {
@@ -70,6 +74,10 @@ public class VerificationService {
             adminRepository.save(admin);
         }
 
+        if(user != null) {
+            mailService.sendWelcomeMail(user.getEmail(), user.getFullName());
+        }
+
         clearCode(email);
         return true;
     }
@@ -77,20 +85,5 @@ public class VerificationService {
     public void clearCode(String email) {
         emailCodeMap.remove(email);
         expiryMap.remove(email);
-    }
-
-    private void sendVerificationCode(String to, String code) {
-        try {
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setTo(to);
-            message.setSubject("Bookademia Verification Code");
-            message.setText("Your code is: " + code);
-            message.setFrom("your_email@gmail.com");
-
-            mailSender.send(message);
-        } catch (MailException ex) {
-            System.err.println("Failed to send email: " + ex.getMessage());
-            throw new RuntimeException("Email could not be sent. Check SMTP configuration.", ex);
-        }
     }
 }

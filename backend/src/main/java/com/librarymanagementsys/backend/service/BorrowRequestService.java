@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Comparator;
@@ -29,11 +30,21 @@ public class BorrowRequestService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private MailService mailService;
+
     // Only checking if today's date is after the due date (ignoring the time part)
     private boolean isDateAfter(Date d1, Date d2) {
         LocalDate date1 = d1.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         LocalDate date2 = d2.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         return date1.isAfter(date2);
+    }
+
+    // Only checking if today's date is the same as the due date (ignoring the time part)
+    private boolean isToday(Date today, Date dueDate) {
+        LocalDate todayDate = today.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate dueDateLocal = dueDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        return todayDate.isEqual(dueDateLocal);
     }
 
     public void createBorrowRequest(BorrowRequest borrowRequest) {
@@ -115,6 +126,25 @@ public class BorrowRequestService {
             borrowRequestRepository.save(borrowRequest); // Save the updated borrow request
             bookRepository.save(book); // Save the updated book information
             userRepository.save(user); // Save the updated user information
+
+            try {
+                SimpleDateFormat formatter = new SimpleDateFormat("dd MMMM, yyyy");
+
+                String formattedIssueDate = formatter.format(borrowRequest.getIssueDate());
+                String formattedDueDate = formatter.format(borrowRequest.getDueDate());
+
+                mailService.sendBorrowConfirmationMail(
+                        user.getEmail(),
+                        user.getFullName(),
+                        book.getTitle(),
+                        formattedIssueDate,
+                        formattedDueDate
+                );
+            } catch (Exception e) {
+                System.err.println("Warning: Borrow request approved but confirmation email not sent due to internal issues: " + e.getMessage());
+            }
+
+
             return borrowRequest; // Return the updated borrow request
         }
         catch (Exception e) {
@@ -148,6 +178,16 @@ public class BorrowRequestService {
             borrowRequestRepository.save(borrowRequest); // Save the updated borrow request
             bookRepository.save(book); // Save the updated book information
             userRepository.save(user); // Save the updated user information
+
+            try{
+                mailService.sendReturnConfirmationMail(
+                        user.getEmail(),
+                        user.getFullName(),
+                        book.getTitle()
+                );
+            } catch (Exception e) {
+                System.err.println("Warning: Book returned but confirmation email not sent due to internal issues: " + e.getMessage());
+            }
             return "Book returned successfully";
         }
         catch (Exception e) {
@@ -180,7 +220,45 @@ public class BorrowRequestService {
 
                 request.setStatus("Overdue");
                 borrowRequestRepository.save(request);
+
+                try{
+                    SimpleDateFormat formatter = new SimpleDateFormat("dd MMMM, yyyy");
+
+                    String formattedDueDate = formatter.format(request.getDueDate());
+
+                    mailService.sendOverdueReminderMail(
+                            request.getStudentEmail(),
+                            request.getStudentFullName(),
+                            request.getBookTitle(),
+                            formattedDueDate
+                    );
+                } catch (Exception e) {
+                    System.err.println("Warning: Overdue reminder email not sent for request ID " + request.getId() + " due to internal issues: " + e.getMessage());
+                }
             }
+
+            if ("Borrowed".equals(request.getStatus())
+                    && request.getDueDate() != null
+                    && request.getReturnDate() == null
+                    && isToday(today, request.getDueDate())) {
+
+                try{
+                    SimpleDateFormat formatter = new SimpleDateFormat("dd MMMM, yyyy");
+
+                    String formattedDueDate = formatter.format(request.getDueDate());
+
+                    mailService.sendDueReminderMail(
+                            request.getStudentEmail(),
+                            request.getStudentFullName(),
+                            request.getBookTitle(),
+                            formattedDueDate
+                    );
+                } catch (Exception e) {
+                    System.err.println("Warning: Due reminder email not sent for request ID " + request.getId() + " due to internal issues: " + e.getMessage());
+                }
+            }
+
+
         }
     }
 
