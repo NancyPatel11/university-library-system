@@ -180,11 +180,26 @@ public class BorrowRequestService {
             userRepository.save(user); // Save the updated user information
 
             try{
-                mailService.sendReturnConfirmationMail(
-                        user.getEmail(),
-                        user.getFullName(),
-                        book.getTitle()
-                );
+                if(borrowRequest.getStatus().equals("Returned")) {
+                    mailService.sendReturnConfirmationMail(
+                            user.getEmail(),
+                            user.getFullName(),
+                            book.getTitle()
+                    );
+                }
+                else{
+                    SimpleDateFormat formatter = new SimpleDateFormat("dd MMMM, yyyy");
+                    String formattedDueDate = formatter.format(borrowRequest.getDueDate());
+                    String formattedReturnDate = formatter.format(borrowRequest.getReturnDate());
+
+                    mailService.sendLateReturnMail(
+                            user.getEmail(),
+                            user.getFullName(),
+                            book.getTitle(),
+                            formattedDueDate,
+                            formattedReturnDate
+                    );
+                }
             } catch (Exception e) {
                 System.err.println("Warning: Book returned but confirmation email not sent due to internal issues: " + e.getMessage());
             }

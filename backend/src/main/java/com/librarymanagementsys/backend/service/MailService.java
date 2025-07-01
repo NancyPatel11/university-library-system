@@ -186,6 +186,33 @@ public class MailService {
         sendHtmlMail(to, studentName, subject, greetingTitle, messageBody, "Explore New Books", closingMessage);
     }
 
+    public void sendLateReturnMail(String to, String studentName, String bookTitle, String dueDate, String returnDate) {
+        String subject = "Book \"%s\" Returned Late".formatted(bookTitle);
+        String greetingTitle = "Thanks for Returning \"%s\"".formatted(bookTitle);
+
+        String messageBody = """
+            <p style="margin-top: 20px;">
+                We've received your return of 
+                <span style="color: #E7C9A5; font-weight: bold;">%s</span>. However, it was returned after the due date.
+            </p>
+            <ul style="color: #D6E0FF; font-size: 16px; line-height: 1.6; margin-top: 10px;">
+                <li><strong>Due Date:</strong> <span style="color: #E7C9A5;">%s</span></li>
+                <li><strong>Returned On:</strong> <span style="color: #E7C9A5;">%s</span></li>
+            </ul>
+            <p style="margin-top: 20px;">
+                Please try to return your books on time in the future to avoid late fees.
+            </p>
+            <p style="margin-top: 20px;">
+                You can continue exploring and borrowing more books from our collection.
+            </p>
+        """.formatted(bookTitle, dueDate, returnDate);
+
+        String closingMessage = """
+            <p style="margin-top: 30px; line-height: 1.4;">Keep reading,<br>The Bookademia Team</p>
+        """;
+
+        sendHtmlMail(to, studentName, subject, greetingTitle, messageBody, "Explore New Books", closingMessage);
+    }
 
     public void sendHtmlMail(String to, String name, String subject, String greetingTitle, String messageBody, String buttonText, String closingMessage) {
         try {
