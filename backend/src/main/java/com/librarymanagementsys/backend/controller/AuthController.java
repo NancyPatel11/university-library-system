@@ -22,7 +22,7 @@ public class AuthController {
 
     @GetMapping("/check-token")
     public ResponseEntity<?> checkAuth(HttpSession session) {
-        System.out.println("Checking authentication status...");
+//        System.out.println("Checking authentication status...");
         if(session == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("message", "Unauthenticated user. Login again or check if the account exists."));
@@ -43,7 +43,7 @@ public class AuthController {
         boolean exists = "admin".equalsIgnoreCase(sessionRole)
                 ? authService.adminExists(sessionEmail)
                 : authService.userExists(sessionEmail);
-        System.out.println("User exists: " + exists + ", Role: " + sessionRole + ", Email: " + sessionEmail);
+//        System.out.println("User exists: " + exists + ", Role: " + sessionRole + ", Email: " + sessionEmail);
         if (!exists) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(Map.of("message", "Account no longer exists. Check with the admin for more details."));
