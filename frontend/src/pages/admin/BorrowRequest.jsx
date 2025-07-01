@@ -10,6 +10,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons'
 import calendarIcon from '@/assets/icons/calendar.svg'
 import receiptIcon from '@/assets/icons/receipt.svg'
+import approveIcon from '../../assets/icons/admin/approve.png'
+import closeIcon from '../../assets/icons/admin/close.svg'
 import { toast } from 'sonner'
 import html2canvas from 'html2canvas-pro'
 
@@ -45,6 +47,7 @@ export const BorrowRequest = () => {
     const [approving, setApproving] = useState(false);
     const [showReceiptModal, setShowReceiptModal] = useState(false);
     const [selectedReceiptRequest, setSelectedReceiptRequest] = useState(null);
+    const [showApprovalModal, setShowApprovalModal] = useState(false);
 
     useEffect(() => {
         setLoading(true);
@@ -106,6 +109,7 @@ export const BorrowRequest = () => {
             toast.error(error.message || "Failed to approve request");
         } finally {
             setApproving(false);
+            setShowApprovalModal(false);
         }
     };
 
@@ -151,7 +155,7 @@ export const BorrowRequest = () => {
                 </Button>
 
                 <div className='flex flex-col mt-10 ibm-plex-sans-600 gap-7'>
-                <h1 className='text-4xl'>Borrow Request </h1>
+                    <h1 className='text-4xl'>Borrow Request </h1>
                     <h1 className='text-xl text-admin-secondary-black ibm-plex-sans-300'>Book Requested: </h1>
                     <div className='flex gap-5'>
                         <div className="relative w-[150px] h-[150px] rounded-lg overflow-hidden">
@@ -246,7 +250,9 @@ export const BorrowRequest = () => {
                         <Button
                             className="mt-5 w-[800px] bg-admin-primary-blue text-white hover:bg-admin-tertiary-blue hover:cursor-pointer"
                             onClick={
-                                () => handleApproveRequest(borrowRequest)
+                                () => {
+                                    setShowApprovalModal(true);
+                                }
                             }
                             disabled={approving}
                         >
@@ -269,6 +275,49 @@ export const BorrowRequest = () => {
                             </Button>
                         )
                     }
+
+                    {showApprovalModal && (
+                        <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
+                            <div className="relative bg-white p-6 rounded-lg shadow-lg text-center w-[450px] flex flex-col items-center">
+
+                                <Button
+                                    onClick={() => setShowApprovalModal(false)}
+                                    className="absolute top-2 right-4 p-0 m-0 bg-transparent hover:bg-transparent shadow-none border-none hover:shadow-none focus:outline-none hover:cursor-pointer"
+                                    disabled={approving}
+                                >
+                                    <img src={closeIcon} alt="close" className="h-4 w-4" />
+                                </Button>
+
+                                {approving ? (
+                                    <div className="flex gap-3 items-center justify-center mt-2 mb-3">
+                                        <Loader small admin />
+                                        <p className='text-admin-primary-blue font-medium'>Approving request, please wait...</p>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <div className='p-4 bg-admin-green-bg rounded-full'>
+                                            <img src={approveIcon} alt="" className='h-15 w-15' />
+                                        </div>
+
+                                        <h1 className='mt-5'>Approve Book Request</h1>
+                                        <p className='text-sm ibm-plex-sans-300 text-admin-secondary-black'>
+                                            Approve the student's request to borrow this book. A confirmation email will be sent upon approval.
+                                        </p>
+
+                                        <Button
+                                            onClick={() => {
+                                                handleApproveRequest(borrowRequest);
+                                            }}
+                                            className="bg-admin-green mt-5 w-full p-5 hover:cursor-pointer hover:bg-admin-dark-green"
+                                        >
+                                            Approve & Send Confirmation
+                                        </Button>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
                     {showReceiptModal && selectedReceiptRequest && (
                         <ReceiptModal
                             selectedReceiptRequest={selectedReceiptRequest}
