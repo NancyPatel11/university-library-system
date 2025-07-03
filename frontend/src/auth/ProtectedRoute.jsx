@@ -15,7 +15,7 @@ export const ProtectedRoute = ({ children, allowedRoles }) => {
     useEffect(() => {
         const checkAuth = async () => {
             try {
-                const response = await fetch("/api/auth/check-token", {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/check-token`, {
                     method: "GET",
                     credentials: "include",
                 });
@@ -37,8 +37,8 @@ export const ProtectedRoute = ({ children, allowedRoles }) => {
                 }
 
                 const url = role === "student"
-                    ? "/api/user/check-email-verification"
-                    : "/api/admin/check-email-verification";
+                    ? `${import.meta.env.VITE_API_URL}/user/check-email-verification`
+                    : `${import.meta.env.VITE_API_URL}/admin/check-email-verification`;
 
                 try {
                     const emailVerifiedResponse = await fetch(url, {

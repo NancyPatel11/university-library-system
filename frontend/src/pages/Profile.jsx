@@ -22,7 +22,7 @@ export const Profile = () => {
   useEffect(() => {
     const fetchIdCard = async () => {
       try {
-        const requestUrl = `/api/user/idcard/${auth.email}`;
+        const requestUrl = `${import.meta.env.VITE_API_URL}/user/idcard/${auth.email}`;
         const response = await fetch(requestUrl, {
           method: "GET",
           credentials: "include"
@@ -48,7 +48,7 @@ export const Profile = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await fetch("/api/user/profile", {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/user/profile`, {
           method: "GET",
           credentials: "include"
         });
@@ -74,7 +74,7 @@ export const Profile = () => {
       if (auth.userRole !== 'student') return;
 
       try {
-        const response = await fetch("/api/borrow-requests/my-borrowed-books", {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/borrow-requests/my-borrowed-books`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -93,7 +93,7 @@ export const Profile = () => {
           data.map(async (borrowRequest) => {
             const bookId = borrowRequest.bookId;
 
-            const res = await fetch(`/api/books/${bookId}`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/books/${bookId}`, {
               method: "GET",
               headers: {
                 "Content-Type": "application/json",

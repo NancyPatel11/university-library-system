@@ -102,8 +102,8 @@ export const Register = () => {
         if (role === "student") formData.append("idCardImage", values.idCard);
 
         const endpoint = role === "admin"
-            ? "/api/admin/register"
-            : "/api/user/register";
+            ? `${import.meta.env.VITE_API_URL}/admin/register`
+            : `${import.meta.env.VITE_API_URL}/user/register`;
 
         try {
             const response = await fetch(endpoint, {

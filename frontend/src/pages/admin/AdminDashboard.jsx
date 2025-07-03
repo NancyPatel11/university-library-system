@@ -57,17 +57,17 @@ export const AdminDashboard = () => {
       try {
         // Fetch all data in parallel
         const [booksRes, usersRes, requestsRes] = await Promise.all([
-          fetch("/api/books/allBooks", {
+          fetch(`${import.meta.env.VITE_API_URL}/books/allBooks`, {
             method: "GET",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
           }),
-          fetch("/api/user/allUsers", {
+          fetch(`${import.meta.env.VITE_API_URL}/user/allUsers`, {
             method: "GET",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
           }),
-          fetch("/api/borrow-requests/all-borrow-requests", {
+          fetch(`${import.meta.env.VITE_API_URL}/borrow-requests/all-borrow-requests`, {
             method: "GET",
             credentials: "include",
           }),

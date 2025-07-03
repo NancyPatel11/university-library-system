@@ -68,7 +68,7 @@ export const AccountRequest = () => {
 
     const fetchStudent = useCallback(async (userId) => {
         try {
-            const studentsRes = await fetch(`/api/user/${userId}`, {
+            const studentsRes = await fetch(`${import.meta.env.VITE_API_URL}/user/${userId}`, {
                 method: "GET",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",
@@ -91,7 +91,7 @@ export const AccountRequest = () => {
 
     const fetchIdCard = async (email) => {
         try {
-            const requestUrl = `/api/user/idcard/${email}`;
+            const requestUrl = `${import.meta.env.VITE_API_URL}/user/idcard/${email}`;
             const response = await fetch(requestUrl, {
                 method: "GET",
                 credentials: "include"
@@ -136,7 +136,7 @@ export const AccountRequest = () => {
         if (!userEmail) return;
         setActionLoading(true);
 
-        const url = `/api/user/approve/${userEmail}`;
+        const url = `${import.meta.env.VITE_API_URL}/user/approve/${userEmail}`;
 
         try {
             const res = await fetch(url, {
@@ -165,7 +165,7 @@ export const AccountRequest = () => {
         setActionLoading(true);
 
         try {
-            const res = await fetch(`/api/user/deny/${userEmail}`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/user/deny/${userEmail}`, {
                 method: "PUT",
                 credentials: "include",
             });

@@ -53,7 +53,7 @@ export const BorrowRequest = () => {
         setLoading(true);
         const fetchBorrowRequest = async () => {
             try {
-                const response = await fetch(`/api/borrow-requests/${borrowRequestId}`, {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/borrow-requests/${borrowRequestId}`, {
                     method: 'GET',
                     credentials: 'include'
                 });
@@ -77,7 +77,7 @@ export const BorrowRequest = () => {
     const handleApproveRequest = async (request) => {
         setApproving(true);
         try {
-            const response = await fetch(`/api/borrow-requests/approve-request/${request.id}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/borrow-requests/approve-request/${request.id}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",

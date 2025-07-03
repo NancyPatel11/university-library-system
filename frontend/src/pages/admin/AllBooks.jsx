@@ -39,7 +39,7 @@ export const AllBooks = () => {
         const fetchBooks = async () => {
             setLoading(true);
             try {
-                const response = await fetch("/api/books/allBooks", {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/books/allBooks`, {
                     method: "GET",
                     credentials: "include",
                 });
@@ -72,7 +72,7 @@ export const AllBooks = () => {
         setDeleting(true);
         try {
             console.log("Deleting book with ID:", bookId);
-            const response = await fetch(`/api/books/${bookId}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/books/${bookId}`, {
                 method: "DELETE",
                 credentials: "include",
             });

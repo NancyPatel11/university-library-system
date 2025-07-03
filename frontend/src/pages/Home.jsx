@@ -26,7 +26,7 @@ export const Home = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("/api/books/allBooks", {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/books/allBooks`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -47,7 +47,7 @@ export const Home = () => {
         setAllBooks(sortedBooks);
         setBook1(data[0]); // Set the first book as book1
 
-        const studentResponse = await fetch(`/api/user/accountStatus`, {
+        const studentResponse = await fetch(`${import.meta.env.VITE_API_URL}/user/accountStatus`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -82,7 +82,7 @@ export const Home = () => {
         bookId: book1.id,
         studentId: auth.userId
       };
-      const response = await fetch(`/api/borrow-requests/check-status`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/borrow-requests/check-status`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -133,7 +133,7 @@ export const Home = () => {
         studentFullName: auth.name,
       };
 
-      const response = await fetch(`/api/borrow-requests/create`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/borrow-requests/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -161,7 +161,7 @@ export const Home = () => {
   const handleReturnBook = async (borrowRequestId) => {
     setButtonLoading(true);
     try {
-      const response = await fetch(`/api/borrow-requests/return-book/${borrowRequestId}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/borrow-requests/return-book/${borrowRequestId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

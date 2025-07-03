@@ -31,7 +31,7 @@ export const Search = () => {
     const fetchBooks = async () => {
         setFlag(false); // Reset flag before fetching books
         try {
-            const response = await fetch("/api/books/allBooks", {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/books/allBooks`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -79,7 +79,7 @@ export const Search = () => {
         if (!searchValue.trim()) return;
 
         try {
-            const response = await fetch(`/api/books/search/${searchValue}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/books/search/${searchValue}`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",

@@ -17,7 +17,7 @@ export const VerifyEmail = () => {
     const sendCode = async () => {
         const toastId = toast.loading("Sending verification code to your inbox...");
         try {
-            const response = await fetch("/api/verify/send-code", {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/verify/send-code`, {
                 method: "POST",
                 credentials: "include",
                 headers: {
@@ -77,7 +77,7 @@ export const VerifyEmail = () => {
         setIsButtonLoading(true);
         const toastId = toast.loading("Verifying email...");
         try {
-            const response = await fetch("/api/verify/verify-email", {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/verify/verify-email`, {
                 method: "POST",
                 credentials: "include",
                 headers: {

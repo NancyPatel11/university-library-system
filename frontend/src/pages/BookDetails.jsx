@@ -32,7 +32,7 @@ export const BookDetails = () => {
     setLoading(true);
     try {
       // Fetch current book by ID
-      const bookRes = await fetch(`/api/books/${bookId}`, {
+      const bookRes = await fetch(`${import.meta.env.VITE_API_URL}/books/${bookId}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -48,7 +48,7 @@ export const BookDetails = () => {
       setBook(bookData);
 
       // Fetch all books
-      const allBooksRes = await fetch("/api/books/allBooks", {
+      const allBooksRes = await fetch(`${import.meta.env.VITE_API_URL}/books/allBooks`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -70,7 +70,7 @@ export const BookDetails = () => {
 
       // Fetch student account status
       if (auth.userRole !== "student") return; // Only fetch for students
-      const studentResponse = await fetch(`/api/user/accountStatus`, {
+      const studentResponse = await fetch(`${import.meta.env.VITE_API_URL}/user/accountStatus`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -111,7 +111,7 @@ export const BookDetails = () => {
         bookId: book.id,
         studentId: auth.userId
       };
-      const response = await fetch(`/api/borrow-requests/check-status`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/borrow-requests/check-status`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -164,7 +164,7 @@ export const BookDetails = () => {
         studentFullName: auth.name,
       };
 
-      const response = await fetch(`/api/borrow-requests/create`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/borrow-requests/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -192,7 +192,7 @@ export const BookDetails = () => {
   const handleReturnBook = async (borrowRequestId) => {
     setButtonLoading(true);
     try {
-      const response = await fetch(`/api/borrow-requests/return-book/${borrowRequestId}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/borrow-requests/return-book/${borrowRequestId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -225,7 +225,7 @@ export const BookDetails = () => {
         bookId: book.id,
         rating: rating,
       };
-      const response = await fetch(`/api/books/rating`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/books/rating`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

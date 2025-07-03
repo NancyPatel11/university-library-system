@@ -74,11 +74,11 @@ export const BorrowRequests = () => {
             setLoading(true);
             try {
                 const [booksRes, borrowRequestsRes] = await Promise.all([
-                    fetch("/api/books/allBooks", {
+                    fetch(`${import.meta.env.VITE_API_URL}/books/allBooks`, {
                         method: "GET",
                         credentials: "include",
                     }),
-                    fetch("/api/borrow-requests/all-borrow-requests", {
+                    fetch(`${import.meta.env.VITE_API_URL}/borrow-requests/all-borrow-requests`, {
                         method: "GET",
                         credentials: "include",
                     }),
@@ -118,7 +118,7 @@ export const BorrowRequests = () => {
     const handleApproveRequest = async (request) => {
         setApproving(true);
         try {
-            const response = await fetch(`/api/borrow-requests/approve-request/${request.id}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/borrow-requests/approve-request/${request.id}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",

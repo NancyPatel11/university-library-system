@@ -46,8 +46,8 @@ export const Login = () => {
         setLoading(true);
         try {
             const endpoint = role === "admin"
-                ? "/api/admin/login"
-                : "/api/user/login";
+                ? `${import.meta.env.VITE_API_URL}/admin/login`
+                : `${import.meta.env.VITE_API_URL}/user/login`;
             const response = await fetch(endpoint, {
                 method: "POST",
                 headers: {
