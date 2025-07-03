@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api")
 public class HelloController {
 
-    @GetMapping("/hello")
+    @GetMapping("/hello/test")
     public String sayHello() {
         System.out.println("Hello endpoint was called");
         return "Hello, World!";
