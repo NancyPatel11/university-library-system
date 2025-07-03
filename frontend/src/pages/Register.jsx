@@ -112,10 +112,11 @@ export const Register = () => {
                 credentials: "include"
             });
 
-            const result = await response.json();
+            const isJson = response.headers.get("content-type")?.includes("application/json");
+            const responseData = isJson ? await response.json() : await response.text();
 
             if (!response.ok) {
-                toast.error(result.message || "Registration failed");
+                toast.error(responseData.message || responseData || "Server Error");
                 setLoading(false);
                 return;
             }
