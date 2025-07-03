@@ -2,7 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom';
 import bg from "../assets/images/bg.png";
 import bookicon from "../assets/icons/logo.svg";
-import sampleBooks from '../assets/sampleBooks.json';
+import sampleBooks from '../assets/samplebooks.json';
 import BookCoverSvg from '../components/BookCoverSvg.jsx';
 import { Button } from '@/components/ui/button';
 
