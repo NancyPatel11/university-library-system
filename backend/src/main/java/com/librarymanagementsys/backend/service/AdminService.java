@@ -8,7 +8,6 @@ import com.librarymanagementsys.backend.exception.EmailAlreadyExistsException;
 import com.librarymanagementsys.backend.exception.InvalidCredentialsException;
 import com.librarymanagementsys.backend.exception.UserNotFoundException;
 import com.librarymanagementsys.backend.model.Admin;
-import com.librarymanagementsys.backend.model.User;
 import com.librarymanagementsys.backend.repository.AdminRepository;
 import com.librarymanagementsys.backend.security.JwtUtil;
 import jakarta.servlet.http.HttpSession;
@@ -22,14 +21,15 @@ import java.util.List;
 @Service
 public class AdminService {
 
-    private final AdminRepository adminRepository;
-    private final JwtUtil jwtUtil;
-    private final BCryptPasswordEncoder passwordEncoder;
+    @Autowired
+    private AdminRepository adminRepository;
 
     @Autowired
-    public AdminService(AdminRepository adminRepository, JwtUtil jwtUtil) {
-        this.adminRepository = adminRepository;
-        this.jwtUtil = jwtUtil;
+    private JwtUtil jwtUtil;
+
+    private final BCryptPasswordEncoder passwordEncoder;
+
+    public AdminService() {
         this.passwordEncoder = new BCryptPasswordEncoder();
     }
 
@@ -82,8 +82,8 @@ public class AdminService {
         return admin.isEmailVerified();
     }
 
-    public List<Admin> getAllAdmins(){
-        try{
+    public List<Admin> getAllAdmins() {
+        try {
             return adminRepository.findAll();
         } catch (Exception e) {
             throw new RuntimeException("Failed to fetch users: " + e.getMessage());
@@ -102,7 +102,5 @@ public class AdminService {
             throw new RuntimeException("Failed to delete admin: " + e.getMessage());
         }
     }
-
-
 
 }

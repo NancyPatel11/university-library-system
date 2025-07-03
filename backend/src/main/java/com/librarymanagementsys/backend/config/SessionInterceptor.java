@@ -4,18 +4,17 @@ import com.librarymanagementsys.backend.session.SessionRegistry;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 @Component
 public class SessionInterceptor implements HandlerInterceptor {
 
-    private final SessionRegistry sessionRegistry;
-
-    public SessionInterceptor(SessionRegistry sessionRegistry) {
-        this.sessionRegistry = sessionRegistry;
-    }
-
+    @Autowired
+    private SessionRegistry sessionRegistry;
+    
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         HttpSession session = request.getSession(false);

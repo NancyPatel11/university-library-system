@@ -27,17 +27,19 @@ import java.util.List;
 @Service
 public class UserService {
 
-    private final UserRepository userRepository;
-    private final JwtUtil jwtUtil;
-    private final BCryptPasswordEncoder passwordEncoder;
-    private final MailService mailService;
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
-    public UserService(UserRepository userRepository, JwtUtil jwtUtil, MailService mailService) {
-        this.userRepository = userRepository;
-        this.jwtUtil = jwtUtil;
+    private JwtUtil jwtUtil;
+
+    @Autowired
+    private MailService mailService;
+
+    private final BCryptPasswordEncoder passwordEncoder;
+
+    public UserService() {
         this.passwordEncoder = new BCryptPasswordEncoder();
-        this.mailService = mailService;
     }
 
     public RegisterResponse registerUser(RegisterRequest request, MultipartFile idCardImage) {
@@ -85,7 +87,7 @@ public class UserService {
         LoginResponse response = new LoginResponse();
         response.setUserId(user.getId());
         response.setFullName(user.getFullName());
-        response.setJwt( jwtUtil.generateToken(user.getEmail()));
+        response.setJwt(jwtUtil.generateToken(user.getEmail()));
         return response;
     }
 
@@ -132,7 +134,7 @@ public class UserService {
     }
 
     public List<User> getAllUsers() {
-        try{
+        try {
             return userRepository.findAll();
         } catch (Exception e) {
             throw new RuntimeException("Failed to fetch users: " + e.getMessage());
@@ -145,11 +147,11 @@ public class UserService {
             throw new UserNotFoundException("User not found with email: " + email);
         }
 
-        if(user.getNoBooksBorrowed() > 0){
+        if (user.getNoBooksBorrowed() > 0) {
             throw new IllegalStateException("Cannot delete user with borrowed books");
         }
 
-        try{
+        try {
             userRepository.delete(user);
         } catch (Exception e) {
             throw new RuntimeException("Failed to delete user: " + e.getMessage());
@@ -173,7 +175,8 @@ public class UserService {
         try {
             mailService.sendAccountApprovalMail(user.getEmail(), user.getFullName()); // then send the mail
         } catch (Exception e) {
-            System.err.println("Warning: User approved but approval email not sent due to internal issues: " + e.getMessage());
+            System.err.println(
+                    "Warning: User approved but approval email not sent due to internal issues: " + e.getMessage());
         }
     }
 
@@ -194,7 +197,8 @@ public class UserService {
         try {
             mailService.sendAccountRejectionMail(user.getEmail(), user.getFullName());
         } catch (Exception e) {
-            System.err.println("Warning: User denied but rejection email not sent due to internal issues: " + e.getMessage());
+            System.err.println(
+                    "Warning: User denied but rejection email not sent due to internal issues: " + e.getMessage());
         }
     }
 

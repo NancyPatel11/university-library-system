@@ -2,6 +2,7 @@ package com.librarymanagementsys.backend.service;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -17,11 +18,8 @@ public class MailService {
     @Value("${bookademia.email.bg-url}")
     private String bgUrl;
 
-    private final JavaMailSender mailSender;
-
-    public MailService(JavaMailSender mailSender) {
-        this.mailSender = mailSender;
-    }
+    @Autowired
+    private JavaMailSender mailSender;
 
     public void sendVerificationCode(String to, String name, String code) {
         String subject = "Your Bookademia Verification Code";

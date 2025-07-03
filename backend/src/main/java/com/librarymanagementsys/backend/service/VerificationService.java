@@ -14,8 +14,11 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class VerificationService {
 
-    private final UserRepository userRepository;
-    private final AdminRepository adminRepository;
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private AdminRepository adminRepository;
 
     @Autowired
     private MailService mailService;
