@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { useAuth } from '@/context/authContext.jsx';
+import { useAuth } from '@/context/AuthContext.jsx';
 import { Link } from 'react-router-dom';
 import { NavBar } from '@/components/NavBar';
 import BookCoverSvg from '../components/BookCoverSvg.jsx';

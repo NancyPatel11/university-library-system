@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, useNavigate, Link, useLocation } from 'react-router-dom';
-import { useAuth } from '@/context/authContext';
+import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
 import bookicon from "../assets/icons/logo.svg";
 import logoutSvg from "../assets/icons/logout.svg";
