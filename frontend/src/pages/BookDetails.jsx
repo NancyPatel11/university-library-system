@@ -228,6 +228,7 @@ export const BookDetails = () => {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/books/rating`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify(payload),
       });
 
