@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import {
@@ -19,6 +19,7 @@ import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons'
+import { Loader } from '@/components/Loader'
 
 const formSchema = z.object({
     title: z.string().min(1, "Title is required"),
@@ -35,6 +36,8 @@ const formSchema = z.object({
 export const CreateBookDetails = () => {
     const { auth } = useAuth()
     const navigate = useNavigate();
+
+    const [buttonLoading, setButtonLoading] = useState(false);
 
     const form = useForm({
         resolver: zodResolver(formSchema),
@@ -64,6 +67,7 @@ export const CreateBookDetails = () => {
         };
 
         try {
+            setButtonLoading(true);
             const response = await fetch(`${import.meta.env.VITE_API_URL}/books/createBook`, {
                 method: "POST",
                 headers: {
@@ -85,6 +89,8 @@ export const CreateBookDetails = () => {
         } catch (error) {
             console.error("Error creating book:", error);
             toast.error(error.message || "Failed to add book. Please try again.");
+        } finally {
+            setButtonLoading(false);
         }
     };
 
@@ -257,8 +263,12 @@ export const CreateBookDetails = () => {
                                 </FormItem>
                             )} />
 
-                            <Button type="submit" className="bg-admin-primary-blue text-white hover:bg-admin-tertiary-blue hover:cursor-pointer w-full rounded-xs">
-                                Create Book
+                            <Button
+                                disabled={buttonLoading}
+                                type="submit"
+                                className="bg-admin-primary-blue text-white hover:bg-admin-tertiary-blue hover:cursor-pointer w-full rounded-xs"
+                            >
+                                {buttonLoading ? <Loader small admin /> : "Create Book"}
                             </Button>
                         </form>
                     </Form>

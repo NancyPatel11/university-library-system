@@ -34,6 +34,7 @@ export const EditBookDetails = () => {
     const navigate = useNavigate();
 
     const [loading, setLoading] = useState(false);
+    const [buttonLoading, setButtonLoading] = useState(false);
 
     const form = useForm({
         resolver: zodResolver(formSchema),
@@ -87,6 +88,7 @@ export const EditBookDetails = () => {
 
     const onSubmit = async (values) => {
         try {
+            setButtonLoading(true);
             const payload = {
                 title: values.title,
                 author: values.author,
@@ -119,6 +121,8 @@ export const EditBookDetails = () => {
         } catch (error) {
             console.error(error);
             toast.error(error.message || "Something went wrong while updating the book");
+        } finally {
+            setButtonLoading(false);
         }
     };
 
@@ -295,8 +299,12 @@ export const EditBookDetails = () => {
                                 </FormItem>
                             )} />
 
-                            <Button type="submit" className="bg-admin-primary-blue text-white hover:bg-admin-tertiary-blue hover:cursor-pointer w-full rounded-xs">
-                                Update Book
+                            <Button
+                                disabled={buttonLoading}
+                                type="submit"
+                                className="bg-admin-primary-blue text-white hover:bg-admin-tertiary-blue hover:cursor-pointer w-full rounded-xs"
+                            >
+                                {buttonLoading ? <Loader small admin /> : "Update Book"}
                             </Button>
                         </form>
                     </Form>
